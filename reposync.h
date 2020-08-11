@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <curl/curl.h>
 
-int sync_repo(char repourl[]);
-int 
+int sync_repo(char reponame[], char repourl[]);
+int sync_all();
 
 int sync_repo(char reponame[], char repourl[]){
     CURL *curl;
@@ -44,7 +44,7 @@ int sync_all() {
     fp = fopen(strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf"), "r");
 
     while (fscanf(fp, "%s %s", reponame, repourl) != NULL) {
-        printf("Syncing Repo %s...", reponame);
+        printf("Syncing Repo %s...\n", reponame);
         retval += sync_repo(reponame, repourl);
     }
     
