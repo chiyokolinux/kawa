@@ -7,9 +7,11 @@ the package manager for the chiyoko linux distribution
 REQUIRED FILES:
 - /etc/kawa.d/repos.conf, example:
 ```example
-https://raw.githubusercontent.com/chiyokolinux/packages/main/packages.db
-https://raw.githubusercontent.com/chiyokolinux/packages/community/packages.db
-https://raw.githubusercontent.com/chiyokolinux/packages/contrib/packages.db
-https://raw.githubusercontent.com/chiyokolinux/packages/nonfree/packages.db
+# i am not a comment and will make your compuler explode!!!
+Main https://raw.githubusercontent.com/chiyokolinux/packages/main/packages.db
+Community https://raw.githubusercontent.com/chiyokolinux/packages/community/packages.db
+Contrib https://raw.githubusercontent.com/chiyokolinux/packages/contrib/packages.db ; wtf are you doing, comments are not supported
+Non-Free https://raw.githubusercontent.com/chiyokolinux/packages/nonfree/packages.db
+// please stop, i mean i- *BOOM*
 ```
 - more to come? i don't know

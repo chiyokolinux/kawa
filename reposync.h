@@ -7,7 +7,6 @@ int sync_repo(char repourl[]){
     CURL *curl;
     CURLcode res;
 
-
     curl = curl_easy_init();
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, repourl);
@@ -20,8 +19,6 @@ int sync_repo(char repourl[]){
         curl_easy_cleanup(curl);
     }
 
-    curl_global_cleanup();
-
     return 0;
 }
 
@@ -29,17 +26,17 @@ int sync_all() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     FILE *fp;
-    char buff[255];
+    char reponame[127];
+    char repourl[511];
 
     fp = fopen(INSTALLPREFIX + "/etc/kawa.d/repos.conf", "r");
-    fscanf(fp, "%s", buff);
-    printf("1 : %s\n", buff );
 
-    fgets(buff, 255, (FILE*)fp);
-    printf("2: %s\n", buff );
-
-    fgets(buff, 255, (FILE*)fp);
-    printf("3: %s\n", buff );
+    while (fscanf(fp, "%s %s", reponame, repourl) != NULL) {
+        printf("Syncing Repo %s...", reponame);
+        sync_repo(repourl);
+    }
+    
     fclose(fp);
     
+    curl_global_cleanup();
 }
