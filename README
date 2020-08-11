@@ -11,6 +11,7 @@ REQUIRED FILES:
 Main https://raw.githubusercontent.com/chiyokolinux/packages/main/packages.db
 Community https://raw.githubusercontent.com/chiyokolinux/packages/community/packages.db
 Contrib https://raw.githubusercontent.com/chiyokolinux/packages/contrib/packages.db ; wtf are you doing, comments are not supported
+/* oh and also repo names must be directory-safe, you're on your own with that */
 Non-Free https://raw.githubusercontent.com/chiyokolinux/packages/nonfree/packages.db
 // please stop, i mean i- *BOOM*
 ```
