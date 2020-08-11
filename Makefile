@@ -16,6 +16,7 @@ BINAOBJ = binarypkg.o
 METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
+DATAOBJ = datatypes.o
 
 all: $(INITBIN) $(SERVBIN)
 
