@@ -1,0 +1,15 @@
+kawa
+---
+
+the package manager for the chiyoko linux distribution
+
+
+REQUIRED FILES:
+- /etc/kawa.d/repos.conf, example:
+```example
+https://raw.githubusercontent.com/chiyokolinux/packages/main/packages.db
+https://raw.githubusercontent.com/chiyokolinux/packages/community/packages.db
+https://raw.githubusercontent.com/chiyokolinux/packages/contrib/packages.db
+https://raw.githubusercontent.com/chiyokolinux/packages/nonfree/packages.db
+```
+- more to come? i don't know
