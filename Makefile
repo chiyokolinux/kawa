@@ -17,7 +17,7 @@ METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
-all: $(INITBIN) $(SERVBIN) confs
+all: $(INITBIN) $(SERVBIN)
 
 $(INITBIN): $(INITOBJ)
 	$(CC) $(LDFLAGS) -o $@ $(INITOBJ) $(LDLIBS)
