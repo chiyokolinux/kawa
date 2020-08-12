@@ -18,16 +18,16 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
 OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ)
-HEADERS = datatypes.h
+HEADERS = config.h datatypes.h
 
 all: $(PROGBIN)
 
 $(PROGBIN): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(PROGOBJ) $(LDLIBS)
 
-$(PROGOBJ): config.h
+$(PROGOBJ): $(HEADERS)
 
-%.o: %.c %.h $(HEADERS)
+%.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 install: all

@@ -1,3 +1,5 @@
+#include "database.h"
+
 struct package parse_csv_line(char line[]) {
     char *p = line;
     size_t ln = strlen(p) - 1;
@@ -66,9 +68,10 @@ struct pkglist get_all_packages() {
     char reponame[127];
     char repourl[511];
 
-    fp = fopen(strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf"), "r");
+    char path[] = strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf");
+    fp = fopen(path, "r");
 
-    while (fscanf(fp, "%s %s", reponame, repourl) != NULL) {
+    while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
         retval.pkg_count += currepo.pkg_count;
