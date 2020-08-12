@@ -31,17 +31,11 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     strcat(path, "/etc/kawa.d/");
     strcat(path, reponame);
     strcat(path, ".packages.db");
-    FILE* indexfile = fopen(path, "w+");
+    FILE* indexfile = fopen(path, "r");
     
-    while (fscanf(indexfile, "%s", reponame) != EOF) {
-        printf("Reading Repo %s...\n", reponame);
-        struct pkglist currepo = get_packages_from_repo(reponame);
-        retval.pkg_count += currepo.pkg_count;
-        for (int i = 0; i < currepo.pkg_count; i++) {
-            curpkg.current = currepo.packages[i];
-            curpkg.next->prev = &curpkg;
-            curpkg = *(curpkg.next);
-        }
+    char buffer[4096];
+    while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
+        parse_csv_line(buffer);
     }
     
     /* this is a lazy fix, but i'm too tired to do it properly rn */
