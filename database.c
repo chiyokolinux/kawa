@@ -50,20 +50,20 @@ struct package parse_csv_line(char line[]) {
         index++;
     }
     struct package retval = {
-        parsed[0],
-        parsed[1],
-        parsed[2],
-        parsed[3],
-        parsed[4],
-        split_space(parsed[5]).retval,
-        split_space(parsed[6]).retval,
-        parsed[7],
-        split_space(parsed[8]).retval,
-        parsed[9],
-        parsed[10],
-        parsed[11],
-        parsed[12],
-        split_space(parsed[13]).retval
+        .name = parsed[0],
+        .description = parsed[1],
+        .version = parsed[2],
+        .archiveurl = parsed[3],
+        .maintainer = parsed[4],
+        .depends = split_space(parsed[5]).retval,
+        .conflicts = split_space(parsed[6]).retval,
+        .configurecmd = parsed[7],
+        .configureopts = split_space(parsed[8]).retval,
+        .type = parsed[9],
+        .sepbuild = parsed[10],
+        .uninstallcmd = parsed[11],
+        .license = parsed[12],
+        .scripts = split_space(parsed[13]).retval
     };
     return retval;
 }
