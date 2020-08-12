@@ -7,8 +7,38 @@ struct pkglist get_all_packages();
 int compare_strings(const void* a, const void* b);
 struct pkglist sort_package_list(struct pkglist orig_pkglist);
 
+struct package parse_csv_line(char line[]) {
+    char *p = line;
+    size_t ln = strlen(p) - 1;
+    char parsed[14][];
+    if (p[ln] == '\n')
+        p[ln] = '\0';
+    while (1) {
+        char *p2 = strchr(p, ';');
+        if(p2 != NULL)
+            *p2 = '\0';
+        printf("\"%s\"\n", p);
+        if(p2 == NULL)
+            break;
+        p = p2 + 1;
+    }
+}
+
 struct pkglist get_packages_from_repo(char reponame[]) {
+    FILE* indexfile = fopen(strcat(INSTALLPREFIX, strcat("/etc/kawa.d/", strcat(reponame, ".packages.db"))), "w+");
     
+    while (fscanf(fp, "%s %s", reponame, repourl) != NULL) {
+        printf("Reading Repo %s...\n", reponame);
+        struct pkglist currepo = get_packages_from_repo(reponame);
+        retval.pkg_count += currepo.pkg_count;
+        for (int i = 0; i < currepo.pkg_count; i++) {
+            curpkg.current = currepo.packages[i];
+            curpkg.next->prev = &curpkg;
+            curpkg = *(curpkg.next);
+        }
+    }
+    
+    fclose(indexfile);
 }
 
 struct pkglist get_all_packages() {
