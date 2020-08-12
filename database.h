@@ -8,9 +8,10 @@
 #include "datatypes.h"
 #include "config.h"
 
-char **split_space(char to_split[]);
+struct strarr_retval split_space(char to_split[]);
 struct pkglist get_packages_from_repo(char reponame[]);
 struct pkglist get_all_packages();
+struct pkglist get_installed_packages();
 int compare_strings(const void* a, const void* b);
 struct pkglist sort_package_list(struct pkglist orig_pkglist);
 

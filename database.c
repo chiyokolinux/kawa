@@ -1,6 +1,6 @@
 #include "database.h"
 
-char **split_space(char to_split[]) {
+struct strarr_retval split_space(char to_split[]) {
     char *p = to_split;
     int spacecount = 0;
     for(int i = 0; to_split[i]; i++) {
@@ -9,11 +9,8 @@ char **split_space(char to_split[]) {
         }
     }
     
-    char **retval;
-    retval = malloc(sizeof(char*) * spacecount);
-    for(int i = 0; i < spacecount; i++) {
-        retval[i] = malloc(sizeof(char*) * 64);
-    }
+    char *retval[64];
+    retval = malloc(sizeof(char[64]) * spacecount);
     
     size_t ln = strlen(p) - 1;
     if (p[ln] == '\n')
@@ -31,8 +28,8 @@ char **split_space(char to_split[]) {
         i++;
     }
     
-    // struct strarr_retval sarv = { spacecount, retval };
-    return retval;
+    struct strarr_retval sarv = { .retval = retval };
+    return sarv;
 }
 
 struct package parse_csv_line(char line[]) {
@@ -58,15 +55,15 @@ struct package parse_csv_line(char line[]) {
         parsed[2],
         parsed[3],
         parsed[4],
-        split_space(parsed[5]),
-        split_space(parsed[6]),
+        split_space(parsed[5]).retval,
+        split_space(parsed[6]).retval,
         parsed[7],
-        split_space(parsed[8]),
+        split_space(parsed[8]).retval,
         parsed[9],
         parsed[10],
         parsed[11],
         parsed[12],
-        split_space(parsed[13])
+        split_space(parsed[13]).retval
     };
     return retval;
 }
@@ -159,6 +156,10 @@ struct pkglist get_all_packages() {
     fclose(fp);
         
     return sort_package_list(retval);
+}
+
+struct pkglist get_installed_packages() {
+    return sort_package_list(get_packages_from_repo("installed"));
 }
 
 int compare_strings(const void* a, const void* b) {

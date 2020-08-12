@@ -9,7 +9,6 @@ REMVOBJ = remove.o
 SRCHOBJ = search.o
 SHOWOBJ = show.o
 UPDTOBJ = update.o
-UPGROBJ = upgrade.o
 SAUCOBJ = sourcepkg.o
 PATCOBJ = patchpkg.o
 BINAOBJ = binarypkg.o
