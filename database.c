@@ -35,7 +35,9 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        parse_csv_line(buffer);
+        curpkg.current = parse_csv_line(buffer);;
+        curpkg.next->prev = &curpkg;
+        curpkg = *(curpkg.next);
     }
     
     /* this is a lazy fix, but i'm too tired to do it properly rn */
