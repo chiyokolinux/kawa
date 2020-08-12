@@ -28,7 +28,7 @@ struct strarr_retval split_space(char to_split[]) {
         i++;
     }
     
-    struct strarr_retval sarv = { .retval = retval };
+    struct strarr_retval sarv = { .retval = { retval } };
     return sarv;
 }
 
@@ -55,15 +55,15 @@ struct package parse_csv_line(char line[]) {
         .version = parsed[2],
         .archiveurl = parsed[3],
         .maintainer = parsed[4],
-        .depends = split_space(parsed[5]).retval,
-        .conflicts = split_space(parsed[6]).retval,
+        .depends = { split_space(parsed[5]).retval },
+        .conflicts = { split_space(parsed[6]).retval },
         .configurecmd = parsed[7],
-        .configureopts = split_space(parsed[8]).retval,
+        .configureopts = { split_space(parsed[8]).retval },
         .type = parsed[9],
         .sepbuild = parsed[10],
         .uninstallcmd = parsed[11],
         .license = parsed[12],
-        .scripts = split_space(parsed[13]).retval
+        .scripts = { split_space(parsed[13]).retval }
     };
     return retval;
 }
