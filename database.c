@@ -27,6 +27,11 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     struct ll_node curpkg;
     
     char *path = strcat(INSTALLPREFIX, strcat("/etc/kawa.d/", strcat(reponame, ".packages.db")));
+    char path[strlen(INSTALLPREFIX)+25];
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/");
+    strcat(path, reponame);
+    strcat(path ".packages.db");
     FILE* indexfile = fopen(path, "w+");
     
     while (fscanf(indexfile, "%s", reponame) != EOF) {
@@ -69,7 +74,9 @@ struct pkglist get_all_packages() {
     char reponame[127];
     char repourl[511];
 
-    char path[strlen(INSTALLPREFIX)+23] = &strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf");
+    char path[strlen(INSTALLPREFIX)+23];
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
