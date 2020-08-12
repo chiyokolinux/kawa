@@ -18,41 +18,30 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 DATAOBJ = datatypes.o
 
-all: $(INITBIN) $(SERVBIN)
+all: $(PROGBIN)
 
-$(INITBIN): $(INITOBJ)
+$(PROGBIN): $(PROGOBJ)
 	$(CC) $(LDFLAGS) -o $@ $(INITOBJ) $(LDLIBS)
 
-$(SERVBIN): $(SERVOBJ)
-	$(CC) $(LDFLAGS) -o $@ $(SERVOBJ) $(LDLIBS)
-
-$(INITOBJ): config.h
-$(SERVOBJ): config.h
-
-confs:
-    mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f $(CONFS) $(DESTDIR)$(PREFIX)/bin
+$(PROGOBJ): config.h
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f $(INITBIN) $(DESTDIR)$(PREFIX)/bin
-	cp -f $(SERVBIN) $(DESTDIR)$(PREFIX)/bin
+	cp -f $(PROGOBJ) $(DESTDIR)$(PREFIX)/bin
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(INITBIN) $(DESTDIR)$(PREFIX)/bin/$(SERVBIN)
 
 dist: clean
-	mkdir -p ichirou-$(VERSION)
-	mkdir -p ichirou-$(VERSION)/confs
-	cp LICENSE Makefile README config.def.h config.mk ichirou.c kanrisha.c ichirou-$(VERSION)
-	cp confs/rc.conf confs/rc.init confs/rc.local confs/rc.postinit \
-	   confs/rc.shutdown ichirou-$(VERSION)/confs
-	tar -cf ichirou-$(VERSION).tar ichirou-$(VERSION)
-	gzip ichirou-$(VERSION).tar
-	rm -rf ichirou-$(VERSION)
+	mkdir -p kawa-$(VERSION)
+	mkdir -p kawa-$(VERSION)/confs
+	cp LICENSE Makefile README config.def.h config.mk kawa.c *.h kawa-$(VERSION)
+	tar -cf kawa-$(VERSION).tar kawa-$(VERSION)
+	gzip kawa-$(VERSION).tar
+	rm -rf kawa-$(VERSION)
 
 clean:
-	rm -f $(INITBIN) $(SERVBIN) $(INITOBJ) $(SERVOBJ) ichirou-$(VERSION).tar.gz
+	rm -f $(PROGBIN) $(PROGOBJ) kawa-$(VERSION).tar.gz
 
 .SUFFIXES: .def.h
 
