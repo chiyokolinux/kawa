@@ -1,6 +1,7 @@
 #include "reposync.h"
 
 int sync_repo(char reponame[], char repourl[]){
+    printf("dong\n");
     CURL *curl;
     CURLcode res;
     int retval = 0;
@@ -36,6 +37,7 @@ int sync_repo(char reponame[], char repourl[]){
 
 int sync_all() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
+    
     int retval = 0;
 
     FILE *fp;

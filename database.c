@@ -1,4 +1,5 @@
 #include "database.h"
+#include <errno.h>
 
 struct strarr_retval split_space(char to_split[]) {
     char *p = to_split;
@@ -136,6 +137,7 @@ struct pkglist get_all_packages() {
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
+    printf("%s %d %s\n", path, fp == NULL, strerror(errno));
     printf("15\n");
     fgets(repourl, 511, (FILE*)fp);
     printf("17 %s\n", repourl);
