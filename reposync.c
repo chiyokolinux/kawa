@@ -37,7 +37,7 @@ int sync_all() {
     char reponame[127];
     char repourl[511];
 
-    char path[] = strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf");
+    char *path = strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
