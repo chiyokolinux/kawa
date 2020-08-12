@@ -10,7 +10,12 @@ int sync_repo(char reponame[], char repourl[]){
         curl_easy_setopt(curl, CURLOPT_URL, repourl);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
-        FILE* indexfile = fopen(strcat(INSTALLPREFIX, strcat("/etc/kawa.d/", strcat(reponame, ".packages.db"))), "w+");
+        char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
+        strcat(path, INSTALLPREFIX);
+        strcat(path, "/etc/kawa.d/");
+        strcat(path, reponame);
+        strcat(path, ".packages.db");
+        FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile) ;
 
         res = curl_easy_perform(curl);
@@ -37,7 +42,9 @@ int sync_all() {
     char reponame[127];
     char repourl[511];
 
-    char *path = strcat(INSTALLPREFIX, "/etc/kawa.d/repos.conf");
+    char path[strlen(INSTALLPREFIX)+23];
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
