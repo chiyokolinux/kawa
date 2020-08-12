@@ -17,12 +17,12 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
 OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ) $(UPDTOBJ)
-HEADERS = config.h datatypes.h
+HEADERS = config.h datatypes.h reposync.h database.h update.h
 
 all: $(PROGBIN)
 
 $(PROGBIN): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(PROGOBJ) $(LDLIBS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
 
 $(PROGOBJ): $(HEADERS)
 
