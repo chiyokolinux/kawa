@@ -1,5 +1,40 @@
 #include "database.h"
 
+char **split_space(char to_split[]) {
+    char *p = to_split;
+    int spacecount = 0;
+    for(int i = 0; to_split[i]; i++) {
+        if(to_split[i] == ' ') {
+            spacecount++;
+        }
+    }
+    
+    char **retval;
+    retval = malloc(sizeof(char*) * spacecount);
+    for(int i = 0; i < spacecount; i++) {
+        retval[i] = malloc(sizeof(char*) * 64);
+    }
+    
+    size_t ln = strlen(p) - 1;
+    if (p[ln] == '\n')
+        p[ln] = '\0';
+    
+    int i = 0;
+    while (1) {
+        char *p2 = strchr(p, ' ');
+        if(p2 != NULL)
+            *p2 = '\0';
+        strcpy(retval[i], p);
+        if(p2 == NULL)
+            break;
+        p = p2 + 1;
+        i++;
+    }
+    
+    // struct strarr_retval sarv = { spacecount, retval };
+    return retval;
+}
+
 struct package parse_csv_line(char line[]) {
     char *p = line;
     size_t ln = strlen(p) - 1;
@@ -11,13 +46,29 @@ struct package parse_csv_line(char line[]) {
         char *p2 = strchr(p, ';');
         if(p2 != NULL)
             *p2 = '\0';
-        printf("\"%s\"\n", p);
         strcpy(parsed[index], p);
         if(p2 == NULL)
             break;
         p = p2 + 1;
         index++;
     }
+    struct package retval = {
+        parsed[0],
+        parsed[1],
+        parsed[2],
+        parsed[3],
+        parsed[4],
+        split_space(parsed[5]),
+        split_space(parsed[6]),
+        parsed[7],
+        split_space(parsed[8]),
+        parsed[9],
+        parsed[10],
+        parsed[11],
+        parsed[12],
+        split_space(parsed[13])
+    };
+    return retval;
 }
 
 struct pkglist get_packages_from_repo(char reponame[]) {
@@ -57,6 +108,8 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     }
     
     fclose(indexfile);
+    
+    return retval;
 }
 
 struct pkglist get_all_packages() {

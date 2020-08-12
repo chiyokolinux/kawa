@@ -15,11 +15,11 @@ struct package {
     char *conflicts[256];
     char *configurecmd;
     char *configureopts[2048];
-    enum pkgtype type;
+    char *type;
     char *sepbuild;
     char *uninstallcmd;
-    enum license licenseobj;
-    enum scripts scriptsobj[6];
+    char *license;
+    char *scripts[6];
 };
 
 struct pkglist {
