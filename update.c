@@ -43,11 +43,23 @@ int update() {
         updatepkg = *(updatepkg.next);
     }
     
+    // seek back before passing to upgrade();
+    while (updatepkg.prev) {
+        updatepkg = *(updatepkg.prev);
+    }
+    
     printf("\nDo you wish to install these updates now? [Y/n] ");
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;
     if (response == 'y' || response == 'Y')
-        return upgrade();
+        return upgrade(updatepkg);
+    return 0;
+}
+
+int upgrade(struct ll_node_update updpkglst) {
+    while (updpkglst.next != NULL) {
+        updatepkg = *(updatepkg.next);
+    }
     return 0;
 }
