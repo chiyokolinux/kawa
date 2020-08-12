@@ -33,17 +33,17 @@ struct ll_node {
     struct ll_node *prev;
 };
 
+struct pkg_update {
+    char *name;
+    char *version_local;
+    char *version_remote;
+};
+
 struct ll_node_update {
     struct pkg_update current;
     struct ll_node_update *next;
     struct ll_node_update *prev;
 };
-
-struct pkg_update {
-    char *name;
-    char *version_local;
-    char *version_remote;
-}
 
 struct strarr_retval {
     char *retval[64];
