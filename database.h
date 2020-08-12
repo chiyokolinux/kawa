@@ -10,17 +10,20 @@ struct pkglist sort_package_list(struct pkglist orig_pkglist);
 struct package parse_csv_line(char line[]) {
     char *p = line;
     size_t ln = strlen(p) - 1;
-    char parsed[14][];
+    char parsed[14][2048];
     if (p[ln] == '\n')
         p[ln] = '\0';
+    index = 0;
     while (1) {
         char *p2 = strchr(p, ';');
         if(p2 != NULL)
             *p2 = '\0';
         printf("\"%s\"\n", p);
+        parsed[index] = p;
         if(p2 == NULL)
             break;
         p = p2 + 1;
+        index++;
     }
 }
 
