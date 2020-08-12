@@ -2,8 +2,11 @@
 
 int update() {
     sync_all();
+    printf("1\n");
     struct pkglist database = get_all_packages();
+    printf("2\n");
     struct pkglist installed = get_installed_packages();
+    printf("3\n");
     struct ll_node_update updatepkg;
     int remote_i = 0;
     int updatec = 0;
@@ -11,11 +14,11 @@ int update() {
         struct package currpkg_l = installed.packages[i];
         while (strcmp(currpkg_l.name, database.packages[remote_i].name))
             remote_i++; // this should work because the package lists are sorted (hopefully)
-        if (strcmp(currpkg_l.version, database.packages[remote_i].version) {
+        if (strcmp(currpkg_l.version, database.packages[remote_i].version)) {
             struct pkg_update pkgupdt = {
                 .name = currpkg_l.name,
                 .version_local = currpkg_l.version,
-                .version_remote = database.packages[remote_i].version;
+                .version_remote = database.packages[remote_i].version
             };
             updatepkg.current = pkgupdt;
             updatepkg.next->prev = &updatepkg;
@@ -59,7 +62,7 @@ int update() {
 
 int upgrade(struct ll_node_update updpkglst) {
     while (updpkglst.next != NULL) {
-        updatepkg = *(updatepkg.next);
+        updpkglst = *(updpkglst.next);
     }
     return 0;
 }
