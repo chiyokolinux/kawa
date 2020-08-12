@@ -16,14 +16,19 @@ BINAOBJ = binarypkg.o
 METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
-DATAOBJ = datatypes.o
+
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ)
+HEADERS = datatypes.h
 
 all: $(PROGBIN)
 
-$(PROGBIN): $(PROGOBJ)
-	$(CC) $(LDFLAGS) -o $@ $(INITOBJ) $(LDLIBS)
+$(PROGBIN): $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(PROGOBJ) $(LDLIBS)
 
 $(PROGOBJ): config.h
+
+%.o: %.c %.h $(HEADERS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
@@ -41,7 +46,7 @@ dist: clean
 	rm -rf kawa-$(VERSION)
 
 clean:
-	rm -f $(PROGBIN) $(PROGOBJ) kawa-$(VERSION).tar.gz
+	rm -f $(PROGBIN) *.o kawa-$(VERSION).tar.gz
 
 .SUFFIXES: .def.h
 

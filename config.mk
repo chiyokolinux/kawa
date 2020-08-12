@@ -8,5 +8,5 @@ LD = $(CC)
 CPPFLAGS =
 CFLAGS   = -Wextra -Wall -Os -s
 # LDFLAGS  = -s -static
-LDFLAGS  = -s
+LDFLAGS  = -s -lcurl
 # I don't wanna install glibc-static
