@@ -17,15 +17,15 @@ struct package {
     char *uninstallcmd;
     enum license licenseobj;
     enum scripts scriptsobj[6];
-}
+};
 
 struct pkglist {
     int pkg_count;
     struct package packages[];
-} 
+};
 
 struct ll_node {
     struct package current;
     struct ll_node *next;
     struct ll_node *prev;
-}
+};
