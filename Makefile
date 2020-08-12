@@ -16,7 +16,7 @@ METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
-OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ)
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ) $(UPDTOBJ)
 HEADERS = config.h datatypes.h
 
 all: $(PROGBIN)

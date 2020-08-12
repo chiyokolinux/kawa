@@ -10,7 +10,7 @@ struct strarr_retval split_space(char to_split[]) {
     }
     
     char *retval[64];
-    retval = malloc(sizeof(char[64]) * spacecount);
+    // retval = malloc(sizeof(char[64]) * spacecount);
     
     size_t ln = strlen(p) - 1;
     if (p[ln] == '\n')
@@ -21,14 +21,15 @@ struct strarr_retval split_space(char to_split[]) {
         char *p2 = strchr(p, ' ');
         if(p2 != NULL)
             *p2 = '\0';
-        strcpy(retval[i], p);
+        retval[i] = p;
+        strcpy(retval[i++], p);
         if(p2 == NULL)
             break;
         p = p2 + 1;
         i++;
     }
     
-    struct strarr_retval sarv = { .retval = { retval } };
+    struct strarr_retval sarv = { .retval = retval, .retc = spacecount+1 };
     return sarv;
 }
 
@@ -55,15 +56,15 @@ struct package parse_csv_line(char line[]) {
         .version = parsed[2],
         .archiveurl = parsed[3],
         .maintainer = parsed[4],
-        .depends = { split_space(parsed[5]).retval },
-        .conflicts = { split_space(parsed[6]).retval },
+        .depends = split_space(parsed[5]).retval,
+        .conflicts = split_space(parsed[6]).retval,
         .configurecmd = parsed[7],
-        .configureopts = { split_space(parsed[8]).retval },
+        .configureopts = split_space(parsed[8]).retval,
         .type = parsed[9],
         .sepbuild = parsed[10],
         .uninstallcmd = parsed[11],
         .license = parsed[12],
-        .scripts = { split_space(parsed[13]).retval }
+        .scripts = split_space(parsed[13]).retval
     };
     return retval;
 }

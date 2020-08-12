@@ -11,15 +11,15 @@ struct package {
     char *version;
     char *archiveurl;
     char *maintainer;
-    char *depends[256];
-    char *conflicts[256];
+    char **depends;
+    char **conflicts;
     char *configurecmd;
-    char *configureopts[2048];
+    char **configureopts;
     char *type;
     char *sepbuild;
     char *uninstallcmd;
     char *license;
-    char *scripts[6];
+    char **scripts;
 };
 
 struct pkglist {
@@ -46,7 +46,8 @@ struct ll_node_update {
 };
 
 struct strarr_retval {
-    char *retval[64];
+    int retc;
+    char **retval;
 };
 
 #endif // DATATYPES_H

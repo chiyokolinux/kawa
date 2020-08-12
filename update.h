@@ -9,6 +9,6 @@
 #include "datatypes.h"
 
 int update();
-int upgrade();
+int upgrade(struct ll_node_update updpkglst);
 
 #endif // UPDATE_H
