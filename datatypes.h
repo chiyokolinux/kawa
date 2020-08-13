@@ -5,21 +5,26 @@ enum pkgtype{source, patch, meta, binary};
 enum license{GPLv1, GPLv2, GPLv3, LGPLv1, LGPLv2, LGPLv21, LGPLv3, BSD, FREEOTHER, OTHER, CCBYSA, ZLIB, PUBLICDOMAIN, OSLv3, MIT, OPENSSL, PSFL, APACHE, APACHEv2, VIM};
 enum scripts{preinstall, preupdate, dobuild, doinstall, postinstall, postupdate};
 
+struct strarr_retval {
+    int retc;
+    char **retval;
+};
+
 struct package {
     char *name;
     char *description;
     char *version;
     char *archiveurl;
     char *maintainer;
-    char **depends;
-    char **conflicts;
+    struct strarr_retval depends;
+    struct strarr_retval conflicts;
     char *configurecmd;
-    char **configureopts;
+    struct strarr_retval configureopts;
     char *type;
     char *sepbuild;
     char *uninstallcmd;
     char *license;
-    char **scripts;
+    struct strarr_retval scripts;
 };
 
 struct pkglist {
@@ -45,9 +50,14 @@ struct ll_node_update {
     struct ll_node_update *prev;
 };
 
-struct strarr_retval {
-    int retc;
-    char **retval;
+struct repository {
+    char reponame[127];
+    char repourl[511];
+};
+
+struct repolist {
+    int repo_count;
+    struct repository repos[];
 };
 
 #endif // DATATYPES_H

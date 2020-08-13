@@ -2,11 +2,8 @@
 
 int update() {
     sync_all();
-    printf("1\n");
     struct pkglist database = get_all_packages();
-    printf("2\n");
     struct pkglist installed = get_installed_packages();
-    printf("3\n");
     struct ll_node_update updatepkg;
     int remote_i = 0;
     int updatec = 0;

@@ -10,6 +10,5 @@ int main(int argc, char *argv[]) {
         printf("Because error handling is somewhere on TODO, just run this as root for now and everything should be fine.\n");
         return -1;
     }
-    printf("wip\n");
     return update();
 }
