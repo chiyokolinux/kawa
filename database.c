@@ -51,6 +51,8 @@ struct package parse_csv_line(char line[]) {
         p = p2 + 1;
         index++;
     }
+    // struct package *retval = malloc(sizeof(struct package*) + (sizeof(char) * strlen(line)));
+    // struct package *retval = &(struct package) {
     struct package retval = {
         .name = parsed[0],
         .description = parsed[1],
@@ -71,11 +73,6 @@ struct package parse_csv_line(char line[]) {
 }
 
 struct pkglist get_packages_from_repo(char reponame[]) {
-    struct pkglist retval;
-    retval.pkg_count = 0;
-    
-    struct ll_node curpkg;
-    
     char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
@@ -84,39 +81,26 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     strcat(path, ".packages.db");
     FILE* indexfile = fopen(path, "r");
     
+    fseek(indexfile, 0L, SEEK_END);
+    int fsize = ftell(indexfile);
+    fseek(indexfile, 0L, SEEK_SET);
+    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    retval->pkg_count = 0;
+    
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        curpkg.current = parse_csv_line(buffer);;
-        curpkg.next->prev = &curpkg;
-        curpkg = *(curpkg.next);
-    }
-    
-    /* this is a lazy fix, but i'm too tired to do it properly rn */
-    curpkg = *(curpkg.prev);
-    curpkg.next = NULL;
-    while (curpkg.prev) {
-        curpkg = *(curpkg.prev);
-    }
-    
-    /* is this required? idk, don't wanna check (it isn't, it's even illegal, ok) */
-    // struct package packages[retval.pkg_count];
-    int index = 0;
-    while (curpkg.next != NULL) {
-        // packages[index++] = curpkg.current;
-        retval.packages[index++] = curpkg.current;
-        curpkg = *(curpkg.next);
+        retval->packages[retval->pkg_count++] = parse_csv_line(buffer);
+        // printf("parsed package %s\n", retval.packages[retval.pkg_count-1].name);
     }
     
     fclose(indexfile);
         
-    return retval;
+    return *retval;
 }
 
 struct pkglist get_all_packages() {
     struct pkglist retval;
     retval.pkg_count = 0;
-    
-    struct ll_node curpkg;
 
     FILE *fp;
     char reponame[127];
@@ -131,31 +115,10 @@ struct pkglist get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
-        retval.pkg_count += currepo.pkg_count;
         for (int i = 0; i < currepo.pkg_count; i++) {
-            curpkg.current = currepo.packages[i];
-            curpkg.next->prev = &curpkg;
-            curpkg = *(curpkg.next);
+            retval.packages[retval.pkg_count++] = currepo.packages[i];
         }
     }
-    
-    /* this is a lazy fix, but i'm too tired to do it properly rn */
-    curpkg = *(curpkg.prev);
-    curpkg.next = NULL;
-    while (curpkg.prev) {
-        curpkg = *(curpkg.prev);
-    }
-    
-    /* is this required? idk, don't wanna check (it isn't, it's even illegal, ok) */
-    // struct package packages[retval.pkg_count];
-    int index = 0;
-    while (curpkg.next != NULL) {
-        // packages[index++] = curpkg.current;
-        retval.packages[index++] = curpkg.current;
-        curpkg = *(curpkg.next);
-    }
-    
-    // retval.packages = packages;
     
     fclose(fp);
         
@@ -163,6 +126,7 @@ struct pkglist get_all_packages() {
 }
 
 struct pkglist get_installed_packages() {
+    printf("Querying installed packages...\n");
     return sort_package_list(get_packages_from_repo("installed"));
 }
 

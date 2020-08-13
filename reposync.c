@@ -11,6 +11,7 @@ int sync_repo(char reponame[], char repourl[]){
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
         char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
+        strcpy(path, "");
         strcat(path, INSTALLPREFIX);
         strcat(path, "/etc/kawa.d/");
         strcat(path, reponame);
