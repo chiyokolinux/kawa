@@ -9,6 +9,7 @@
 #include "config.h"
 
 struct strarr_retval split_space(char to_split[]);
+struct package parse_csv_line(char line[]);
 struct pkglist get_packages_from_repo(char reponame[]);
 struct pkglist get_all_packages();
 struct pkglist get_installed_packages();
