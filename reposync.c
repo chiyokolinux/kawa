@@ -1,7 +1,6 @@
 #include "reposync.h"
 
 int sync_repo(char reponame[], char repourl[]){
-    printf("dong\n");
     CURL *curl;
     CURLcode res;
     int retval = 0;
@@ -45,6 +44,7 @@ int sync_all() {
     char repourl[511];
 
     char path[strlen(INSTALLPREFIX)+23];
+    strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
