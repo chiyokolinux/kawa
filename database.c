@@ -1,5 +1,4 @@
 #include "database.h"
-#include <errno.h>
 
 struct strarr_retval split_space(char to_split[]) {
     char *p = to_split;
@@ -34,7 +33,7 @@ struct strarr_retval split_space(char to_split[]) {
     return sarv;
 }
 
-struct package parse_csv_line(char line[]) {
+void parse_csv_line(char line[], struct package* retval) {
     char *p = line;
     size_t ln = strlen(p) - 1;
     char parsed[14][2048];
@@ -53,7 +52,8 @@ struct package parse_csv_line(char line[]) {
     }
     // struct package *retval = malloc(sizeof(struct package*) + (sizeof(char) * strlen(line)));
     // struct package *retval = &(struct package) {
-    struct package retval = {
+    // struct package retval = {
+    *retval = (struct package) {
         .name = parsed[0],
         .description = parsed[1],
         .version = parsed[2],
@@ -69,7 +69,9 @@ struct package parse_csv_line(char line[]) {
         .license = parsed[12],
         .scripts = split_space(parsed[13])
     };
-    return retval;
+    printf("%s : %s ( %s )\n", retval->depends.retval[0], retval->conflicts.retval[0], retval->license);
+    // printf("%s %s\n", retval->name, (*retval).name);
+    // return retval;
 }
 
 struct pkglist get_packages_from_repo(char reponame[]) {
@@ -89,13 +91,20 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        retval->packages[retval->pkg_count++] = parse_csv_line(buffer);
-        // printf("parsed package %s\n", retval.packages[retval.pkg_count-1].name);
+        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char) * strlen(buffer)));
+        // retval->packages[retval->pkg_count] = malloc(sizeof(struct package*) + (sizeof(char) * strlen(buffer)));
+        parse_csv_line(buffer, newpkg);
+        retval->packages[retval->pkg_count++] = newpkg;
+        // retval->pkg_count++;
+        printf("parsed package %s ( at %p )\n", retval->packages[retval->pkg_count-1]->name, retval->packages[retval->pkg_count-1]);
     }
     
+    for (int c = 0; c < retval->pkg_count; c++)
+        printf("%s\n", retval->packages[c]->name);
+    
     fclose(indexfile);
-        
-    return *retval;
+    
+    return (*retval);
 }
 
 struct pkglist get_all_packages() {
@@ -115,8 +124,11 @@ struct pkglist get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
+        printf("donged repo %d\n", currepo.pkg_count);
+        printf("holy balls: %p\n", currepo.packages[0]);
         for (int i = 0; i < currepo.pkg_count; i++) {
             retval.packages[retval.pkg_count++] = currepo.packages[i];
+            printf("donged package %s\n", currepo.packages[0]->name);
         }
     }
     
@@ -133,10 +145,13 @@ struct pkglist get_installed_packages() {
 int compare_strings(const void* a, const void* b) {
     struct package *pkgA = (struct package*)a;
     struct package *pkgB = (struct package*)b;
+    printf("%s\n", pkgA->name);
     return strcmp(pkgA->name, pkgB->name); 
 } 
 
 struct pkglist sort_package_list(struct pkglist orig_pkglist) {
+    printf("Sorting now!\n");
     qsort(orig_pkglist.packages, orig_pkglist.pkg_count, sizeof(struct pkglist), compare_strings);
+    printf("Sorting done!\n");
     return orig_pkglist;
 }

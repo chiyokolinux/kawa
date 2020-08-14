@@ -7,6 +7,6 @@ CC = gcc
 LD = $(CC)
 CPPFLAGS =
 CFLAGS   = -Wextra -Wall -Os -s
-# LDFLAGS  = -s -static
+# LDFLAGS  = -s -lcurl -static
 LDFLAGS  = -s -lcurl
 # I don't wanna install glibc-static
