@@ -1,5 +1,37 @@
 #include "database.h"
 
+struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam){
+
+    // TODO should be strnlen insteaf of srtlen
+    char *name         = malloc(sizeof(char) * sizeof(strlen(nameParam          )) );
+    char *description  = malloc(sizeof(char) * sizeof(strlen(descriptionParam   )) );
+    char *version      = malloc(sizeof(char) * sizeof(strlen(versionParam       )) );
+    char *archiveurl   = malloc(sizeof(char) * sizeof(strlen(archiveurlParam    )) );
+    char *maintainer   = malloc(sizeof(char) * sizeof(strlen(maintainerParam    )) );
+    char *configurecmd = malloc(sizeof(char) * sizeof(strlen(configurecmdParam  )) );
+    char *type         = malloc(sizeof(char) * sizeof(strlen(typeParam          )) );
+    char *sepbuild     = malloc(sizeof(char) * sizeof(strlen(sepbuildParam      )) );
+    char *uninstallcmd = malloc(sizeof(char) * sizeof(strlen(uninstallcmdParam  )) );
+    char *license      = malloc(sizeof(char) * sizeof(strlen(licenseParam       )) );
+
+    /* struct package* retval = malloc(sizeof(struct package)); */
+
+    struct package retval = (struct package) {
+        .name         = name          ,
+        .description  = description   ,
+        .version      = version       ,
+        .archiveurl   = archiveurl    ,
+        .maintainer   = maintainer    ,
+        .configurecmd = configurecmd  ,
+        .type         = type          ,
+        .sepbuild     = sepbuild      ,
+        .uninstallcmd = uninstallcmd  ,
+        .license      = license       
+    };
+
+    return retval;
+}
+
 struct strarr_retval split_space(char to_split[]) {
     char *p = to_split;
     int spacecount = 0;
