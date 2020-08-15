@@ -123,12 +123,16 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     }
 
     struct pkglist retval = (struct pkglist) {
-        .pkg_count = pkg_count,
-        .packages  = packages
+        .pkg_count = pkg_count
     };
     
+    for (int c = 0; c < pkg_count; c++)
+        printf("before copying: %s\n", packages[c]->name);
+    
+    memcpy(&(retval.packages), packages, sizeof(struct package*) + sizeof(char) * fsize);
+    
     for (int c = 0; c < retval.pkg_count; c++)
-        printf("%s\n", retval.packages[c]->name);
+        printf("after copying: %s\n", retval.packages[c]->name);
     
     fclose(indexfile);
     
