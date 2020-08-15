@@ -122,21 +122,16 @@ struct pkglist get_packages_from_repo(char reponame[]) {
         packages[pkg_count++] = newpkg;
     }
 
-    struct pkglist retval = (struct pkglist) {
-        .pkg_count = pkg_count
-    };
+    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    retval->pkg_count = pkg_count;
+    memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
     
-    for (int c = 0; c < pkg_count; c++)
-        printf("before copying: %s\n", packages[c]->name);
-    
-    memcpy(&(retval.packages), packages, sizeof(struct package*) + sizeof(char) * fsize);
-    
-    for (int c = 0; c < retval.pkg_count; c++)
-        printf("after copying: %s\n", retval.packages[c]->name);
+    for (int c = 0; c < retval->pkg_count; c++)
+        printf("after copying: %s\n", retval->packages[c]->name);
     
     fclose(indexfile);
     
-    return retval;
+    return (*retval);
 }
 
 struct pkglist get_all_packages() {
@@ -157,7 +152,7 @@ struct pkglist get_all_packages() {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
         printf("Read %d packages from Repo %s\n", currepo.pkg_count, reponame);
-        printf("holy balls: %s\n", currepo.packages[0]->name);
+        // printf("holy balls: %s\n", currepo.packages[0]->name);
         for (int i = 0; i < currepo.pkg_count; i++) {
             retval.packages[retval.pkg_count++] = currepo.packages[i];
             printf("donged package %s\n", currepo.packages[0]->name);
@@ -165,7 +160,11 @@ struct pkglist get_all_packages() {
     }
     
     fclose(fp);
-        
+    
+    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    retval->pkg_count = pkg_count;
+    memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
+    
     return sort_package_list(retval);
 }
 
