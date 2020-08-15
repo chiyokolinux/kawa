@@ -52,8 +52,8 @@ struct strarr_retval split_space(char to_split[]) {
         }
     }
     
-    char *retval[64];
-    // retval = malloc(sizeof(char[64]) * spacecount);
+    // char *retval[64];
+    char **retval = malloc(sizeof(char[64]) * spacecount);
     
     size_t ln = strlen(p) - 1;
     if (p[ln] == '\n')
@@ -64,7 +64,7 @@ struct strarr_retval split_space(char to_split[]) {
         char *p2 = strchr(p, ' ');
         if(p2 != NULL)
             *p2 = '\0';
-        retval[i] = p;
+        retval[i] = malloc(sizeof(char[64]));
         strcpy(retval[i], p);
         if(p2 == NULL)
             break;
@@ -135,8 +135,9 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     fseek(indexfile, 0L, SEEK_END);
     int fsize = ftell(indexfile);
     fseek(indexfile, 0L, SEEK_SET);
-    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
-    retval->pkg_count = 0;
+    // struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    struct package *packages[] = malloc(sizeof(struct package*) + sizeof(char) * fsize);
+    int pkg_count = 0;
     
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
@@ -146,13 +147,15 @@ struct pkglist get_packages_from_repo(char reponame[]) {
         retval->packages[retval->pkg_count++] = newpkg;
         // retval->pkg_count++;
     }
+
+    struct pkglist retval = ;
     
     for (int c = 0; c < retval->pkg_count; c++)
         printf("%s\n", retval->packages[c]->name);
     
     fclose(indexfile);
     
-    return (*retval);
+    return retval;
 }
 
 struct pkglist get_all_packages() {
@@ -172,7 +175,7 @@ struct pkglist get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
-        printf("Read %d packages in Repo %s\n", currepo.pkg_count, reponame);
+        printf("Read %d packages from Repo %s\n", currepo.pkg_count, reponame);
         printf("holy balls: %s\n", currepo.packages[0]->name);
         for (int i = 0; i < currepo.pkg_count; i++) {
             retval.packages[retval.pkg_count++] = currepo.packages[i];
@@ -187,7 +190,7 @@ struct pkglist get_all_packages() {
 
 struct pkglist get_installed_packages() {
     printf("Querying installed packages...\n");
-    return sort_package_list(get_packages_from_repo("installed"));
+    return sort_package_list(get_packages_from_repo("Installed"));
 }
 
 int compare_strings(const void* a, const void* b) {
