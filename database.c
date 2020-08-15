@@ -99,7 +99,7 @@ void parse_csv_line(char line[], struct package* retval) {
         retval->scripts        = split_space(parsed[13]);
 }
 
-struct pkglist get_packages_from_repo(char reponame[]) {
+struct pkglist *get_packages_from_repo(char reponame[]) {
     char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
@@ -126,17 +126,15 @@ struct pkglist get_packages_from_repo(char reponame[]) {
     retval->pkg_count = pkg_count;
     memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
     
-    for (int c = 0; c < retval->pkg_count; c++)
-        printf("after copying: %s\n", retval->packages[c]->name);
-    
     fclose(indexfile);
     
-    return (*retval);
+    return retval;
 }
 
 struct pkglist get_all_packages() {
-    struct pkglist retval;
-    retval.pkg_count = 0;
+    struct package **packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096);
+    int pkg_count = 0;
+    long total_size = 0L;
 
     FILE *fp;
     char reponame[127];
@@ -149,21 +147,26 @@ struct pkglist get_all_packages() {
     fp = fopen(path, "r");
 
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
-        printf("Reading Repo %s...\n", reponame);
-        struct pkglist currepo = get_packages_from_repo(reponame);
-        printf("Read %d packages from Repo %s\n", currepo.pkg_count, reponame);
-        // printf("holy balls: %s\n", currepo.packages[0]->name);
-        for (int i = 0; i < currepo.pkg_count; i++) {
-            retval.packages[retval.pkg_count++] = currepo.packages[i];
-            printf("donged package %s\n", currepo.packages[0]->name);
+        printf("Reading Repo %s...", reponame);
+        fflush(stdout);
+        struct pkglist *currepo = get_packages_from_repo(reponame);
+        printf(" Read %d packages\n", currepo->pkg_count);
+        for (int i = 0; i < currepo->pkg_count; i++) {
+            packages[pkg_count++] = currepo->packages[i];
+            total_size += sizeof(currepo->packages[i]);
         }
     }
     
     fclose(fp);
     
-    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    struct pkglist *retval = malloc(sizeof(struct pkglist*) + total_size);
     retval->pkg_count = pkg_count;
-    memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
+    memcpy(retval->packages, packages, total_size);
+    
+    printf("Read %d packages from all repos\nAll packages before sorting:", retval->pkg_count);
+    for (int c = 0; c < retval->pkg_count; c++)
+        printf(" %s", retval->packages[c]->name);
+    printf("\n");
     
     return sort_package_list(retval);
 }
@@ -180,9 +183,9 @@ int compare_strings(const void* a, const void* b) {
     return strcmp(pkgA->name, pkgB->name); 
 } 
 
-struct pkglist sort_package_list(struct pkglist orig_pkglist) {
+struct pkglist sort_package_list(struct pkglist *orig_pkglist) {
     printf("Sorting now!\n");
-    qsort(orig_pkglist.packages, orig_pkglist.pkg_count, sizeof(struct pkglist), compare_strings);
+    qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(struct pkglist), compare_strings);
     printf("Sorting done!\n");
-    return orig_pkglist;
+    return *orig_pkglist;
 }
