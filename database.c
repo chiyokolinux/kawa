@@ -1,18 +1,29 @@
 #include "database.h"
 
-struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam){
+struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam) {
 
     // TODO should be strnlen insteaf of srtlen
+    // TODO: I know that this is horrible spaghetti code, please forgive me
     char *name         = malloc(sizeof(char) * sizeof(strlen(nameParam          )) );
+    strcpy(name, nameParam);
     char *description  = malloc(sizeof(char) * sizeof(strlen(descriptionParam   )) );
+    strcpy(description, descriptionParam);
     char *version      = malloc(sizeof(char) * sizeof(strlen(versionParam       )) );
+    strcpy(version, versionParam);
     char *archiveurl   = malloc(sizeof(char) * sizeof(strlen(archiveurlParam    )) );
+    strcpy(archiveurl, archiveurlParam);
     char *maintainer   = malloc(sizeof(char) * sizeof(strlen(maintainerParam    )) );
+    strcpy(maintainer, maintainerParam);
     char *configurecmd = malloc(sizeof(char) * sizeof(strlen(configurecmdParam  )) );
+    strcpy(configurecmd, configurecmdParam);
     char *type         = malloc(sizeof(char) * sizeof(strlen(typeParam          )) );
+    strcpy(type, typeParam);
     char *sepbuild     = malloc(sizeof(char) * sizeof(strlen(sepbuildParam      )) );
+    strcpy(sepbuild, sepbuildParam);
     char *uninstallcmd = malloc(sizeof(char) * sizeof(strlen(uninstallcmdParam  )) );
+    strcpy(uninstallcmd, uninstallcmdParam);
     char *license      = malloc(sizeof(char) * sizeof(strlen(licenseParam       )) );
+    strcpy(license, licenseParam);
 
     /* struct package* retval = malloc(sizeof(struct package)); */
 
@@ -28,6 +39,8 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
         .uninstallcmd = uninstallcmd  ,
         .license      = license       
     };
+    
+    printf("%s : %s : %s\n", nameParam, name, retval.name);
 
     return retval;
 }
@@ -54,7 +67,7 @@ struct strarr_retval split_space(char to_split[]) {
         if(p2 != NULL)
             *p2 = '\0';
         retval[i] = p;
-        strcpy(retval[i++], p);
+        strcpy(retval[i], p);
         if(p2 == NULL)
             break;
         p = p2 + 1;
@@ -108,7 +121,7 @@ void parse_csv_line(char line[], struct package* retval) {
     /*     .license = parsed[12], */
     /*     .scripts = split_space(parsed[13]) */
     /* }; */
-    printf("%s : %s ( %s )\n", retval->depends.retval[0], retval->conflicts.retval[0], retval->license);
+    printf("%s ( %s )\n", retval->name, retval->license);
     // printf("%s %s\n", retval->name, (*retval).name);
     // return retval;
 }
