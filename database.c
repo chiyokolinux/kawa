@@ -4,25 +4,25 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
 
     // TODO should be strnlen insteaf of srtlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
-    char *name         = malloc(sizeof(char) * sizeof(strlen(nameParam          )) );
+    char *name         = malloc(sizeof(char) * strlen(nameParam         ) + 1);
     strcpy(name, nameParam);
-    char *description  = malloc(sizeof(char) * sizeof(strlen(descriptionParam   )) );
+    char *description  = malloc(sizeof(char) * strlen(descriptionParam  ) + 1);
     strcpy(description, descriptionParam);
-    char *version      = malloc(sizeof(char) * sizeof(strlen(versionParam       )) );
+    char *version      = malloc(sizeof(char) * strlen(versionParam      ) + 1);
     strcpy(version, versionParam);
-    char *archiveurl   = malloc(sizeof(char) * sizeof(strlen(archiveurlParam    )) );
+    char *archiveurl   = malloc(sizeof(char) * strlen(archiveurlParam   ) + 1);
     strcpy(archiveurl, archiveurlParam);
-    char *maintainer   = malloc(sizeof(char) * sizeof(strlen(maintainerParam    )) );
+    char *maintainer   = malloc(sizeof(char) * strlen(maintainerParam   ) + 1);
     strcpy(maintainer, maintainerParam);
-    char *configurecmd = malloc(sizeof(char) * sizeof(strlen(configurecmdParam  )) );
+    char *configurecmd = malloc(sizeof(char) * strlen(configurecmdParam ) + 1);
     strcpy(configurecmd, configurecmdParam);
-    char *type         = malloc(sizeof(char) * sizeof(strlen(typeParam          )) );
+    char *type         = malloc(sizeof(char) * strlen(typeParam         ) + 1);
     strcpy(type, typeParam);
-    char *sepbuild     = malloc(sizeof(char) * sizeof(strlen(sepbuildParam      )) );
+    char *sepbuild     = malloc(sizeof(char) * strlen(sepbuildParam     ) + 1);
     strcpy(sepbuild, sepbuildParam);
-    char *uninstallcmd = malloc(sizeof(char) * sizeof(strlen(uninstallcmdParam  )) );
+    char *uninstallcmd = malloc(sizeof(char) * strlen(uninstallcmdParam ) + 1);
     strcpy(uninstallcmd, uninstallcmdParam);
-    char *license      = malloc(sizeof(char) * sizeof(strlen(licenseParam       )) );
+    char *license      = malloc(sizeof(char) * strlen(licenseParam      ) + 1);
     strcpy(license, licenseParam);
 
     /* struct package* retval = malloc(sizeof(struct package)); */
@@ -39,8 +39,6 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
         .uninstallcmd = uninstallcmd  ,
         .license      = license       
     };
-    
-    printf("%s : %s : %s\n", nameParam, name, retval.name);
 
     return retval;
 }
@@ -121,7 +119,6 @@ void parse_csv_line(char line[], struct package* retval) {
     /*     .license = parsed[12], */
     /*     .scripts = split_space(parsed[13]) */
     /* }; */
-    printf("%s ( %s )\n", retval->name, retval->license);
     // printf("%s %s\n", retval->name, (*retval).name);
     // return retval;
 }
@@ -148,7 +145,6 @@ struct pkglist get_packages_from_repo(char reponame[]) {
         parse_csv_line(buffer, newpkg);
         retval->packages[retval->pkg_count++] = newpkg;
         // retval->pkg_count++;
-        printf("parsed package %s ( at %p )\n", retval->packages[retval->pkg_count-1]->name, retval->packages[retval->pkg_count-1]);
     }
     
     for (int c = 0; c < retval->pkg_count; c++)
@@ -176,8 +172,8 @@ struct pkglist get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...\n", reponame);
         struct pkglist currepo = get_packages_from_repo(reponame);
-        printf("donged repo %d\n", currepo.pkg_count);
-        printf("holy balls: %p\n", currepo.packages[0]);
+        printf("Read %d packages in Repo %s\n", currepo.pkg_count, reponame);
+        printf("holy balls: %s\n", currepo.packages[0]->name);
         for (int i = 0; i < currepo.pkg_count; i++) {
             retval.packages[retval.pkg_count++] = currepo.packages[i];
             printf("donged package %s\n", currepo.packages[0]->name);
