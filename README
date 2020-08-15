@@ -15,4 +15,8 @@ Contrib https://raw.githubusercontent.com/chiyokolinux/packages/contrib/packages
 Non-Free https://raw.githubusercontent.com/chiyokolinux/packages/nonfree/packages.db
 // please stop, i mean i- *BOOM*
 ```
+- /etc/kawa.d/Installed.packages.db
+```example
+// Yes, this is meant to be empty. No, this file doesn't support comments either.
+```
 - more to come? i don't know
