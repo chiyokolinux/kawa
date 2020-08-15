@@ -179,13 +179,21 @@ struct pkglist get_installed_packages() {
 int compare_strings(const void* a, const void* b) {
     struct package *pkgA = (struct package*)a;
     struct package *pkgB = (struct package*)b;
-    printf("%s\n", pkgA->name);
+    printf(" %s ", pkgA->name);
     return strcmp(pkgA->name, pkgB->name); 
 } 
 
 struct pkglist sort_package_list(struct pkglist *orig_pkglist) {
     printf("Sorting now!\n");
-    qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(struct pkglist), compare_strings);
+    printf("Packages to sort:");
+    for (int c = 0; c < orig_pkglist->pkg_count; c++)
+        printf(" %s", orig_pkglist->packages[c]->name);
+    printf("\n");
+    qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(orig_pkglist->packages[0]), compare_strings);
+    printf("\nPackages after sort:");
+    for (int c = 0; c < orig_pkglist->pkg_count; c++)
+        printf(" %s", orig_pkglist->packages[c]->name);
+    printf("\n");
     printf("Sorting done!\n");
     return *orig_pkglist;
 }
