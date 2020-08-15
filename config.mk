@@ -6,7 +6,7 @@ MANPREFIX = $(PREFIX)/share/man
 CC = gcc
 LD = $(CC)
 CPPFLAGS =
-CFLAGS   = -Wextra -Wall -Os -s
+CFLAGS   = -Wextra -Wall -Os -g
 # LDFLAGS  = -s -lcurl -static
-LDFLAGS  = -s -lcurl
+LDFLAGS  = -lcurl
 # I don't wanna install glibc-static
