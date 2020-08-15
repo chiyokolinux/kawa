@@ -85,22 +85,29 @@ void parse_csv_line(char line[], struct package* retval) {
     // struct package *retval = malloc(sizeof(struct package*) + (sizeof(char) * strlen(line)));
     // struct package *retval = &(struct package) {
     // struct package retval = {
-    *retval = (struct package) {
-        .name = parsed[0],
-        .description = parsed[1],
-        .version = parsed[2],
-        .archiveurl = parsed[3],
-        .maintainer = parsed[4],
-        .depends = split_space(parsed[5]),
-        .conflicts = split_space(parsed[6]),
-        .configurecmd = parsed[7],
-        .configureopts = split_space(parsed[8]),
-        .type = parsed[9],
-        .sepbuild = parsed[10],
-        .uninstallcmd = parsed[11],
-        .license = parsed[12],
-        .scripts = split_space(parsed[13])
-    };
+    *retval = package_constructor(parsed[0],parsed[1],parsed[2],parsed[3],parsed[4],parsed[7],parsed[9],parsed[10],parsed[11],parsed[12]);
+
+        retval->depends        = split_space(parsed[5]);
+        retval->conflicts      = split_space(parsed[6]);
+        retval->configureopts  = split_space(parsed[8]);
+        retval->scripts        = split_space(parsed[13]);
+
+    /* *retval = (struct package) { */
+    /*     .name = parsed[0], */
+    /*     .description = parsed[1], */
+    /*     .version = parsed[2], */
+    /*     .archiveurl = parsed[3], */
+    /*     .maintainer = parsed[4], */
+    /*     .depends = split_space(parsed[5]), */
+    /*     .conflicts = split_space(parsed[6]), */
+    /*     .configurecmd = parsed[7], */
+    /*     .configureopts = split_space(parsed[8]), */
+    /*     .type = parsed[9], */
+    /*     .sepbuild = parsed[10], */
+    /*     .uninstallcmd = parsed[11], */
+    /*     .license = parsed[12], */
+    /*     .scripts = split_space(parsed[13]) */
+    /* }; */
     printf("%s : %s ( %s )\n", retval->depends.retval[0], retval->conflicts.retval[0], retval->license);
     // printf("%s %s\n", retval->name, (*retval).name);
     // return retval;
