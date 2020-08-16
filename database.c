@@ -177,9 +177,9 @@ struct pkglist get_installed_packages() {
 }
 
 int compare_strings(const void* a, const void* b) {
-    struct package *pkgA = (struct package*)a;
-    struct package *pkgB = (struct package*)b;
-    printf(" %s ", pkgA->name);
+    struct package *pkgA = *(struct package**)a;
+    struct package *pkgB = *(struct package**)b;
+    /* printf(" %s ", pkgA->name); */
     return strcmp(pkgA->name, pkgB->name); 
 } 
 

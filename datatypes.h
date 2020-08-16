@@ -29,7 +29,7 @@ struct package {
 
 struct pkglist {
     int pkg_count;
-    struct package *packages[];
+    struct package **packages;
 };
 
 struct ll_node {
