@@ -125,6 +125,7 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
+    // memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
     
     fclose(indexfile);
     
@@ -162,6 +163,7 @@ struct pkglist get_all_packages() {
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + total_size);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
+    // memcpy(retval->packages, packages, total_size);
     
     printf("Read %d packages from all repos\nAll packages before sorting:", retval->pkg_count);
     for (int c = 0; c < retval->pkg_count; c++)

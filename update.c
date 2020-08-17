@@ -4,6 +4,7 @@ int update() {
     sync_all();
     struct pkglist database = get_all_packages();
     struct pkglist installed = get_installed_packages();
+    printf("%s %s", database.packages[5]->name, installed.packages[1]->name);
     struct ll_node_update updatepkg;
     int remote_i = 0;
     int updatec = 0;
