@@ -2,6 +2,7 @@
 #define SHOW_H
 
 #include <stdio.h>
+#include <string.h>
 
 #include "datatypes.h"
 #include "database.h"

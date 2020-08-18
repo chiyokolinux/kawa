@@ -165,11 +165,6 @@ struct pkglist *get_all_packages() {
     retval->packages = packages;
     // memcpy(retval->packages, packages, total_size);
     
-    printf("Read %d packages from all repos\nAll packages before sorting:", retval->pkg_count);
-    for (int c = 0; c < retval->pkg_count; c++)
-        printf(" %s", retval->packages[c]->name);
-    printf("\n");
-    
     return sort_package_list(retval);
 }
 
@@ -186,16 +181,6 @@ int compare_strings(const void* a, const void* b) {
 } 
 
 struct pkglist *sort_package_list(struct pkglist *orig_pkglist) {
-    printf("Sorting now!\n");
-    printf("Packages to sort:");
-    for (int c = 0; c < orig_pkglist->pkg_count; c++)
-        printf(" %s", orig_pkglist->packages[c]->name);
-    printf("\n");
     qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(orig_pkglist->packages[0]), compare_strings);
-    printf("\nPackages after sort:");
-    for (int c = 0; c < orig_pkglist->pkg_count; c++)
-        printf(" %s", orig_pkglist->packages[c]->name);
-    printf("\n");
-    printf("Sorting done!\n");
     return orig_pkglist;
 }
