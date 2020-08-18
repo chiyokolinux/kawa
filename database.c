@@ -132,7 +132,7 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     return retval;
 }
 
-struct pkglist get_all_packages() {
+struct pkglist *get_all_packages() {
     struct package **packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096);
     int pkg_count = 0;
     long total_size = 0L;
@@ -173,7 +173,7 @@ struct pkglist get_all_packages() {
     return sort_package_list(retval);
 }
 
-struct pkglist get_installed_packages() {
+struct pkglist *get_installed_packages() {
     printf("Querying installed packages...\n");
     return sort_package_list(get_packages_from_repo("Installed"));
 }
@@ -185,7 +185,7 @@ int compare_strings(const void* a, const void* b) {
     return strcmp(pkgA->name, pkgB->name); 
 } 
 
-struct pkglist sort_package_list(struct pkglist *orig_pkglist) {
+struct pkglist *sort_package_list(struct pkglist *orig_pkglist) {
     printf("Sorting now!\n");
     printf("Packages to sort:");
     for (int c = 0; c < orig_pkglist->pkg_count; c++)
@@ -197,5 +197,5 @@ struct pkglist sort_package_list(struct pkglist *orig_pkglist) {
         printf(" %s", orig_pkglist->packages[c]->name);
     printf("\n");
     printf("Sorting done!\n");
-    return *orig_pkglist;
+    return orig_pkglist;
 }
