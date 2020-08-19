@@ -7,8 +7,18 @@ int sync_repo(char reponame[], char repourl[]){
 
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, repourl);
+        /* curl did some caching of the repos, we don't want that */
+        char repourl_cachefix[strlen(repourl) + 20]; // 19 is max value of unsigned long long, we add a ? so 20 chars max. added
+        strcpy(repourl_cachefix, "");
+        sprintf(repourl_cachefix, "%s?%ld", repourl, (unsigned long)time(NULL));
+        
+        curl_easy_setopt(curl, CURLOPT_URL, repourl_cachefix);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        
+        // struct curl_slist *list = NULL;
+        // list = curl_slist_append(list, "Cache-Control: no-cache");
+        // list = curl_slist_append(list, "Pragma: no-cache");
+        // curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
         
         char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
         strcpy(path, "");
@@ -17,7 +27,7 @@ int sync_repo(char reponame[], char repourl[]){
         strcat(path, reponame);
         strcat(path, ".packages.db");
         FILE* indexfile = fopen(path, "w+");
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile) ;
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
@@ -26,6 +36,7 @@ int sync_repo(char reponame[], char repourl[]){
         }
 
         curl_easy_cleanup(curl);
+        // curl_slist_free_all(list);
         fclose(indexfile);
     } else {
         fprintf(stderr, "Syncing repo %s failed: Cannot create cURL object\n", reponame);
