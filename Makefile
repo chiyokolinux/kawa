@@ -16,8 +16,8 @@ METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
-OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ) $(UPDTOBJ) $(SHOWOBJ)
-HEADERS = config.h datatypes.h reposync.h database.h update.h show.h
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 

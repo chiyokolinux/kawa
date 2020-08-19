@@ -5,6 +5,7 @@
 #include "config.h"
 
 #include "update.h"
+#include "search.h"
 #include "show.h"
 
 int main(int argc, char *argv[]) {
@@ -16,6 +17,8 @@ int main(int argc, char *argv[]) {
         return sync_all();
     else if (!strcmp(argv[1], "update") && argc == 2)
         return update();
+    else if (!strcmp(argv[1], "search") && argc == 3)
+        return search(argv[2]);
     else if (!strcmp(argv[1], "show") && argc == 3)
         return show(argv[2]);
     printf("-- TODO: INSERT USAGE/HELP THING HERE --\n");
