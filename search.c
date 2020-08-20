@@ -19,7 +19,7 @@ int search(char searchterm[]) {
             char name_colored[strlen(currpkg->name) + strlen(HIGHLIGHTCOLOR) + 9];
             int firstpart_len = strlen(currpkg->name) - strlen(pos);
             // int 
-            sprintf(name_colored, "%.*s\033%s%.*s\033[0m%s", firstpart_len, currpkg->name, HIGHLIGHTCOLOR, strlen(searchterm), pos, pos+strlen(searchterm));
+            sprintf(name_colored, "%.*s\033%s%.*s\033[0m%s", firstpart_len, currpkg->name, HIGHLIGHTCOLOR, (int)strlen(searchterm), pos, pos+strlen(searchterm));
             printf("%4s | %-37s | %-14s | %s\n", package_installed, name_colored, currpkg->version, currpkg->type);
         }
     }
