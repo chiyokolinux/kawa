@@ -4,6 +4,7 @@ PROGBIN = kawa
 
 PROGOBJ = kawa.o
 DFSAOBJ = dfs.o
+HELPOBJ = help.o
 INSTOBJ = install.o
 REMVOBJ = remove.o
 SRCHOBJ = search.o
@@ -16,8 +17,8 @@ METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
 
-OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(REPOOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(HELPOBJ) $(REPOOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h help.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 
