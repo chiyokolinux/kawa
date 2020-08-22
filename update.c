@@ -37,12 +37,13 @@ int update() {
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;
-    if (response == 'y' || response == 'Y' || response == '\n')
+    else if (response == 'y' || response == 'Y' || response == '\n')
         return upgrade(updatepkg);
-    return 1;
+    else
+        return 1;
 }
 
 int upgrade(struct pkg_update *updpkglst[]) {
-    printf("upgrading! %s", updpkglst[0]->name);
+    printf("upgrading! %s\n", updpkglst[0]->name);
     return 0;
 }

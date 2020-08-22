@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 
-int repoadd();
+#include "config.h"
+#include "reposync.h"
+
+int repoadd(char reponame[], char repourl[]);
 
 #endif // REPOADD_H

@@ -1,6 +1,6 @@
 #include "reposync.h"
 
-int sync_repo(char reponame[], char repourl[]){
+int sync_repo(char reponame[], char repourl[]) {
     CURL *curl;
     CURLcode res;
     int retval = 0;

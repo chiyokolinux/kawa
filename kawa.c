@@ -27,6 +27,6 @@ int main(int argc, char *argv[]) {
     else if (!strcmp(argv[1], "version") && argc == 2)
         return version();
     else if (!strcmp(argv[1], "addrepo") && argc == 4)
-        return repoadd();
+        return repoadd(argv[2], argv[3]);
     return help()+1;
 }
