@@ -16,9 +16,10 @@ BINAOBJ = binarypkg.o
 METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
+RPADOBJ = repoadd.o
 
-OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(HELPOBJ) $(REPOOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h help.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(HELPOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h help.h repoadd.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 
