@@ -47,13 +47,13 @@ int update() {
         return 0;
     }
     
-    printf("The following packages can be updated:\n");
+    printf("\nThe following packages can be updated:\n  ");
     
     for (int i = 0; i < updatec; i++) {
         printf("%s (%s -> %s) ", updatepkg[i]->name, updatepkg[i]->version_local, updatepkg[i]->version_remote);
     }
     
-    printf("\nDo you wish to install these updates now? [Y/n] ");
+    printf("\n\nDo you wish to install these updates now? [Y/n] ");
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;

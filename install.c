@@ -3,19 +3,28 @@
 int install(int pkgc, char *pkgnames[]) {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
+    struct pkg_update *updatepkgs[installed->pkg_count];
     struct package **packages = malloc(sizeof(database->packages)+1024);
     struct pkglist *nodelist = malloc(sizeof(struct pkglist)+1024);
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
+    int *updatec = malloc(sizeof(int));
+    *updatec = 0;
     printf("\n");
     for (int i = 2; i < pkgc; i++) {
-        resolve_recursive(nodelist, pkgnames[i], database, installed, 0);
+        resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec);
     }
     printf("The following packages will be installed:\n ");
     for (int i = 0; i < nodelist->pkg_count; i++) {
         printf(" %s", nodelist->packages[i]->name);
     }
-    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count, 0, 0);
+    if (*updatec) {
+        printf("\nThe following packages will be updated:\n ");
+        for (int i = 0; i < *updatec; i++) {
+            printf(" %s (%s -> %s)", updatepkgs[i]->name, updatepkgs[i]->version_local, updatepkgs[i]->version_remote);
+        }
+    }
+    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count, 0, *updatec);
     printf("Do you wish to proceed? [Y/n] ");
     fflush(stdout);
     char response = getchar();

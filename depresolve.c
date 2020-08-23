@@ -1,6 +1,6 @@
 #include "depresolve.h"
 
-void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *database, struct pkglist *installed, int depth) {
+void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec) {
     if (depth >= MAXDEPTH) {
         printf("Error: maximum recursion depth of %d reached during dependency resolving.\n", MAXDEPTH);
         printf("This is most commonly caused by cyclic dependencies, please contact the maintainer of the package you want to install.\n");
@@ -17,6 +17,13 @@ void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *
                     break;
                 }
             }
+            if (current_installed) {
+                struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
+                if (pkgupdt != NULL) {
+                    updatepkgs[*updatec] = pkgupdt;
+                    *updatec = *updatec + 1;
+                }
+            }
             if (!currpkg->depends.retval[0][0] == '\0') {
                 for (int i = 0; i < currpkg->depends.retc; i++) {
                     int in_queue = 0;
@@ -26,10 +33,8 @@ void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *
                             break;
                         }
                     }
-                    // TODO!!
-                    struct pkg_update *updt = pkg_has_update(current, database, installed);
-                    if (!in_queue && (updt != NULL))
-                        resolve_recursive(nodelist, currpkg->depends.retval[i], database, installed, depth + 1);
+                    if (!in_queue)
+                        resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i], database, installed, depth + 1, updatec);
                 }
             }
             if (!current_installed) {
