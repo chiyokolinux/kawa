@@ -60,4 +60,9 @@ struct repolist {
     struct repository repos[];
 };
 
+struct install_pkg {
+    char *name;
+    struct package **depends;
+};
+
 #endif // DATATYPES_H

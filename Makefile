@@ -3,7 +3,7 @@ include config.mk
 PROGBIN = kawa
 
 PROGOBJ = kawa.o
-DFSAOBJ = dfs.o
+DFSAOBJ = depresolve.o
 HELPOBJ = help.o
 INSTOBJ = install.o
 REMVOBJ = remove.o
@@ -18,8 +18,8 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 RPADOBJ = repoadd.o
 
-OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(HELPOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h help.h repoadd.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h depresolve.h help.h install.h repoadd.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 
