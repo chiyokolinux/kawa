@@ -1,5 +1,25 @@
 #include "update.h"
 
+struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, struct pkglist *installed) {
+    int remote_i = 0;
+    int i = 0;
+    while (strcmp(pkgname, installed->packages[i]->name))
+        i++;
+    struct package *currpkg_l = installed->packages[i];
+    while (strcmp(currpkg_l->name, database->packages[remote_i]->name))
+        remote_i++; // this should work because the package lists are sorted (hopefully)
+    if (strcmp(currpkg_l->version, database->packages[remote_i]->version)) {
+        struct pkg_update *pkgupdt = malloc(sizeof(struct pkg_update));
+        *pkgupdt = (struct pkg_update) {
+            .name = currpkg_l->name,
+            .version_local = currpkg_l->version,
+            .version_remote = database->packages[remote_i]->version
+        };
+        return pkgupdt;
+    }
+    return NULL;
+}
+
 int update() {
     sync_all();
     struct pkglist *database = get_all_packages();

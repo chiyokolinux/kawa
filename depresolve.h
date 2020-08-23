@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "update.h"
 #include "database.h"
 #include "datatypes.h"
 

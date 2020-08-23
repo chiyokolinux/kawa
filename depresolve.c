@@ -26,7 +26,9 @@ void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *
                             break;
                         }
                     }
-                    if (!in_queue)
+                    // TODO!!
+                    struct pkg_update *updt = pkg_has_update(current, database, installed);
+                    if (!in_queue && (updt != NULL))
                         resolve_recursive(nodelist, currpkg->depends.retval[i], database, installed, depth + 1);
                 }
             }

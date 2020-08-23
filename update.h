@@ -10,5 +10,6 @@
 
 int update();
 int upgrade(struct pkg_update *updpkglst[]);
+struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, struct pkglist *installed);
 
 #endif // UPDATE_H
