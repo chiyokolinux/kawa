@@ -13,4 +13,7 @@
 // Replace the first 0 with a 1 for bold text.
 #define HIGHLIGHTCOLOR "[0;32m"
 
+// Maximum dependency resolving depth.
+#define MAXDEPTH 8192
+
 #endif // CONFIG_H

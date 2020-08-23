@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "database.h"
 #include "datatypes.h"
 
-struct dependency_graph *resolve_recursive(struct dependency_graph *nodelist, char *current, struct pkglist *database, struct pkglist *installed);
+void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *database, struct pkglist *installed, int depth);
 
 #endif // DEPRESOLVE_H

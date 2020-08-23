@@ -18,8 +18,10 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 RPADOBJ = repoadd.o
 
-OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h depresolve.h help.h install.h repoadd.h reposync.h database.h update.h search.h show.h
+# OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+OBJECTS = $(PROGOBJ) $(DTBSOBJ) $(HELPOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h help.h repoadd.h reposync.h database.h update.h search.h show.h
+# HEADERS = config.h datatypes.h depresolve.h help.h install.h repoadd.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 

@@ -133,6 +133,8 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
 }
 
 struct pkglist *get_all_packages() {
+    // all repos together probably won't exceed 16MiB. If they do, I'll just release a kawa update making this limit bigger
+    // I just checked, 32MiB could cover more than 45,000 packages. Yeah, 16MiB is enough
     struct package **packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096);
     int pkg_count = 0;
     long total_size = 0L;

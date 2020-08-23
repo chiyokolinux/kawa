@@ -1,6 +1,16 @@
 #include "install.h"
 
 int install(int pkgc, char *pkgnames[]) {
+    struct pkglist *database = get_all_packages();
+    struct pkglist *installed = get_installed_packages();
+    struct pkglist *nodelist = malloc(sizeof(database));
+    for (int i = 0; i < pkgc; i++) {
+        resolve_recursive(nodelist, pkgnames[i], database, installed, 0);
+    }
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        printf("%d: %s ", i, nodelist->packages[i]->name);
+    }
+    printf("\n");
     return 0;
 }
 

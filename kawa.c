@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
     }
     if (!strcmp(argv[1], "sync") && argc == 2)
         return sync_all();
+//     else if (!strcmp(argv[1], "install") && argc == 3)
+//         return install(argc, argv);
     else if (!strcmp(argv[1], "update") && argc == 2)
         return update();
     else if (!strcmp(argv[1], "search") && argc == 3)
