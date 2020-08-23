@@ -3,8 +3,8 @@
 int install(int pkgc, char *pkgnames[]) {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
-    struct package **packages = malloc(sizeof(database->packages));
-    struct pkglist *nodelist = malloc(sizeof(struct pkglist));
+    struct package **packages = malloc(sizeof(database->packages)+1024);
+    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+1024);
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
     printf("\n");
@@ -12,7 +12,7 @@ int install(int pkgc, char *pkgnames[]) {
         resolve_recursive(nodelist, pkgnames[i], database, installed, 0);
     }
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        printf("%d: %s ", i, nodelist->packages[i]->name);
+        printf("%d: %s\n", i, nodelist->packages[i]->name);
     }
     printf("\n");
     return 0;
