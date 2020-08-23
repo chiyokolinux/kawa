@@ -14,7 +14,7 @@ int show(char pkgname[]) {
                     break;
                 }
             }
-            printf("Information for package %s:\n-------------------------", pkgname);
+            printf("\nInformation for package %s:\n-------------------------", pkgname);
             int dashes_total = strlen(pkgname);
             for (int dash = 0; dash < dashes_total; dash++)
                 printf("-");

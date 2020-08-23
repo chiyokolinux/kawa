@@ -34,6 +34,7 @@ void resolve_recursive(struct pkglist *nodelist, char *current, struct pkglist *
                 nodelist->packages[nodelist->pkg_count] = currpkg;
                 nodelist->pkg_count++;
             }
+            return;
         }
     }
     printf("Error: Package %s not found, but required by another package.\n", current);
