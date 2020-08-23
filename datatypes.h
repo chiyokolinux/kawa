@@ -62,7 +62,12 @@ struct repolist {
 
 struct install_pkg {
     char *name;
-    struct package **depends;
+    struct install_pkg **depends;
 };
+
+struct dependency_graph {
+    int pkg_count;
+    struct install_pkg **packages;
+}
 
 #endif // DATATYPES_H
