@@ -11,15 +11,27 @@ int install(int pkgc, char *pkgnames[]) {
     for (int i = 2; i < pkgc; i++) {
         resolve_recursive(nodelist, pkgnames[i], database, installed, 0);
     }
+    printf("The following packages will be installed:\n ");
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        printf("%d: %s\n", i, nodelist->packages[i]->name);
+        printf(" %s", nodelist->packages[i]->name);
     }
-    printf("\n");
-    return 0;
+    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count, 0, 0);
+    printf("Do you wish to proceed? [Y/n] ");
+    fflush(stdout);
+    char response = getchar();
+    if (response == 'n' || response == 'N')
+        return 0;
+    else if (response == 'y' || response == 'Y' || response == '\n') {
+        int retval = 0;
+        for (int i = 0; i < nodelist->pkg_count; i++) {
+            retval += install_no_deps(nodelist->packages[i]->name, database);
+        }
+        return retval;
+    } else
+        return 1;
 }
 
-int install_no_deps(char pkgname[]) {
-    struct pkglist *database = get_all_packages();
+int install_no_deps(char pkgname[], struct pkglist *database) {
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];

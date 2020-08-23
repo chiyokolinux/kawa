@@ -9,6 +9,6 @@
 #include "depresolve.h"
 
 int install(int pkgc, char *pkgnames[]);
-int install_no_deps(char pkgname[]);
+int install_no_deps(char pkgname[], struct pkglist *database);
 
 #endif // INSTALL_H
