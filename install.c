@@ -4,8 +4,8 @@ int install(int pkgc, char *pkgnames[]) {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkgs[installed->pkg_count];
-    struct package **packages = malloc(sizeof(database->packages)+1024);
-    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+1024);
+    struct package **packages = malloc(sizeof(char)*database->pkg_count*1024);
+    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+sizeof(char)*database->pkg_count*1024);
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
     int *updatec = malloc(sizeof(int));
