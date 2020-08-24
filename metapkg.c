@@ -11,5 +11,6 @@ int metapkg_install(char pkgname[], struct package *pkgobj) {
 }
 
 int metapkg_remove(char pkgname[]) {
+    kawafile_run(pkgname, "remove");
     return 0;
 }

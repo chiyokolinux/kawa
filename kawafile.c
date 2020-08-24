@@ -16,6 +16,9 @@ void spawnwait(char *const argv[]) { // copied from ichirou
     }
 }
 
-void kawafile_run(char pkgname[], char *const argv[]) {
-    
+void kawafile_run(char pkgname[], char operation[]) {
+    // argv = INSTALLPREFIX + /etc/kawa.d/kawafiles/${pkgname}/Kawafile, ${operation}, NULL
+    // Kawafiles only need script path and operation and do the rest by themselves, so there's no need for
+    // complicated array prepending, NULL appending, type conversion or other stuff
+    // it sounds smart right now, but we'll see tomorrow
 }
