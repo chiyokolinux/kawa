@@ -1,6 +1,10 @@
 #include "metapkg.h"
 
 int metapkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
+    // no patch stuff
+    // no install()
+    // uninstall: kawa remove ${DEPENDS}.join(" ")
+    // but we'll probably do that in the main process
     return 0;
 }
 
@@ -11,6 +15,6 @@ int metapkg_install(char pkgname[], struct package *pkgobj) {
 }
 
 int metapkg_remove(char pkgname[]) {
-    kawafile_run(pkgname, "remove");
+    kawafile_run(pkgname, "remove"); // TODO: change that to for i in depends: uninstall(package)
     return 0;
 }
