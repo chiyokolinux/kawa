@@ -16,4 +16,8 @@
 // Maximum dependency resolving depth.
 #define MAXDEPTH 8192
 
+// you can use any number here, but for the fastest install times just use the number of threads you CPU has
+#define THREADNUM "$(nproc)"
+// ex.: #define THREADNUM "8" // for 8 jobs
+
 #endif // CONFIG_H

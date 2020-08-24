@@ -1,6 +1,6 @@
 #include "kawafile.h"
 
-static void spawnwait(char *const argv[]) { // copied from ichirou
+void spawnwait(char *const argv[]) { // copied from ichirou
     pid_t chpid = fork();
     switch (chpid) {
         case 0:
@@ -14,4 +14,8 @@ static void spawnwait(char *const argv[]) { // copied from ichirou
         default:
             waitpid(chpid, NULL, WUNTRACED);
     }
+}
+
+void kawafile_run(char pkgname[], char *const argv[]) {
+    
 }
