@@ -32,6 +32,9 @@ int install(int pkgc, char *pkgnames[]) {
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
         int retval = 0;
+        for (int i = 0; i < *updatec; i++) {
+            retval += install_no_deps(updatepkgs[i]->name, database);
+        }
         for (int i = 0; i < nodelist->pkg_count; i++) {
             retval += install_no_deps(nodelist->packages[i]->name, database);
         }
