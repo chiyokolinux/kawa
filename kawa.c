@@ -6,6 +6,7 @@
 
 #include "help.h"
 #include "install.h"
+#include "makepackages.h"
 #include "repoadd.h"
 #include "update.h"
 #include "search.h"
@@ -31,5 +32,7 @@ int main(int argc, char *argv[]) {
         return version();
     else if (!strcmp(argv[1], "addrepo") && argc == 4)
         return repoadd(argv[2], argv[3]);
+    else if (!strcmp(argv[1], "makepackages") && argc == 2)
+        return makepackages();
     return help()+1;
 }

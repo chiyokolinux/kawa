@@ -17,9 +17,10 @@ METAOBJ = metapkg.o
 DTBSOBJ = database.o
 REPOOBJ = reposync.o
 RPADOBJ = repoadd.o
+MKPGOBJ = makepackages.o
 
-OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h depresolve.h help.h install.h repoadd.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(MKPGOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h datatypes.h depresolve.h help.h install.h makepackages.h repoadd.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 
