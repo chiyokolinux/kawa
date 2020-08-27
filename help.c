@@ -7,6 +7,7 @@ int help() {
     printf("    kawa install [package(s)]\n");
     printf("    kawa remove [package(s)]\n");
     printf("    kawa help\n");
+    printf("    kawa makepackages\n");
     printf("    kawa update\n");
     printf("    kawa search [term]\n");
     printf("    kawa show [package]\n");
