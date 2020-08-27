@@ -53,7 +53,7 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
             else if (!strcmp(currpkg->type, "patch"))
                 return 0; // TODO: sourcepkg_install(patch=pkgname)
             else if (!strcmp(currpkg->type, "meta"))
-                return 0; // TODO: metapkg_install(name=pkgname)
+                return metapkg_install(pkgname);
             else if (!strcmp(currpkg->type, "binary"))
                 return 0; // binarypkg_install(name=pkgname)
             return 1;

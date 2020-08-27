@@ -1,6 +1,6 @@
 #include "metapkg.h"
 
-int metapkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
+int metapkg_gen_kawafile(char pkgname[]) {
     kawafile_dir_create(pkgname);
     
     FILE *fp;
@@ -20,14 +20,15 @@ int metapkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
     return 0;
 }
 
-int metapkg_install(char pkgname[], struct package *pkgobj) {
+int metapkg_install(char pkgname[]) {
     // meta packages only install their depends and remove them on uninstall,
     // but that's handled without Kawafiles,
     // so we only need to generate an empty Kawafile
-    return metapkg_gen_kawafile(pkgname, pkgobj);
+    return metapkg_gen_kawafile(pkgname);
 }
 
 int metapkg_remove(char pkgname[]) {
+    printf("%s", pkgname);
     // TODO: change that to for i in depends: uninstall(package)
     return 0;
 }

@@ -4,15 +4,16 @@ void spawnwait(char *const argv[]) { // copied from ichirou
     pid_t chpid = fork();
     switch (chpid) {
         case 0:
-            sigprocmask(SIG_UNBLOCK, &set, NULL);
             setsid();
             execvp(argv[0], argv);
             perror("execvp");
             _exit(1);
         case -1:
             perror("fork");
+            break;
         default:
             waitpid(chpid, NULL, WUNTRACED);
+            break;
     }
 }
 
@@ -21,6 +22,7 @@ void kawafile_run(char pkgname[], char operation[]) {
     // Kawafiles only need script path and operation and do the rest by themselves, so there's no need for
     // complicated array prepending, NULL appending, type conversion or other stuff
     // it sounds smart right now, but we'll see tomorrow
+    spawnwait((char *const[]){ pkgname, operation, NULL });
 }
 
 void kawafile_dir_create(char pkgname[]) {

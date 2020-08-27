@@ -7,8 +7,8 @@
 #include "datatypes.h"
 #include "kawafile.h"
 
-int metapkg_gen_kawafile(char pkgname[], struct package *pkgobj);
-int metapkg_install(char pkgname[], struct package *pkgobj);
+int metapkg_gen_kawafile(char pkgname[]);
+int metapkg_install(char pkgname[]);
 int metapkg_remove(char pkgname[]);
 
 #endif // METAPKG_H

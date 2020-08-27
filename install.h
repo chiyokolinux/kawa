@@ -8,6 +8,8 @@
 #include "database.h"
 #include "depresolve.h"
 
+#include "metapkg.h"
+
 int install(int pkgc, char *pkgnames[]);
 int install_no_deps(char pkgname[], struct pkglist *database);
 

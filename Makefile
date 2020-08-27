@@ -18,9 +18,10 @@ DTBSOBJ = database.o
 REPOOBJ = reposync.o
 RPADOBJ = repoadd.o
 MKPGOBJ = makepackages.o
+KWFLOBJ = kawafile.o
 
-OBJECTS = $(PROGOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(MKPGOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h datatypes.h depresolve.h help.h install.h makepackages.h repoadd.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(BINAOBJ) $(DFSAOBJ) $(DTBSOBJ) $(HELPOBJ) $(INSTOBJ) $(KWFLOBJ) $(METAOBJ) $(MKPGOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h binarypkg.h datatypes.h depresolve.h help.h install.h kawafile.h makepackages.h metapkg.h repoadd.h reposync.h database.h update.h search.h show.h
 
 all: $(PROGBIN)
 
