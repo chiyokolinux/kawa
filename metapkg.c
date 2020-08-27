@@ -1,20 +1,33 @@
 #include "metapkg.h"
 
 int metapkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
-    // no patch stuff
-    // no install()
-    // uninstall: kawa remove ${DEPENDS}.join(" ")
-    // but we'll probably do that in the main process
+    kawafile_dir_create(pkgname);
+    
+    FILE *fp;
+
+    char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, pkgname);
+    strcat(path, "/Kawafile");
+    
+    // We just want to create the file without writing anything
+    fp = fopen(path, "w");
+    fputs("#!/bin/sh\n", fp);
+    fclose(fp);
+    
     return 0;
 }
 
 int metapkg_install(char pkgname[], struct package *pkgobj) {
     // meta packages only install their depends and remove them on uninstall,
-    // so we only need to generate a Kawafile which uninstalls all dependencies
+    // but that's handled without Kawafiles,
+    // so we only need to generate an empty Kawafile
     return metapkg_gen_kawafile(pkgname, pkgobj);
 }
 
 int metapkg_remove(char pkgname[]) {
-    kawafile_run(pkgname, "remove"); // TODO: change that to for i in depends: uninstall(package)
+    // TODO: change that to for i in depends: uninstall(package)
     return 0;
 }

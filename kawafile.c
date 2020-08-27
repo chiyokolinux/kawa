@@ -22,3 +22,17 @@ void kawafile_run(char pkgname[], char operation[]) {
     // complicated array prepending, NULL appending, type conversion or other stuff
     // it sounds smart right now, but we'll see tomorrow
 }
+
+void kawafile_dir_create(char pkgname[]) {
+    struct stat st = {0};
+    
+    char path[strlen(INSTALLPREFIX)+23+strlen(pkgname)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, pkgname);
+    
+    if (stat(path, &st) == -1) {
+        mkdir(path, 0700);
+    }
+}
