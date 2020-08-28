@@ -27,8 +27,9 @@ int metapkg_install(char pkgname[]) {
     return metapkg_gen_kawafile(pkgname);
 }
 
-int metapkg_remove(char pkgname[]) {
-    printf("%s", pkgname);
-    // TODO: change that to for i in depends: uninstall(package)
+int metapkg_remove(struct package *package) {
+    for (int i = 0; i < package->depends->retc; i++) {
+        // uninstall dat boi
+    }
     return 0;
 }

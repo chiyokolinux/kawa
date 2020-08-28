@@ -9,6 +9,6 @@
 
 int metapkg_gen_kawafile(char pkgname[]);
 int metapkg_install(char pkgname[]);
-int metapkg_remove(char pkgname[]);
+int metapkg_remove(struct package *package);
 
 #endif // METAPKG_H
