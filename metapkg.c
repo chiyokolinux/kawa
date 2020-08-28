@@ -28,7 +28,7 @@ int metapkg_install(char pkgname[]) {
 }
 
 int metapkg_remove(struct package *package) {
-    for (int i = 0; i < package->depends->retc; i++) {
+    for (int i = 0; i < package->depends.retc; i++) {
         // uninstall dat boi
     }
     return 0;

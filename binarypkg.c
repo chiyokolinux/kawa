@@ -1,11 +1,10 @@
 #include "binarypkg.h"
 
 // command to generate uninstall cmd:
-// tar -tf packages/wallpaper-chungus/archives/wallpaper-chungus-1.0.tar.gz | sed '/\/$/d' | sed -e 's/^/rm \//'
-int binarypkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
+// tar -tf package.tar.* | sed '/\/$/d' | sed -e 's/^/    rm \//'
+// tar xf package.tar.* -C /
+int binarypkg_gen_kawafile(char pkgname[]) {
     kawafile_dir_create(pkgname);
-    
-    FILE *fp;
 
     char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
     strcpy(path, "");
@@ -14,27 +13,25 @@ int binarypkg_gen_kawafile(char pkgname[], struct package *pkgobj) {
     strcat(path, pkgname);
     strcat(path, "/Kawafile");
     
-    printf("%s", pkgobj->name);
+    char cmdline[446+strlen(path)];
+    strcpy(cmdline, "");
+    // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
+    sprintf(cmdline, "(echo \"#!/bin/sh\" echo \"do_install() {\"; echo \"tar xf package.tar.* -C /\"; echo \"}\" echo \"do_remove() {\"; tar -tf package.tar.* | sed '/\\/$/d' | sed -e 's/^/    rm \\//'; echo \"}\"; echo \"do_update() {\"; echo \"    do_remove\"; echo \"    do_install\"; echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") > %s", path);
     
-    system("for d in packages/*/; do ${d}/mkpackage.sh >> Kawamake.log; done;");
+    system(cmdline);
     printf(".");
     fflush(stdout);
-    
-    // We just want to create the file without writing anything
-    fp = fopen(path, "w");
-    fputs("#!/bin/sh\n", fp);
-    fclose(fp);
     
     return 0;
 }
 
-int binarypkg_install(char pkgname[], struct package *pkgobj) {
+int binarypkg_install(char pkgname[]) {
     // binary packages are basically untared on install and to uninstall,
     // we remove all files that were in the tar. so that's all our Kawafile does
     int retval = 0;
     printf("Installing %s.", pkgname);
     fflush(stdout);
-    retval += binarypkg_gen_kawafile(pkgname, pkgobj);
+    retval += binarypkg_gen_kawafile(pkgname);
     printf(" Done.\n");
     return retval;
 }

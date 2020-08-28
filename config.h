@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "0.1"
+#define VERSION "0.2"
 
 // Prefix for basically everything (also config files!)
 // Use for distributing binary packages of this program (for example)
