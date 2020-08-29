@@ -55,7 +55,7 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
             else if (!strcmp(currpkg->type, "meta"))
                 return metapkg_install(pkgname);
             else if (!strcmp(currpkg->type, "binary"))
-                return 0; // binarypkg_install(name=pkgname)
+                return binarypkg_install(pkgname);
             return 1;
         }
     }
