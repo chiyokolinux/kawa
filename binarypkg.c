@@ -48,9 +48,13 @@ int binarypkg_remove(char pkgname[]) {
 }
 
 int binarypkg_update(char pkgname[]) {
-    printf("Updating %s...", pkgname);
+    int retval = 0;
+    printf("Updating %s.", pkgname);
     fflush(stdout);
+    retval += binarypkg_gen_kawafile(pkgname);
     kawafile_run(pkgname, "update");
+    printf(".");
+    fflush(stdout);
     printf(" Done.\n");
-    return 0;
+    return retval;
 }
