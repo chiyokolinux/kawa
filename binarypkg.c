@@ -16,7 +16,7 @@ int binarypkg_gen_kawafile(char pkgname[]) {
     char cmdline[446+strlen(path)];
     strcpy(cmdline, "");
     // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
-    sprintf(cmdline, "(echo \"#!/bin/sh\" echo \"do_install() {\"; echo \"tar xf package.tar.* -C /\"; echo \"}\" echo \"do_remove() {\"; tar -tf package.tar.* | sed '/\\/$/d' | sed -e 's/^/    rm -f \\//'; echo \"}\"; echo \"do_update() {\"; echo \"    do_remove\"; echo \"    do_install\"; echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") > %s", path);
+    sprintf(cmdline, "(echo \"#!/bin/sh\"; echo \"do_install() {\"; echo \"    tar xf package.tar.* -C /\"; echo \"}\"; echo \"do_remove() {\"; tar -tf package.tar.* | sed '/\\/$/d' | sed -e 's/^/    rm -f \\//'; echo \"}\"; echo \"do_update() {\"; echo \"    do_remove\"; echo \"    do_install\"; echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") > %s", path);
     
     system(cmdline);
     printf(".");
