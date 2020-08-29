@@ -2,6 +2,7 @@
 #define INSTALL_H
 
 #include <stdio.h>
+#include <curl/curl.h>
 
 #include "config.h"
 #include "datatypes.h"
