@@ -12,5 +12,6 @@
 int binarypkg_gen_kawafile(char pkgname[]);
 int binarypkg_install(char pkgname[]);
 int binarypkg_remove(char pkgname[]);
+int binarypkg_update(char pkgname[]);
 
 #endif // BINARYPKG_H

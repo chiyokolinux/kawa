@@ -32,6 +32,9 @@ int binarypkg_install(char pkgname[]) {
     printf("Installing %s.", pkgname);
     fflush(stdout);
     retval += binarypkg_gen_kawafile(pkgname);
+    kawafile_run(pkgname, "install");
+    printf(".");
+    fflush(stdout);
     printf(" Done.\n");
     return retval;
 }
@@ -40,6 +43,14 @@ int binarypkg_remove(char pkgname[]) {
     printf("Removing %s...", pkgname);
     fflush(stdout);
     kawafile_run(pkgname, "remove");
+    printf(" Done.\n");
+    return 0;
+}
+
+int binarypkg_update(char pkgname[]) {
+    printf("Updating %s...", pkgname);
+    fflush(stdout);
+    kawafile_run(pkgname, "update");
     printf(" Done.\n");
     return 0;
 }
