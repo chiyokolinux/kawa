@@ -7,16 +7,18 @@ int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
     kawafile_dir_create(pkgname);
 
     char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
+    char dir[strlen(INSTALLPREFIX)+23+strlen(pkgname)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/kawafiles/");
     strcat(path, pkgname);
+    strcpy(dir, path);
     strcat(path, "/Kawafile");
     
     char cmdline[446+strlen(path)];
     strcpy(cmdline, "");
     // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
-    sprintf(cmdline, "(echo \"#!/bin/sh\"; echo \"do_install() {\"; echo \"    tar xf package.tar.* -C /\"; echo \"}\"; echo \"do_remove() {\"; tar -tf package.tar.* | sed '/\\/$/d' | sed -e 's/^/    rm -f \\//'; echo \"}\"; echo \"do_update() {\"; echo \"    do_remove\"; echo \"    do_install\"; echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") > %s", path);
+    sprintf(cmdline, "(echo \"#!/bin/sh\"; echo \"cd %3$s\"; echo \"do_install() {\"; echo \"    tar xf package.tar.%2$s -C /\"; echo \"}\"; echo \"do_remove() {\"; tar -tf %3$s/package.tar.%2$s | sed '/\\/$/d' | sed -e 's/^/    rm -f \\//'; echo \"}\"; echo \"do_update() {\"; echo \"    do_remove\"; echo \"    do_install\"; echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") > %1$s", path, filetype, dir);
     
     int retval = system(cmdline);
     printf(".");
@@ -47,11 +49,11 @@ int binarypkg_remove(char pkgname[]) {
     return 0;
 }
 
-int binarypkg_update(char pkgname[]) {
+int binarypkg_update(char pkgname[], char filetype[]) {
     int retval = 0;
     printf("Updating %s.", pkgname);
     fflush(stdout);
-    retval += binarypkg_gen_kawafile(pkgname);
+    retval += binarypkg_gen_kawafile(pkgname, filetype);
     kawafile_run(pkgname, "update");
     printf(".");
     fflush(stdout);

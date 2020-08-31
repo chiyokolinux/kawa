@@ -45,7 +45,7 @@ int install(int pkgc, char *pkgnames[]) {
         return 1;
 }
 
-int download_archive(struct package *dlpackage) {
+int download_archive(struct package *dlpackage, char filetype[]) {
     CURL *curl;
     CURLcode res;
     int retval = 0;
@@ -54,25 +54,8 @@ int download_archive(struct package *dlpackage) {
     if (curl) {
         char *archiveurl_version_replaced = str_replace(dlpackage->archiveurl, "${VERSION}", dlpackage->version);
         char *archiveurl_name_replaced = str_replace(archiveurl_version_replaced, "${NAME}", dlpackage->name);
-        printf("%s -> %s\n", archiveurl_version_replaced, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        
-        char *p = dlpackage->archiveurl;
-        size_t ln = strlen(p) - 1;
-        char filetype[8];
-        if (p[ln] == '\n')
-            p[ln] = '\0';
-        while (1) {
-            char *p2 = strchr(p, '.');
-            if(p2 != NULL)
-                *p2 = '\0';
-            if (strlen(p) < 8)
-                strcpy(filetype, p);
-            if(p2 == NULL)
-                break;
-            p = p2 + 1;
-        }
         
         char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
         strcpy(path, "");
@@ -105,7 +88,26 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
         if (!strcmp(currpkg->name, pkgname)) {
-            if (download_archive(currpkg))
+            // compute filetype
+            char *p = malloc(strlen(currpkg->archiveurl));
+            strcpy(p, currpkg->archiveurl);
+            // char *p = tmp;
+            size_t ln = strlen(p) - 1;
+            char filetype[8];
+            if (p[ln] == '\n')
+                p[ln] = '\0';
+            while (1) {
+                char *p2 = strchr(p, '.');
+                if(p2 != NULL)
+                    *p2 = '\0';
+                if (strlen(p) < 8)
+                    strcpy(filetype, p);
+                if(p2 == NULL)
+                    break;
+                p = p2 + 1;
+            }
+            
+            if (download_archive(currpkg, filetype))
                 return 1;
             if (!strcmp(currpkg->type, "source"))
                 return 0; // TODO: sourcepkg_install(name=pkgname)

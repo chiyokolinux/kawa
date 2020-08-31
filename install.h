@@ -16,7 +16,7 @@
 
 int install(int pkgc, char *pkgnames[]);
 int install_no_deps(char pkgname[], struct pkglist *database);
-int download_archive(struct package *dlpackage);
+int download_archive(struct package *dlpackage, char filetype[]);
 char *str_replace(char *orig, char *rep, char *with);
 
 #endif // INSTALL_H
