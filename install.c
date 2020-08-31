@@ -31,6 +31,7 @@ int install(int pkgc, char *pkgnames[]) {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
         int retval = 0;
         for (int i = 0; i < *updatec; i++) {
             retval += install_no_deps(updatepkgs[i]->name, database);
@@ -38,13 +39,14 @@ int install(int pkgc, char *pkgnames[]) {
         for (int i = 0; i < nodelist->pkg_count; i++) {
             retval += install_no_deps(nodelist->packages[i]->name, database);
         }
+            curl_global_cleanup();
         return retval;
     } else
         return 1;
 }
 
 int download_archive(struct package *dlpackage) {
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    
     
     CURL *curl;
     CURLcode res;
@@ -71,7 +73,6 @@ int download_archive(struct package *dlpackage) {
         }
 
         curl_easy_cleanup(curl);
-        // curl_slist_free_all(list);
         fclose(indexfile);
     } else {
         fprintf(stderr, "Syncing repo %s failed: Cannot create cURL object\n", reponame);
@@ -79,8 +80,6 @@ int download_archive(struct package *dlpackage) {
     }
  
     return retval;
-    
-    curl_global_cleanup();
 }
 
 int install_no_deps(char pkgname[], struct pkglist *database) {
