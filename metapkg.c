@@ -17,7 +17,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     fputs("#!/bin/sh\n", fp);
     fclose(fp);
     
-    printf(" Done.\n");
+    printf(" Done\n");
     
     return 0;
 }
@@ -37,7 +37,7 @@ int metapkg_remove(struct package *package) {
     for (int i = 0; i < package->depends.retc; i++) {
         kawafile_run(package->depends.retval[i], "remove");
     }
-    printf(" Done.\n");
+    printf(" Done\n");
     return 0;
 }
 

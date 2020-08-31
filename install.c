@@ -46,6 +46,24 @@ int install(int pkgc, char *pkgnames[]) {
 }
 
 int download_archive(struct package *dlpackage, char filetype[]) {
+    printf("Downloading %s...", dlpackage->name);
+    fflush(stdout);
+    
+    struct stat st = {0};
+    
+    char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, dlpackage->name);
+    strcat(path, "/package.tar.");
+    strcat(path, filetype);
+    
+    if (stat(path, &st) != -1) {
+        printf(" Done\n");
+        return 0;
+    }
+    
     CURL *curl;
     CURLcode res;
     int retval = 0;
@@ -57,13 +75,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
         curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
-        char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
-        strcpy(path, "");
-        strcat(path, INSTALLPREFIX);
-        strcat(path, "/etc/kawa.d/kawafiles/");
-        strcat(path, dlpackage->name);
-        strcat(path, "/package.tar.");
-        strcat(path, filetype);
+        
         FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
@@ -79,7 +91,8 @@ int download_archive(struct package *dlpackage, char filetype[]) {
         fprintf(stderr, "Downloading package %s failed: Cannot create cURL object\n", dlpackage->name);
         return ++retval;
     }
- 
+
+    printf(" Done\n");
     return retval;
 }
 
@@ -106,6 +119,8 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
                     break;
                 p = p2 + 1;
             }
+            
+            kawafile_dir_create(pkgname);
             
             if (download_archive(currpkg, filetype))
                 return 1;

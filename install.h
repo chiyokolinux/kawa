@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <sys/stat.h>
 
 #include "config.h"
 #include "datatypes.h"
 #include "database.h"
 #include "depresolve.h"
+#include "kawafile.h"
 
 #include "metapkg.h"
 #include "binarypkg.h"
