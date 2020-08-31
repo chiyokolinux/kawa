@@ -57,12 +57,29 @@ int download_archive(struct package *dlpackage) {
         curl_easy_setopt(curl, CURLOPT_URL, dlpackage->archiveurl);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
+        char *p = dlpackage->archiveurl;
+        size_t ln = strlen(p) - 1;
+        char filetype[8];
+        if (p[ln] == '\n')
+            p[ln] = '\0';
+        while (1) {
+            char *p2 = strchr(p, '.');
+            if(p2 != NULL)
+                *p2 = '\0';
+            if (strlen(p) < 8)
+                strcpy(filetype, p);
+            if(p2 == NULL)
+                break;
+            p = p2 + 1;
+        }
+        
         char path[strlen(INSTALLPREFIX)+25+strlen(dlpackage->name)];
         strcpy(path, "");
         strcat(path, INSTALLPREFIX);
         strcat(path, "/etc/kawa.d/kawafiles/");
         strcat(path, dlpackage->name);
-        strcat(path, "/archive.tar.TODO: detect file type");
+        strcat(path, "/archive.tar.");
+        strcat(path, filetype);
         FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
