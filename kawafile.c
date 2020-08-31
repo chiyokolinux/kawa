@@ -22,7 +22,13 @@ void kawafile_run(char pkgname[], char operation[]) {
     // Kawafiles only need script path and operation and do the rest by themselves, so there's no need for
     // complicated array prepending, NULL appending, type conversion or other stuff
     // it sounds smart right now, but we'll see tomorrow
-    spawnwait((char *const[]){ pkgname, operation, NULL });
+    char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, pkgname);
+    strcat(path, "/Kawafile");
+    spawnwait((char *const[]){ path, operation, NULL });
 }
 
 void kawafile_dir_create(char pkgname[]) {
