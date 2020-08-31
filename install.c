@@ -46,14 +46,12 @@ int install(int pkgc, char *pkgnames[]) {
 }
 
 int download_archive(struct package *dlpackage) {
-    
-    
     CURL *curl;
     CURLcode res;
     int retval = 0;
 
     curl = curl_easy_init();
-    if (curl) {
+    if (curl) {        
         curl_easy_setopt(curl, CURLOPT_URL, dlpackage->archiveurl);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
@@ -73,12 +71,12 @@ int download_archive(struct package *dlpackage) {
             p = p2 + 1;
         }
         
-        char path[strlen(INSTALLPREFIX)+25+strlen(dlpackage->name)];
+        char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
         strcpy(path, "");
         strcat(path, INSTALLPREFIX);
         strcat(path, "/etc/kawa.d/kawafiles/");
         strcat(path, dlpackage->name);
-        strcat(path, "/archive.tar.");
+        strcat(path, "/package.tar.");
         strcat(path, filetype);
         FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
@@ -103,9 +101,9 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
-        if (download_archive(currpkg))
-            return 1;
         if (!strcmp(currpkg->name, pkgname)) {
+            if (download_archive(currpkg))
+                return 1;
             if (!strcmp(currpkg->type, "source"))
                 return 0; // TODO: sourcepkg_install(name=pkgname)
             else if (!strcmp(currpkg->type, "patch"))
