@@ -68,14 +68,14 @@ int download_archive(struct package *dlpackage) {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            fprintf(stderr, "Syncing repo %s failed: %s\n", reponame, curl_easy_strerror(res));
+            fprintf(stderr, "Downloading package %s failed: %s\n", dlpackage->name, curl_easy_strerror(res));
             retval++;
         }
 
         curl_easy_cleanup(curl);
         fclose(indexfile);
     } else {
-        fprintf(stderr, "Syncing repo %s failed: Cannot create cURL object\n", reponame);
+        fprintf(stderr, "Downloading package %s failed: Cannot create cURL object\n", dlpackage->name);
         return ++retval;
     }
  
