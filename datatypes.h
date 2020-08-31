@@ -1,6 +1,9 @@
 #ifndef DATATYPES_H
 #define DATATYPES_H
 
+#include <stdlib.h>
+#include <string.h>
+
 enum pkgtype{source, patch, meta, binary};
 enum license{GPLv1, GPLv2, GPLv3, LGPLv1, LGPLv2, LGPLv21, LGPLv3, BSD, FREEOTHER, OTHER, CCBYSA, ZLIB, PUBLICDOMAIN, OSLv3, MIT, OPENSSL, PSFL, APACHE, APACHEv2, VIM};
 enum scripts{preinstall, preupdate, dobuild, doinstall, postinstall, postupdate};

@@ -51,8 +51,11 @@ int download_archive(struct package *dlpackage) {
     int retval = 0;
 
     curl = curl_easy_init();
-    if (curl) {        
-        curl_easy_setopt(curl, CURLOPT_URL, dlpackage->archiveurl);
+    if (curl) {
+        char *archiveurl_version_replaced = str_replace(dlpackage->archiveurl, "${VERSION}", dlpackage->version);
+        char *archiveurl_name_replaced = str_replace(archiveurl_version_replaced, "${NAME}", dlpackage->name);
+        printf("%s -> %s\n", archiveurl_version_replaced, archiveurl_name_replaced);
+        curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
         char *p = dlpackage->archiveurl;
@@ -111,10 +114,49 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
             else if (!strcmp(currpkg->type, "meta"))
                 return metapkg_install(pkgname);
             else if (!strcmp(currpkg->type, "binary"))
-                return binarypkg_install(pkgname);
+                return binarypkg_install(pkgname, filetype);
             return 1;
         }
     }
     printf("Error: Package %s not found (try kawa sync)\n", pkgname);
     return 1;
+}
+
+char *str_replace(char *orig, char *rep, char *with) {
+    char *result;
+    char *ins;
+    char *tmp;
+    int len_rep;
+    int len_with;
+    int len_front;
+    int count;
+
+    if (!orig || !rep)
+        return NULL;
+    len_rep = strlen(rep);
+    if (len_rep == 0)
+        return NULL;
+    if (!with)
+        with = "";
+    len_with = strlen(with);
+
+    ins = orig;
+    for (count = 0; (tmp = strstr(ins, rep)); ++count) {
+        ins = tmp + len_rep;
+    }
+
+    tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
+
+    if (!result)
+        return NULL;
+
+    while (count--) {
+        ins = strstr(orig, rep);
+        len_front = ins - orig;
+        tmp = strncpy(tmp, orig, len_front) + len_front;
+        tmp = strcpy(tmp, with) + len_with;
+        orig += len_front + len_rep;
+    }
+    strcpy(tmp, orig);
+    return result;
 }

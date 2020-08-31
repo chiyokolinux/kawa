@@ -3,7 +3,7 @@
 // command to generate uninstall cmd:
 // tar -tf package.tar.* | sed '/\/$/d' | sed -e 's/^/    rm \//'
 // tar xf package.tar.* -C /
-int binarypkg_gen_kawafile(char pkgname[]) {
+int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
     kawafile_dir_create(pkgname);
 
     char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
@@ -25,13 +25,13 @@ int binarypkg_gen_kawafile(char pkgname[]) {
     return retval;
 }
 
-int binarypkg_install(char pkgname[]) {
+int binarypkg_install(char pkgname[], char filetype[]) {
     // binary packages are basically untared on install and to uninstall,
     // we remove all files that were in the tar. so that's all our Kawafile does
     int retval = 0;
     printf("Installing %s.", pkgname);
     fflush(stdout);
-    retval += binarypkg_gen_kawafile(pkgname);
+    retval += binarypkg_gen_kawafile(pkgname, filetype);
     kawafile_run(pkgname, "install");
     printf(".");
     fflush(stdout);
