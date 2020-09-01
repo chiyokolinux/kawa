@@ -140,7 +140,29 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
 }
 
 int add_db_entry(struct package *package, int manual_installed) {
-    // tomorrow
+    // files are for tomorrow
+    
+    struct stat st = {0};
+    
+    char path[strlen(INSTALLPREFIX)+23+strlen(package->name)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, package->name);
+    
+    if (stat(path, &st) != -1) {
+        return 0;
+    }
+    
+    char manual[9];
+    if (manual_installed)
+        strcpy(manual, "manual");
+    else
+        strcpy(manual, "auto");
+    
+    // for all things that need to join with space
+    char placeholder[5] = "todo";
+    printf("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", package->name, manual, package->version, package->archiveurl, package->maintainer, placeholder, placeholder, package->configurecmd, placeholder, package->type, package->sepbuild, package->uninstallcmd, package->license, placeholder);
     return 0;
 }
 
