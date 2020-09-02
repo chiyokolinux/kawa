@@ -39,7 +39,7 @@ int install(int pkgc, char *pkgnames[]) {
         for (int i = 0; i < nodelist->pkg_count; i++) {
             retval += install_no_deps(nodelist->packages[i]->name, database);
         }
-            curl_global_cleanup();
+        curl_global_cleanup();
         return retval;
     } else
         return 1;
@@ -80,7 +80,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
         res = curl_easy_perform(curl);
-        if(res != CURLE_OK) {
+        if (res != CURLE_OK) {
             fprintf(stderr, "Downloading package %s failed: %s\n", dlpackage->name, curl_easy_strerror(res));
             retval++;
         }
@@ -120,6 +120,7 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
                 p = p2 + 1;
             }
             
+            add_db_entry(currpkg, 1);
             kawafile_dir_create(pkgname);
             
             if (download_archive(currpkg, filetype))
@@ -161,8 +162,8 @@ int add_db_entry(struct package *package, int manual_installed) {
         strcpy(manual, "auto");
     
     // for all things that need to join with space
-    char placeholder[5] = "todo";
-    printf("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s", package->name, manual, package->version, package->archiveurl, package->maintainer, placeholder, placeholder, package->configurecmd, placeholder, package->type, package->sepbuild, package->uninstallcmd, package->license, placeholder);
+    // char placeholder[5] = "todo";
+    printf("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, package->maintainer, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
     return 0;
 }
 
@@ -174,7 +175,7 @@ char *str_replace(char *orig, char *rep, char *with) {
     int len_with;
     int len_front;
     int count;
-
+    
     if (!orig || !rep)
         return NULL;
     len_rep = strlen(rep);
@@ -183,13 +184,13 @@ char *str_replace(char *orig, char *rep, char *with) {
     if (!with)
         with = "";
     len_with = strlen(with);
-
+    
     ins = orig;
     for (count = 0; (tmp = strstr(ins, rep)); ++count) {
         ins = tmp + len_rep;
     }
-
-    tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
+    
+    tmp = result = malloc(strlen(orig) * sizeof(char) + (len_with - len_rep) * count * sizeof(char) + 1);
 
     if (!result)
         return NULL;
@@ -203,4 +204,18 @@ char *str_replace(char *orig, char *rep, char *with) {
     }
     strcpy(tmp, orig);
     return result;
+}
+
+char *whitespace_join(struct strarr_retval to_join) {
+    int charc = 0;
+    for (int i = 0; i < to_join.retc; i++)
+        charc += strlen(to_join.retval[i]);
+    char *joined = malloc(sizeof(char) * charc + sizeof(char) * to_join.retc);
+    strcpy(joined, ""); // this seems to fix some stuff
+    for (int i = 0; i < to_join.retc; i++) {
+        strcat(joined, to_join.retval[i]);
+        if (i != to_join.retc - 1)
+            strcat(joined, " ");
+    }
+    return joined;
 }

@@ -21,5 +21,6 @@ int install_no_deps(char pkgname[], struct pkglist *database);
 int download_archive(struct package *dlpackage, char filetype[]);
 char *str_replace(char *orig, char *rep, char *with);
 int add_db_entry(struct package *package, int manual_installed);
+char *whitespace_join(struct strarr_retval to_join);
 
 #endif // INSTALL_H
