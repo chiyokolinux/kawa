@@ -163,15 +163,22 @@ int add_db_entry(struct package *package, int manual_installed) {
         return 0;
     }
     
+    char indexpath[strlen(INSTALLPREFIX)+34];
+    strcpy(indexpath, "");
+    strcat(indexpath, INSTALLPREFIX);
+    strcat(indexpath, "/etc/kawa.d/Installed.packages.db");
+
+    FILE* indexfile = fopen(indexpath, "a+");
+    
     char manual[9];
     if (manual_installed)
         strcpy(manual, "manual");
     else
         strcpy(manual, "auto");
     
-    // for all things that need to join with space
-    // char placeholder[5] = "todo";
-    printf("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, package->maintainer, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
+    fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, package->maintainer, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
+    
+    fclose(indexfile);
     return 0;
 }
 

@@ -2,7 +2,7 @@
 
 struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam) {
 
-    // TODO should be strnlen insteaf of srtlen
+    // TODO: should be strnlen insteaf of srtlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
     char *name         = malloc(sizeof(char) * strlen(nameParam         ) + 1);
     strcpy(name, nameParam);
