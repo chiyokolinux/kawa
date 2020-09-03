@@ -34,10 +34,18 @@ int install(int pkgc, char *pkgnames[]) {
         curl_global_init(CURL_GLOBAL_DEFAULT);
         int retval = 0;
         for (int i = 0; i < *updatec; i++) {
-            retval += install_no_deps(updatepkgs[i]->name, database);
+            // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
+            retval += install_no_deps(updatepkgs[i]->name, database, 0);
         }
         for (int i = 0; i < nodelist->pkg_count; i++) {
-            retval += install_no_deps(nodelist->packages[i]->name, database);
+            int maninst = 0;
+            for (int i2 = 0; i < pkgc; i++) {
+                if (!strcmp(nodelist->packages[i]->name, pkgnames[i2])) {
+                    maninst = 1;
+                    break;
+                }
+            }
+            retval += install_no_deps(nodelist->packages[i]->name, database, maninst);
         }
         curl_global_cleanup();
         return retval;
@@ -96,7 +104,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
     return retval;
 }
 
-int install_no_deps(char pkgname[], struct pkglist *database) {
+int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed) {
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
@@ -120,7 +128,7 @@ int install_no_deps(char pkgname[], struct pkglist *database) {
                 p = p2 + 1;
             }
             
-            add_db_entry(currpkg, 1);
+            add_db_entry(currpkg, manual_installed);
             kawafile_dir_create(pkgname);
             
             if (download_archive(currpkg, filetype))

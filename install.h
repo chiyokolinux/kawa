@@ -17,7 +17,7 @@
 #include "binarypkg.h"
 
 int install(int pkgc, char *pkgnames[]);
-int install_no_deps(char pkgname[], struct pkglist *database);
+int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed);
 int download_archive(struct package *dlpackage, char filetype[]);
 char *str_replace(char *orig, char *rep, char *with);
 int add_db_entry(struct package *package, int manual_installed);
