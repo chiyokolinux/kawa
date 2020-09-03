@@ -25,7 +25,7 @@ int show(char pkgname[]) {
             printf("Maintainer  : %s\n", currpkg->maintainer);
             printf("Type        : %s\n", currpkg->type);
             printf("License     : %s\n", currpkg->license);
-            printf("Description :\n    %s", currpkg->description);
+            printf("Description :\n    %s\n", currpkg->description);
             return 0;
         }
     }
