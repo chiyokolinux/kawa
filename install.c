@@ -39,7 +39,7 @@ int install(int pkgc, char *pkgnames[]) {
         }
         for (int i = 0; i < nodelist->pkg_count; i++) {
             int maninst = 0;
-            for (int i2 = 0; i < pkgc; i++) {
+            for (int i2 = 0; i2 < pkgc; i2++) {
                 if (!strcmp(nodelist->packages[i]->name, pkgnames[i2])) {
                     maninst = 1;
                     break;
