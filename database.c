@@ -116,7 +116,7 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15));
+        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15) + sizeof(struct strarr_retval *) * 5);
         parse_csv_line(buffer, newpkg);
         packages[pkg_count++] = newpkg;
     }

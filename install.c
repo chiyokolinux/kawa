@@ -14,6 +14,10 @@ int install(int pkgc, char *pkgnames[]) {
     for (int i = 2; i < pkgc; i++) {
         resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec);
     }
+    if (!nodelist->pkg_count && !*updatec) {
+        printf("All packages are installed and all dependencies are satisfied.\n");
+        return 0;
+    }
     printf("The following packages will be installed:\n ");
     for (int i = 0; i < nodelist->pkg_count; i++) {
         printf(" %s", nodelist->packages[i]->name);
@@ -110,7 +114,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
         currpkg = database->packages[i];
         if (!strcmp(currpkg->name, pkgname)) {
             // compute filetype
-            char *p = malloc(strlen(currpkg->archiveurl));
+            char *p = malloc(strlen(currpkg->archiveurl)+1);
             strcpy(p, currpkg->archiveurl);
             // char *p = tmp;
             size_t ln = strlen(p) - 1;
