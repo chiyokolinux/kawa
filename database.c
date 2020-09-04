@@ -4,25 +4,25 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
 
     // TODO: should be strnlen insteaf of srtlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
-    char *name         = malloc(sizeof(char) * strlen(nameParam         ) + 1);
+    char *name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1);
     strcpy(name, nameParam);
-    char *description  = malloc(sizeof(char) * strlen(descriptionParam  ) + 1);
+    char *description  = malloc(sizeof(char *) + sizeof(char) * strlen(descriptionParam  ) + 1);
     strcpy(description, descriptionParam);
-    char *version      = malloc(sizeof(char) * strlen(versionParam      ) + 1);
+    char *version      = malloc(sizeof(char *) + sizeof(char) * strlen(versionParam      ) + 1);
     strcpy(version, versionParam);
-    char *archiveurl   = malloc(sizeof(char) * strlen(archiveurlParam   ) + 1);
+    char *archiveurl   = malloc(sizeof(char *) + sizeof(char) * strlen(archiveurlParam   ) + 1);
     strcpy(archiveurl, archiveurlParam);
-    char *maintainer   = malloc(sizeof(char) * strlen(maintainerParam   ) + 1);
+    char *maintainer   = malloc(sizeof(char *) + sizeof(char) * strlen(maintainerParam   ) + 1);
     strcpy(maintainer, maintainerParam);
-    char *configurecmd = malloc(sizeof(char) * strlen(configurecmdParam ) + 1);
+    char *configurecmd = malloc(sizeof(char *) + sizeof(char) * strlen(configurecmdParam ) + 1);
     strcpy(configurecmd, configurecmdParam);
-    char *type         = malloc(sizeof(char) * strlen(typeParam         ) + 1);
+    char *type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1);
     strcpy(type, typeParam);
-    char *sepbuild     = malloc(sizeof(char) * strlen(sepbuildParam     ) + 1);
+    char *sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1);
     strcpy(sepbuild, sepbuildParam);
-    char *uninstallcmd = malloc(sizeof(char) * strlen(uninstallcmdParam ) + 1);
+    char *uninstallcmd = malloc(sizeof(char *) + sizeof(char) * strlen(uninstallcmdParam ) + 1);
     strcpy(uninstallcmd, uninstallcmdParam);
-    char *license      = malloc(sizeof(char) * strlen(licenseParam      ) + 1);
+    char *license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1);
     strcpy(license, licenseParam);
 
     struct package retval = (struct package) {
@@ -50,7 +50,7 @@ struct strarr_retval split_space(char to_split[]) {
         }
     }
     
-    char **retval = malloc(sizeof(char[64]) * spacecount);
+    char **retval = malloc(sizeof(char *) * (spacecount + 1));
     
     size_t ln = strlen(p) - 1;
     if (p[ln] == '\n')
@@ -111,13 +111,12 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     fseek(indexfile, 0L, SEEK_END);
     int fsize = ftell(indexfile);
     fseek(indexfile, 0L, SEEK_SET);
-    // struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
     struct package **packages = malloc(sizeof(struct package*) + sizeof(char) * fsize);
     int pkg_count = 0;
     
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char) * strlen(buffer)));
+        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15));
         parse_csv_line(buffer, newpkg);
         packages[pkg_count++] = newpkg;
     }
@@ -125,7 +124,6 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
-    // memcpy(retval->packages, packages, sizeof(struct package*) + sizeof(char) * fsize);
     
     fclose(indexfile);
     
@@ -134,7 +132,7 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
 
 struct pkglist *get_all_packages() {
     // all repos together probably won't exceed 16MiB. If they do, I'll just release a kawa update making this limit bigger
-    // I just checked, 32MiB could cover more than 45,000 packages. Yeah, 16MiB is enough
+    // I just checked, 16MiB could cover more than 45,000 packages. Yeah, 16MiB is enough
     struct package **packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096);
     int pkg_count = 0;
     long total_size = 0L;
