@@ -43,7 +43,7 @@ uninstall:
 dist: clean
 	mkdir -p kawa-$(VERSION)
 	mkdir -p kawa-$(VERSION)/confs
-	cp LICENSE Makefile README config.def.h config.mk kawa.c *.h kawa-$(VERSION)
+	cp LICENSE Makefile README config.def.h config.mk *.c *.h kawa-$(VERSION)
 	tar -cf kawa-$(VERSION).tar kawa-$(VERSION)
 	gzip kawa-$(VERSION).tar
 	rm -rf kawa-$(VERSION)
