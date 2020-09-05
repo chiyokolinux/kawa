@@ -184,3 +184,24 @@ struct pkglist *sort_package_list(struct pkglist *orig_pkglist) {
     qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(orig_pkglist->packages[0]), compare_strings);
     return orig_pkglist;
 }
+
+void pkglist_free(struct pkglist *packages) {
+    for (int i = 0; i < packages->pkg_count; i++) {
+        struct package *currpkg = packages->packages[i];
+        free(currpkg->name);
+        free(currpkg->description);
+        free(currpkg->version);
+        free(currpkg->archiveurl);
+        free(currpkg->maintainer);
+        free(currpkg->configurecmd);
+        free(currpkg->type);
+        free(currpkg->sepbuild);
+        free(currpkg->uninstallcmd);
+        free(currpkg->license);
+        free(currpkg->depends.retval);
+        free(currpkg->conflicts.retval);
+        free(currpkg->configureopts.retval);
+        free(currpkg->scripts.retval);
+        free(currpkg);
+    }
+}

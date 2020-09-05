@@ -41,6 +41,12 @@ int install(int pkgc, char *pkgnames[]) {
             // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
             retval += install_no_deps(updatepkgs[i]->name, database, 0);
         }
+//         for (int i = 0; i < *updatec; i++) {
+//             free(updatepkgs[i]);
+//         }
+//         pkglist_free(installed);
+//         free(updatepkgs);
+//         free(updatec);
         for (int i = 0; i < nodelist->pkg_count; i++) {
             int maninst = 0;
             for (int i2 = 0; i2 < pkgc; i2++) {
@@ -51,6 +57,8 @@ int install(int pkgc, char *pkgnames[]) {
             }
             retval += install_no_deps(nodelist->packages[i]->name, database, maninst);
         }
+//         pkglist_free(nodelist);
+//         pkglist_free(database);
         curl_global_cleanup();
         return retval;
     } else
