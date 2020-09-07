@@ -14,7 +14,9 @@ int help() {
     printf("    kawa sync\n");
     printf("    kawa version\n");
     printf("\ncommand options:\n");
-    printf("    none (yet)\n");
+    printf("    install:\n");
+    printf("        -D, --no-depends  : Do not resolve dependencies and install\n");
+    printf("                            only the specified packages.\n");
     return 0;
 }
 
