@@ -1,6 +1,11 @@
 #include "install.h"
 
 int install(int pkgc, char *pkgnames[]) {
+    int resolve_depends = 1;
+    for (int i = 0; i < pkgc; i++) {
+        if (!strcmp(pkgnames[i], "-D") || !strcmp(pkgnames[i], "--no-depends"))
+            resolve_depends = 0;
+    }
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkgs[installed->pkg_count];
@@ -11,8 +16,46 @@ int install(int pkgc, char *pkgnames[]) {
     int *updatec = malloc(sizeof(int));
     *updatec = 0;
     printf("\n");
-    for (int i = 2; i < pkgc; i++) {
-        resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec);
+    if (resolve_depends) {
+        for (int i = 2; i < pkgc; i++) {
+            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec);
+        }
+    } else {
+        for (int ii = 2; ii < pkgc; ii++) {
+            if (pkgnames[ii][0] == '-')
+                continue;
+            struct package *currpkg;
+            int success = 0;
+            for (int i = 0; i < database->pkg_count; i++) {
+                currpkg = database->packages[i];
+                if (!strcmp(currpkg->name, pkgnames[ii])) {
+                    int current_installed = 0;
+                    for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+                        if (!strcmp(pkgnames[ii], installed->packages[i2]->name)) {
+                            current_installed = 1;
+                            break;
+                        }
+                    }
+                    if (current_installed) {
+                        struct pkg_update *pkgupdt = pkg_has_update(pkgnames[ii], database, installed);
+                        if (pkgupdt != NULL) {
+                            updatepkgs[*updatec] = pkgupdt;
+                            *updatec = *updatec + 1;
+                        }
+                    }
+                    if (!current_installed) {
+                        nodelist->packages[nodelist->pkg_count] = currpkg;
+                        nodelist->pkg_count++;
+                    }
+                    success = 1;
+                }
+            }
+            if (!success) {
+                printf("Error: Package %s not found.\n", pkgnames[ii]);
+                printf("This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
+                exit(-3);
+            }
+        }
     }
     if (!nodelist->pkg_count && !*updatec) {
         printf("All packages are installed and all dependencies are satisfied.\n");
