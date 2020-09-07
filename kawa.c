@@ -13,12 +13,9 @@
 #include "show.h"
 
 int main(int argc, char *argv[]) {
-    if (argc != 2 && argc != 3 && argc != 4) {
-        return help()+1;
-    }
     if (!strcmp(argv[1], "sync") && argc == 2)
         return sync_all();
-    else if (!strcmp(argv[1], "install") && argc == 3)
+    else if (!strcmp(argv[1], "install") && argc >= 3)
         return install(argc, argv);
     else if (!strcmp(argv[1], "update") && argc == 2)
         return update();
