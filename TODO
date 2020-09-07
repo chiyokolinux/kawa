@@ -1,0 +1,13 @@
+KAWA TODOs
+----------
+
+- add scripts detection, download & Kawafile integration
+- add remove capability
+- add source pkg capability
+- add patch pkg capability
+- install multiple pkgs at once
+- remove multiple pkgs at once
+- kawa mkdb
+- -S (--sync) option
+- -D (--no-depends) option
+- -r (--reinstall) option
