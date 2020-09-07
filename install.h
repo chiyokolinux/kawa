@@ -12,6 +12,7 @@
 #include "database.h"
 #include "depresolve.h"
 #include "kawafile.h"
+#include "reposync.h"
 
 #include "metapkg.h"
 #include "binarypkg.h"

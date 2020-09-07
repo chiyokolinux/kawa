@@ -2,10 +2,15 @@
 
 int install(int pkgc, char *pkgnames[]) {
     int resolve_depends = 1;
+    int sync_before_install = 0;
     for (int i = 0; i < pkgc; i++) {
         if (!strcmp(pkgnames[i], "-D") || !strcmp(pkgnames[i], "--no-depends"))
             resolve_depends = 0;
+        if (!strcmp(pkgnames[i], "-S") || !strcmp(pkgnames[i], "--sync"))
+            sync_before_install = 1;
     }
+    if (sync_before_install)
+        sync_all();
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkgs[installed->pkg_count];

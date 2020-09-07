@@ -8,6 +8,6 @@ KAWA TODOs
 - install multiple pkgs at once
 - remove multiple pkgs at once
 - kawa mkdb
-- -S (--sync) option
+- -S (--sync) option DONE
 - -D (--no-depends) option DONE
 - -r (--reinstall) option

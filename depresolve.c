@@ -6,6 +6,8 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
         printf("This is most commonly caused by cyclic dependencies, please contact the maintainer of the package you want to install.\n");
         exit(-2);
     }
+    if (current[0] == '-')
+        return;
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];

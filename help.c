@@ -17,6 +17,8 @@ int help() {
     printf("    install:\n");
     printf("        -D, --no-depends  : Do not resolve dependencies and install\n");
     printf("                            only the specified packages.\n");
+    printf("        -S, --sync        : Sync all package repositories before resolving the\n");
+    printf("                            dependencies and installing the packages.\n");
     return 0;
 }
 
