@@ -35,10 +35,10 @@ $(PROGOBJ): $(HEADERS)
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f $(PROGOBJ) $(DESTDIR)$(PREFIX)/bin
+	cp -f $(PROGBIN) $(DESTDIR)$(PREFIX)/bin
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(INITBIN) $(DESTDIR)$(PREFIX)/bin/$(SERVBIN)
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(PROGBIN)
 
 dist: clean
 	mkdir -p kawa-$(VERSION)
