@@ -3,11 +3,14 @@
 int install(int pkgc, char *pkgnames[]) {
     int resolve_depends = 1;
     int sync_before_install = 0;
+    int force_install = 0;
     for (int i = 0; i < pkgc; i++) {
         if (!strcmp(pkgnames[i], "-D") || !strcmp(pkgnames[i], "--no-depends"))
             resolve_depends = 0;
         if (!strcmp(pkgnames[i], "-S") || !strcmp(pkgnames[i], "--sync"))
             sync_before_install = 1;
+        if (!strcmp(pkgnames[i], "-r") || !strcmp(pkgnames[i], "--reinstall") || !strcmp(pkgnames[i], "--force"))
+            force_install = 1;
     }
     if (sync_before_install)
         sync_all();
@@ -23,7 +26,7 @@ int install(int pkgc, char *pkgnames[]) {
     printf("\n");
     if (resolve_depends) {
         for (int i = 2; i < pkgc; i++) {
-            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec);
+            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec, force_install);
         }
     } else {
         for (int ii = 2; ii < pkgc; ii++) {

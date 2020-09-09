@@ -9,6 +9,6 @@
 #include "database.h"
 #include "datatypes.h"
 
-void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec);
+void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install);
 
 #endif // DEPRESOLVE_H
