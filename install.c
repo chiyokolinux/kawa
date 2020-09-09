@@ -1,6 +1,7 @@
 #include "install.h"
 
 int install(int pkgc, char *pkgnames[]) {
+    // parse opts
     int resolve_depends = 1;
     int sync_before_install = 0;
     int force_install = 0;
@@ -14,6 +15,8 @@ int install(int pkgc, char *pkgnames[]) {
     }
     if (sync_before_install)
         sync_all();
+    
+    // fetch pkglists & init vars
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkgs[installed->pkg_count];
@@ -24,6 +27,8 @@ int install(int pkgc, char *pkgnames[]) {
     int *updatec = malloc(sizeof(int));
     *updatec = 0;
     printf("\n");
+    
+    // resolve dependencies
     if (resolve_depends) {
         for (int i = 2; i < pkgc; i++) {
             resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec, force_install);
@@ -67,6 +72,8 @@ int install(int pkgc, char *pkgnames[]) {
             }
         }
     }
+    
+    // user dialogue
     if (!nodelist->pkg_count && !*updatec) {
         printf("All packages are installed and all dependencies are satisfied.\n");
         return 0;
@@ -81,6 +88,7 @@ int install(int pkgc, char *pkgnames[]) {
             printf(" %s (%s -> %s)", updatepkgs[i]->name, updatepkgs[i]->version_local, updatepkgs[i]->version_remote);
         }
     }
+    
     printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count, 0, *updatec);
     printf("Do you wish to proceed? [Y/n] ");
     fflush(stdout);
@@ -88,13 +96,16 @@ int install(int pkgc, char *pkgnames[]) {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
+        // install everything
         curl_global_init(CURL_GLOBAL_DEFAULT);
         int retval = 0;
+        // first, update all packages that need to be updated
         for (int i = 0; i < *updatec; i++) {
             // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
             retval += install_no_deps(updatepkgs[i]->name, database, 0);
         }
 
+        // after updating, install all new packages
         for (int i = 0; i < nodelist->pkg_count; i++) {
             int maninst = 0;
             for (int i2 = 0; i2 < pkgc; i2++) {
@@ -118,6 +129,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
     
     struct stat st = {0};
     
+    // initialize path
     char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
@@ -126,6 +138,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
     strcat(path, "/package.tar.");
     strcat(path, filetype);
     
+    // if dir already exists, skip download
     if (stat(path, &st) != -1) {
         printf(" Done\n");
         return 0;
@@ -137,12 +150,13 @@ int download_archive(struct package *dlpackage, char filetype[]) {
 
     curl = curl_easy_init();
     if (curl) {
+        // archiveurl variable parsing (very simple)
         char *archiveurl_version_replaced = str_replace(dlpackage->archiveurl, "${VERSION}", dlpackage->version);
         char *archiveurl_name_replaced = str_replace(archiveurl_version_replaced, "${NAME}", dlpackage->name);
         curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         
-        
+        // do the download thing
         FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
@@ -186,9 +200,11 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
                 p = p2 + 1;
             }
             
+            // register & prepare package
             add_db_entry(currpkg, manual_installed);
             kawafile_dir_create(pkgname);
             
+            // do the actual installation
             if (download_archive(currpkg, filetype))
                 return 1;
             if (!strcmp(currpkg->type, "source"))
@@ -211,6 +227,7 @@ int add_db_entry(struct package *package, int manual_installed) {
     
     struct stat st = {0};
     
+    // compute path
     char path[strlen(INSTALLPREFIX)+23+strlen(package->name)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
@@ -221,6 +238,7 @@ int add_db_entry(struct package *package, int manual_installed) {
         return 0;
     }
     
+    // open file
     char indexpath[strlen(INSTALLPREFIX)+34];
     strcpy(indexpath, "");
     strcat(indexpath, INSTALLPREFIX);
@@ -228,12 +246,14 @@ int add_db_entry(struct package *package, int manual_installed) {
 
     FILE* indexfile = fopen(indexpath, "a+");
     
+    // some stuff for detecting orphans later
     char manual[9];
     if (manual_installed)
         strcpy(manual, "manual");
     else
         strcpy(manual, "auto");
     
+    // write entry
     fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, package->maintainer, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
     
     fclose(indexfile);
