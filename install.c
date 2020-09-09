@@ -38,10 +38,12 @@ int install(int pkgc, char *pkgnames[]) {
                 currpkg = database->packages[i];
                 if (!strcmp(currpkg->name, pkgnames[ii])) {
                     int current_installed = 0;
-                    for (int i2 = 0; i2 < installed->pkg_count; i2++) {
-                        if (!strcmp(pkgnames[ii], installed->packages[i2]->name)) {
-                            current_installed = 1;
-                            break;
+                    if (!force_install) {
+                        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+                            if (!strcmp(pkgnames[ii], installed->packages[i2]->name)) {
+                                current_installed = 1;
+                                break;
+                            }
                         }
                     }
                     if (current_installed) {

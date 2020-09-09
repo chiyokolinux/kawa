@@ -5,7 +5,7 @@ KAWA TODOs
 - add remove capability
 - add source pkg capability
 - add patch pkg capability
-- install multiple pkgs at once
+- install multiple pkgs at once DONE
 - remove multiple pkgs at once
 - kawa mkdb
 - -S (--sync) option DONE
