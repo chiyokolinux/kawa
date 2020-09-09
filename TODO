@@ -11,3 +11,4 @@ KAWA TODOs
 - -S (--sync) option DONE
 - -D (--no-depends) option DONE
 - -r (--reinstall) option DONE
+- kawa cacheclean
