@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "config.h"
+
 int cacheclean();
 
 #endif // CACHECLEAN_H
