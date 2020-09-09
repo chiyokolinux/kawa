@@ -19,6 +19,9 @@ int help() {
     printf("                            only the specified packages.\n");
     printf("        -S, --sync        : Sync all package repositories before resolving the\n");
     printf("                            dependencies and installing the packages.\n");
+    printf("        -r, --reinstall   : Install the package and all of its dependencies,\n");
+    printf("            --force         even if it is already installed and no updates\n");
+    printf("                            for any of said packages are available.\n");
     return 0;
 }
 
