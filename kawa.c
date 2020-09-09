@@ -11,6 +11,7 @@
 #include "update.h"
 #include "search.h"
 #include "show.h"
+#include "cacheclean.h"
 
 int main(int argc, char *argv[]) {
     if (argc == 1)
@@ -33,5 +34,7 @@ int main(int argc, char *argv[]) {
         return repoadd(argv[2], argv[3]);
     else if (!strcmp(argv[1], "makepackages") && argc == 2)
         return makepackages();
+    else if (!strcmp(argv[1], "cacheclean") && argc == 2)
+        return cacheclean();
     return help()+1;
 }
