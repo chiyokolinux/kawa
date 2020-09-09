@@ -163,7 +163,6 @@ struct pkglist *get_all_packages() {
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + total_size);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
-    // memcpy(retval->packages, packages, total_size);
     
     return sort_package_list(retval);
 }
@@ -176,7 +175,6 @@ struct pkglist *get_installed_packages() {
 int compare_strings(const void* a, const void* b) {
     struct package *pkgA = *(struct package**)a;
     struct package *pkgB = *(struct package**)b;
-    /* printf(" %s ", pkgA->name); */
     return strcmp(pkgA->name, pkgB->name); 
 } 
 
