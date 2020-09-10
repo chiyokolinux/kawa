@@ -6,8 +6,10 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
         printf("This is most commonly caused by cyclic dependencies, please contact the maintainer of the package you want to install.\n");
         exit(-2);
     }
+    
     if (current[0] == '-')
         return;
+    
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
@@ -21,6 +23,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
                     }
                 }
             }
+            
             if (current_installed) {
                 struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
                 if (pkgupdt != NULL) {
@@ -28,6 +31,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
                     *updatec = *updatec + 1;
                 }
             }
+            
             if (!currpkg->depends.retval[0][0] == '\0') {
                 for (int i = 0; i < currpkg->depends.retc; i++) {
                     int in_queue = 0;
@@ -37,10 +41,12 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
                             break;
                         }
                     }
+                    
                     if (!in_queue)
                         resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i], database, installed, depth + 1, updatec, force_install);
                 }
             }
+            
             if (!current_installed) {
                 nodelist->packages[nodelist->pkg_count] = currpkg;
                 nodelist->pkg_count++;
@@ -48,6 +54,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
             return;
         }
     }
+    
     printf("Error: Package %s not found, but required by another package.\n", current);
     printf("This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
     exit(-3);

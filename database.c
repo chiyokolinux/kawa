@@ -1,6 +1,9 @@
 #include "database.h"
 
 struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam) {
+    // this constructs a struct package with malloc,
+    // so that it can safely returned, even if a local variable was used
+    // to initialize some parameter
 
     // TODO: should be strnlen insteaf of srtlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
@@ -25,6 +28,7 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
     char *license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1);
     strcpy(license, licenseParam);
 
+    // copy every pointer to struct object
     struct package retval = (struct package) {
         .name         = name          ,
         .description  = description   ,
@@ -44,24 +48,30 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
 struct strarr_retval split_space(char to_split[]) {
     char *p = to_split;
     int spacecount = 0;
+    
+    // count spaces
     for(int i = 0; to_split[i]; i++) {
         if(to_split[i] == ' ') {
             spacecount++;
         }
     }
     
+    // alloc memory
     char **retval = malloc(sizeof(char *) * (spacecount + 1));
     
+    // end at newline
     size_t ln = strlen(p) - 1;
     if (p[ln] == '\n')
         p[ln] = '\0';
     
+    // tokenize everything and put it into the array
     int i = 0;
     while (1) {
         char *p2 = strchr(p, ' ');
         if(p2 != NULL)
             *p2 = '\0';
         retval[i] = malloc(sizeof(char[64]));
+        // important, do not remove
         strcpy(retval[i], p);
         if(p2 == NULL)
             break;
@@ -74,6 +84,7 @@ struct strarr_retval split_space(char to_split[]) {
 }
 
 void parse_csv_line(char line[], struct package* retval) {
+    // see split_space for explanation
     char *p = line;
     size_t ln = strlen(p) - 1;
     char parsed[14][2048];
@@ -91,6 +102,7 @@ void parse_csv_line(char line[], struct package* retval) {
         index++;
     }
     
+    // construct the package
     *retval = package_constructor(parsed[0],parsed[1],parsed[2],parsed[3],parsed[4],parsed[7],parsed[9],parsed[10],parsed[11],parsed[12]);
 
         retval->depends        = split_space(parsed[5]);
@@ -100,6 +112,7 @@ void parse_csv_line(char line[], struct package* retval) {
 }
 
 struct pkglist *get_packages_from_repo(char reponame[]) {
+    // init path variable
     char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
@@ -108,12 +121,14 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     strcat(path, ".packages.db");
     FILE* indexfile = fopen(path, "r");
     
+    // get file size (for malloc)
     fseek(indexfile, 0L, SEEK_END);
     int fsize = ftell(indexfile);
     fseek(indexfile, 0L, SEEK_SET);
     struct package **packages = malloc(sizeof(struct package*) + sizeof(char) * fsize);
     int pkg_count = 0;
     
+    // parse every package
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
         struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15) + sizeof(struct strarr_retval *) * 5);
@@ -121,6 +136,7 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
         packages[pkg_count++] = newpkg;
     }
 
+    // construct return value struct pkglist
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
@@ -141,12 +157,14 @@ struct pkglist *get_all_packages() {
     char reponame[127];
     char repourl[511];
 
+    // init path variable
     char path[strlen(INSTALLPREFIX)+23];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
+    // go through every repo and parse it using get_packages_from_repo
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...", reponame);
         fflush(stdout);
@@ -160,6 +178,7 @@ struct pkglist *get_all_packages() {
     
     fclose(fp);
     
+    // construct return value
     struct pkglist *retval = malloc(sizeof(struct pkglist*) + total_size);
     retval->pkg_count = pkg_count;
     retval->packages = packages;
@@ -179,12 +198,14 @@ int compare_strings(const void* a, const void* b) {
 } 
 
 struct pkglist *sort_package_list(struct pkglist *orig_pkglist) {
+    // this sorts the list of packages (to make a lot of things involving all pkgs vs installed pkgs a lot easier)
     qsort(orig_pkglist->packages, orig_pkglist->pkg_count, sizeof(orig_pkglist->packages[0]), compare_strings);
     return orig_pkglist;
 }
 
 void pkglist_free(struct pkglist *packages) {
     for (int i = 0; i < packages->pkg_count; i++) {
+        // this should properly free a struct pkglist (i think?)
         struct package *currpkg = packages->packages[i];
         free(currpkg->name);
         free(currpkg->description);
