@@ -14,8 +14,10 @@
 #include "cacheclean.h"
 
 int main(int argc, char *argv[]) {
+    // if no args given, exit with help
     if (argc == 1)
         return help();
+    // if args given, send to function
     else if (!strcmp(argv[1], "sync") && argc == 2)
         return sync_all();
     else if (!strcmp(argv[1], "install") && argc >= 3)
@@ -36,5 +38,6 @@ int main(int argc, char *argv[]) {
         return makepackages();
     else if (!strcmp(argv[1], "cacheclean") && argc == 2)
         return cacheclean();
+    // if no args lengths matched, just exit with help
     return help()+1;
 }
