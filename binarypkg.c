@@ -32,7 +32,9 @@ int binarypkg_install(char pkgname[], char filetype[]) {
     int retval = 0;
     printf("Installing %s.", pkgname);
     fflush(stdout);
+    // generate kawafile
     retval += binarypkg_gen_kawafile(pkgname, filetype);
+    // run kawafile install
     kawafile_run(pkgname, "install");
     printf(".");
     fflush(stdout);
@@ -43,6 +45,7 @@ int binarypkg_install(char pkgname[], char filetype[]) {
 int binarypkg_remove(char pkgname[]) {
     printf("Removing %s...", pkgname);
     fflush(stdout);
+    // run kawafile remove
     kawafile_run(pkgname, "remove");
     printf(" Done\n");
     return 0;
@@ -52,7 +55,9 @@ int binarypkg_update(char pkgname[], char filetype[]) {
     int retval = 0;
     printf("Updating %s.", pkgname);
     fflush(stdout);
+    // update kawafile
     retval += binarypkg_gen_kawafile(pkgname, filetype);
+    // run kawafile update
     kawafile_run(pkgname, "update");
     printf(".");
     fflush(stdout);
