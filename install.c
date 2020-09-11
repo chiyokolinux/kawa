@@ -102,7 +102,7 @@ int install(int pkgc, char *pkgnames[]) {
         // first, update all packages that need to be updated
         for (int i = 0; i < *updatec; i++) {
             // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-            retval += install_no_deps(updatepkgs[i]->name, database, 0);
+            retval += install_no_deps(updatepkgs[i]->name, database, 0, 1);
         }
 
         // after updating, install all new packages
@@ -114,7 +114,7 @@ int install(int pkgc, char *pkgnames[]) {
                     break;
                 }
             }
-            retval += install_no_deps(nodelist->packages[i]->name, database, maninst);
+            retval += install_no_deps(nodelist->packages[i]->name, database, maninst, 0);
         }
 
         curl_global_cleanup();
@@ -123,7 +123,7 @@ int install(int pkgc, char *pkgnames[]) {
         return 1;
 }
 
-int download_archive(struct package *dlpackage, char filetype[]) {
+int download_archive(struct package *dlpackage, char filetype[], int force) {
     printf("Downloading %s...", dlpackage->name);
     fflush(stdout);
     
@@ -139,7 +139,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
     strcat(path, filetype);
     
     // if dir already exists, skip download
-    if (stat(path, &st) != -1) {
+    if (stat(path, &st) != -1 && !force) {
         printf(" Done\n");
         return 0;
     }
@@ -177,7 +177,7 @@ int download_archive(struct package *dlpackage, char filetype[]) {
     return retval;
 }
 
-int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed) {
+int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update) {
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
@@ -205,7 +205,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
             kawafile_dir_create(pkgname);
             
             // do the actual installation
-            if (download_archive(currpkg, filetype))
+            if (download_archive(currpkg, filetype, is_update))
                 return 1;
             if (!strcmp(currpkg->type, "source"))
                 return 0; // TODO: sourcepkg_install(name=pkgname)
