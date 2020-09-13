@@ -6,7 +6,7 @@ KAWA TODOs
 - add source pkg capability
 - add patch pkg capability
 - install multiple pkgs at once DONE
-- remove multiple pkgs at once
+- remove multiple pkgs at once DONE
 - -S (--sync) option DONE
 - -D (--no-depends) option DONE
 - -r (--reinstall) option DONE
