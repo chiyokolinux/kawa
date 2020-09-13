@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include "database.h"
 #include "kawafile.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]);
