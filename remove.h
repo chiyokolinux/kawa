@@ -5,6 +5,6 @@
 
 #include "kawafile.h"
 
-int remove(int pkgc, char *pkgnames[]);
+int pkg_remove(int pkgc, char *pkgnames[]);
 
 #endif // REMOVE_H

@@ -1,6 +1,6 @@
 #include "remove.h"
 
-int remove(int pkgc, char *pkgnames[]) {
+int pkg_remove(int pkgc, char *pkgnames[]) {
     for (int i = 2; i < pkgc; i++) {
         int package_installed = 0;
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
