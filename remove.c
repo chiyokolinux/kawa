@@ -1,6 +1,7 @@
 #include "remove.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]) {
+    struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     
     // check if packages *can* be uninstalled
@@ -34,13 +35,37 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
         
         // after updating, install all new packages
         for (int i = 0; i < pkgc; i++) {
-            retval +=
+            retval += remove_single(pkgnames[i], database);
         }
-
-        curl_global_cleanup();
+        
         return retval;
     } else
         return 1;
     
     return 0;
+}
+
+int remove_single(char pkgname[], struct pkglist *database) {
+    struct package *currpkg;
+    for (int i = 0; i < database->pkg_count; i++) {
+        currpkg = database->packages[i];
+        if (!strcmp(currpkg->name, pkgname)) {
+            // unregister package
+            remove_db_entry(currpkg);
+            
+            // remove the package using the function provided by the package type class
+            if (!strcmp(currpkg->type, "source"))
+                return 0; // TODO: sourcepkg_install(name=pkgname)
+            else if (!strcmp(currpkg->type, "patch"))
+                return 0; // TODO: sourcepkg_install(patch=pkgname)
+            else if (!strcmp(currpkg->type, "meta"))
+                return metapkg_remove(currpkg);
+            else if (!strcmp(currpkg->type, "binary"))
+                return binarypkg_remove(pkgname);
+            return 1;
+        }
+    }
+    // this should not happen. if it does, oh well.
+    printf("Error: Package %s not found (try kawa sync)\n", pkgname);
+    return 1;
 }
