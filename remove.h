@@ -10,5 +10,6 @@
 
 int pkg_remove(int pkgc, char *pkgnames[]);
 int remove_single(char pkgname[], struct pkglist *database);
+void remove_db_entry(struct package *package);
 
 #endif // REMOVE_H

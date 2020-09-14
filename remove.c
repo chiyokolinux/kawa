@@ -69,3 +69,9 @@ int remove_single(char pkgname[], struct pkglist *database) {
     printf("Error: Package %s not found (try kawa sync)\n", pkgname);
     return 1;
 }
+
+void remove_db_entry(struct package *package) {
+    // the obvious way would be to just re-write the list of packages
+    // but I'm sure there must be a more elegant way of doing this.
+    // because of that, I'll wait with implementing this until I found a better way.
+}
