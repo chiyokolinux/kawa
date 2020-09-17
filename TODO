@@ -2,7 +2,7 @@ KAWA TODOs
 ----------
 
 - add scripts detection, download & Kawafile integration
-- add remove capability
+- add remove capability DONE
 - add source pkg capability
 - add patch pkg capability
 - install multiple pkgs at once DONE
@@ -11,3 +11,4 @@ KAWA TODOs
 - -D (--no-depends) option DONE
 - -r (--reinstall) option DONE
 - kawa cacheclean DONE
+- re-write Installed.packages.db after update/remove
