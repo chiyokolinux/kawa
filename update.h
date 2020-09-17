@@ -7,9 +7,10 @@
 #include "reposync.h"
 #include "database.h"
 #include "datatypes.h"
+#include "install.h"
 
 int update();
-int upgrade(struct pkg_update *updpkglst[]);
+int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed);
 struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, struct pkglist *installed);
 
 #endif // UPDATE_H

@@ -58,12 +58,25 @@ int update() {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n')
-        return upgrade(updatepkg);
+        return upgrade(updatepkg, updatec, database, installed);
     else
         return 1;
 }
 
-int upgrade(struct pkg_update *updpkglst[]) {
-    printf("upgrading! %s\n", updpkglst[0]->name);
+int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed) {
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    
+    for (int i = 0; i < updatec; i++) {
+        install_no_deps(updpkglst[i]->name, database, 0, 1);
+        struct package *currpkg;
+        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+            currpkg = installed->packages[i2];
+            if (!strcmp(currpkg->name, updpkglst[i]->name)) {
+                currpkg->version = updpkglst[i]->version_remote;
+            }
+        }
+    }
+    
+    curl_global_cleanup();
     return 0;
 }
