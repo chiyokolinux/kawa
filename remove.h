@@ -9,7 +9,7 @@
 #include "metapkg.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]);
-int remove_single(char pkgname[], struct pkglist *database);
-void remove_db_entry(struct package *package);
+int remove_single(char pkgname[], struct pkglist *installed);
+void remove_db_entry(struct package *package, struct pkglist *installed);
 
 #endif // REMOVE_H

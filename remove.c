@@ -1,7 +1,6 @@
 #include "remove.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]) {
-    struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     
     // check if packages *can* be uninstalled
@@ -35,7 +34,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
         
         // after updating, install all new packages
         for (int i = 0; i < pkgc; i++) {
-            retval += remove_single(pkgnames[i], database);
+            retval += remove_single(pkgnames[i], installed);
         }
         
         return retval;
@@ -45,13 +44,13 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
     return 0;
 }
 
-int remove_single(char pkgname[], struct pkglist *database) {
+int remove_single(char pkgname[], struct pkglist *installed) {
     struct package *currpkg;
-    for (int i = 0; i < database->pkg_count; i++) {
-        currpkg = database->packages[i];
+    for (int i = 0; i < installed->pkg_count; i++) {
+        currpkg = installed->packages[i];
         if (!strcmp(currpkg->name, pkgname)) {
             // unregister package
-            remove_db_entry(currpkg);
+            remove_db_entry(currpkg, installed);
             
             // remove the package using the function provided by the package type class
             if (!strcmp(currpkg->type, "source"))
@@ -73,4 +72,13 @@ int remove_single(char pkgname[], struct pkglist *database) {
 void remove_db_entry(struct package *package, struct pkglist *installed) {
     // we're just removing (and free-ing, hopefully this won't cause problems later (spoiler alert: it did))
     // the pointer to the package in *installed, and at the end we'll re-write Installed.packages.db
+    struct package *currpkg;
+    for (int i = 0; i < installed->pkg_count; i++) {
+        currpkg = installed->packages[i];
+        // we're comparing pointers this (should) work(s).
+        if (currpkg == package) {
+            installed->packages[i] = NULL;
+            // free(package); caused problems
+        }
+    }
 }
