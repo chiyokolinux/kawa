@@ -11,4 +11,4 @@ KAWA TODOs
 - -D (--no-depends) option DONE
 - -r (--reinstall) option DONE
 - kawa cacheclean DONE
-- re-write Installed.packages.db after update/remove
+- re-write Installed.packages.db after update/remove DONE
