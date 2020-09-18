@@ -224,3 +224,10 @@ void pkglist_free(struct pkglist *packages) {
         free(currpkg);
     }
 }
+
+int write_installed_packages(struct pkglist *installed) {
+    // no sort, cause already and will be done on read
+    // speed should only be a problem when you literally install the entire
+    // chiyoko linux repo (and also I'll optimize this later)
+    return 0;
+}

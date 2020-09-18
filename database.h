@@ -16,5 +16,6 @@ struct pkglist *get_installed_packages();
 int compare_strings(const void* a, const void* b);
 struct pkglist *sort_package_list(struct pkglist *orig_pkglist);
 void pkglist_free(struct pkglist *packages);
+int write_installed_packages(struct pkglist *installed);
 
 #endif // DATABASE_H
