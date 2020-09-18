@@ -7,6 +7,7 @@
 
 #include "datatypes.h"
 #include "config.h"
+#include "install.h"
 
 struct strarr_retval split_space(char to_split[]);
 void parse_csv_line(char line[], struct package* retval);

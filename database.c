@@ -229,5 +229,28 @@ int write_installed_packages(struct pkglist *installed) {
     // no sort, cause already and will be done on read
     // speed should only be a problem when you literally install the entire
     // chiyoko linux repo (and also I'll optimize this later)
-    return 0;
+    
+    // init path variable
+    char path[strlen(INSTALLPREFIX)+34];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/Installed.packages.db");
+    FILE* indexfile = fopen(path, "w");
+    
+    int retval = 0;
+    
+    // iterate through all installed packages
+    for (int i = 0; i < installed->pkg_count; i++) {
+        struct package *currpkg = installed->packages[i];
+        // this could've been done by remove, if so, skip package
+        // no writing NULL pointers
+        if (currpkg == NULL)
+            continue;
+        // write the package to the index file
+        retval += fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", currpkg->name, currpkg->description, currpkg->version, currpkg->archiveurl, currpkg->maintainer, whitespace_join(currpkg->depends), whitespace_join(currpkg->conflicts), currpkg->configurecmd, whitespace_join(currpkg->configureopts), currpkg->type, currpkg->sepbuild, currpkg->uninstallcmd, currpkg->license, whitespace_join(currpkg->scripts));
+    }
+    
+    fclose(indexfile);
+    
+    return retval;
 }
