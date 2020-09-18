@@ -78,5 +78,5 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     }
     
     curl_global_cleanup();
-    return 0;
+    return write_installed_packages(installed);
 }

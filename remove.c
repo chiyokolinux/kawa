@@ -32,10 +32,12 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
     else if (response == 'y' || response == 'Y' || response == '\n') {
         int retval = 0;
         
-        // after updating, install all new packages
+        // remove requested packages
         for (int i = 0; i < pkgc; i++) {
             retval += remove_single(pkgnames[i], installed);
         }
+        
+        retval += write_installed_packages(installed);
         
         return retval;
     } else

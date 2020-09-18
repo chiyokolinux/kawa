@@ -103,7 +103,20 @@ int install(int pkgc, char *pkgnames[]) {
         for (int i = 0; i < *updatec; i++) {
             // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
             retval += install_no_deps(updatepkgs[i]->name, database, 0, 1);
+            
+            // re-wire version variables
+            struct package *currpkg;
+            for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+                currpkg = installed->packages[i2];
+                if (!strcmp(currpkg->name, updatepkgs[i]->name)) {
+                    currpkg->version = updatepkgs[i]->version_remote;
+                }
+            }
         }
+        
+        // re-write installed if packages were updated
+        if (*updatec)
+            write_installed_packages(installed);
 
         // after updating, install all new packages
         for (int i = 0; i < nodelist->pkg_count; i++) {
