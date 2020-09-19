@@ -25,6 +25,10 @@ int update() {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkg[installed->pkg_count];
+    struct package **packages = malloc(sizeof(char)*database->pkg_count*512);
+    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+sizeof(char)*database->pkg_count*512);
+    nodelist->pkg_count = 0;
+    nodelist->packages = packages;
     int remote_i = 0;
     int updatec = 0;
     for (int i = 0; i < installed->pkg_count; i++) {
@@ -48,7 +52,7 @@ int update() {
     }
     
     for (int i = 0; i < updatec; i++) {
-        resolve_recursive(NULL, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1);
+        resolve_recursive(nodelist, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1);
     }
     
     printf("\nThe following packages can be updated:\n  ");
@@ -57,21 +61,35 @@ int update() {
         printf("%s (%s -> %s) ", updatepkg[i]->name, updatepkg[i]->version_local, updatepkg[i]->version_remote);
     }
     
+    if (nodelist->pkg_count) {
+        printf("The following packages will be installed:\n ");
+        for (int i = 0; i < nodelist->pkg_count; i++) {
+            printf(" %s", nodelist->packages[i]->name);
+        }
+    }
+    
     printf("\n\nDo you wish to install these updates now? [Y/n] ");
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n')
-        return upgrade(updatepkg, updatec, database, installed);
+        return upgrade(updatepkg, updatec, database, installed, nodelist);
     else
         return 1;
 }
 
-int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed) {
+int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
+    int retval = 0;
     
+    // before updating, install all new dependencies
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        retval += install_no_deps(nodelist->packages[i]->name, database, 0, 0);
+    }
+    
+    // install updates and re-wire version pointers
     for (int i = 0; i < updatec; i++) {
-        install_no_deps(updpkglst[i]->name, database, 0, 1);
+        retval += install_no_deps(updpkglst[i]->name, database, 0, 1);
         struct package *currpkg;
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
             currpkg = installed->packages[i2];
@@ -82,5 +100,6 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     }
     
     curl_global_cleanup();
-    return write_installed_packages(installed);
+    retval += write_installed_packages(installed);
+    return retval;
 }
