@@ -16,13 +16,15 @@ int help() {
     printf("    kawa makepackages\n");
     printf("\ncommand options:\n");
     printf("    install:\n");
-    printf("        -D, --no-depends  : Do not resolve dependencies and install\n");
-    printf("                            only the specified packages.\n");
-    printf("        -S, --sync        : Sync all package repositories before resolving the\n");
-    printf("                            dependencies and installing the packages.\n");
-    printf("        -r, --reinstall   : Install the package and all of its dependencies,\n");
-    printf("            --force         even if it is already installed and no updates\n");
-    printf("                            for any of said packages are available.\n");
+    printf("        -D, --no-depends      : Do not resolve dependencies and install\n");
+    printf("                                only the specified packages.\n");
+    printf("        -S, --sync            : Sync all package repositories before resolving the\n");
+    printf("                                dependencies and installing the packages.\n");
+    printf("        -r, --reinstall       : Install the package and all of its dependencies,\n");
+    printf("            --force             even if it is already installed and no updates\n");
+    printf("                                for any of said packages are available.\n");
+    printf("        -I, --ignore-updates  : Ignore packages that the to-be-installed package\n");
+    printf("                                depends on that have available updates.\n");
     return 0;
 }
 
