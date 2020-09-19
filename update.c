@@ -47,6 +47,10 @@ int update() {
         return 0;
     }
     
+    for (int i = 0; i < updatec; i++) {
+        resolve_recursive(NULL, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1);
+    }
+    
     printf("\nThe following packages can be updated:\n  ");
     
     for (int i = 0; i < updatec; i++) {

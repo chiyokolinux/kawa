@@ -12,3 +12,4 @@ KAWA TODOs
 - -r (--reinstall) option DONE
 - kawa cacheclean DONE
 - re-write Installed.packages.db after update/remove DONE
+- re-resolve dependencies on update

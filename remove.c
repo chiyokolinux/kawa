@@ -18,7 +18,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
         }
     }
     
-    printf("The following packages will be installed:\n ");
+    printf("The following packages will be removed:\n ");
     for (int i = 0; i < pkgc; i++) {
         printf(" %s", pkgnames[i]);
     }
