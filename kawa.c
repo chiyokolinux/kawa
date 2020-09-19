@@ -5,6 +5,7 @@
 #include "help.h"
 #include "install.h"
 #include "makepackages.h"
+#include "remove.h"
 #include "repoadd.h"
 #include "update.h"
 #include "search.h"
@@ -22,6 +23,8 @@ int main(int argc, char *argv[]) {
         return install(argc, argv);
     else if (!strcmp(argv[1], "update") && argc == 2)
         return update();
+    else if (!strcmp(argv[1], "remove") && argc >= 3)
+        return pkg_remove(argc, argv);
     else if (!strcmp(argv[1], "search") && argc == 3)
         return search(argv[2]);
     else if (!strcmp(argv[1], "show") && argc == 3)

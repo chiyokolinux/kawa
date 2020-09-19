@@ -19,11 +19,11 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
     }
     
     printf("The following packages will be removed:\n ");
-    for (int i = 0; i < pkgc; i++) {
+    for (int i = 2; i < pkgc; i++) {
         printf(" %s", pkgnames[i]);
     }
     
-    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", 0, pkgc, 0);
+    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", 0, pkgc-2, 0);
     printf("Do you wish to proceed? [Y/n] ");
     fflush(stdout);
     char response = getchar();
@@ -33,7 +33,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
         int retval = 0;
         
         // remove requested packages
-        for (int i = 0; i < pkgc; i++) {
+        for (int i = 2; i < pkgc; i++) {
             retval += remove_single(pkgnames[i], installed);
         }
         

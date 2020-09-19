@@ -47,7 +47,7 @@ int update() {
     }
     
     if (!updatec) {
-        printf("No packages need to be updated.\n");
+        printf("\nNo packages need to be updated.\n");
         return 0;
     }
     
@@ -62,7 +62,7 @@ int update() {
     }
     
     if (nodelist->pkg_count) {
-        printf("The following packages will be installed:\n ");
+        printf("\n\nThe following packages will be installed:\n ");
         for (int i = 0; i < nodelist->pkg_count; i++) {
             printf(" %s", nodelist->packages[i]->name);
         }
