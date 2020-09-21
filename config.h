@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 // Prefix for basically everything (also config files!)
 // Use for distributing binary packages of this program (for example)
@@ -14,7 +14,7 @@
 #define HIGHLIGHTCOLOR "[0;32m"
 
 // Maximum dependency resolving depth.
-#define MAXDEPTH 8192
+#define MAXDEPTH 512
 
 // you can use any number here, but for the fastest install times just use the number of threads you CPU has
 #define THREADNUM "$(nproc)"
