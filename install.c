@@ -223,14 +223,25 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
             // do the actual installation
             if (download_archive(currpkg, filetype, is_update))
                 return 1;
-            if (!strcmp(currpkg->type, "source"))
-                return 0; // TODO: sourcepkg_install(name=pkgname)
-            else if (!strcmp(currpkg->type, "patch"))
-                return 0; // TODO: sourcepkg_install(patch=pkgname)
-            else if (!strcmp(currpkg->type, "meta"))
-                return metapkg_install(pkgname);
-            else if (!strcmp(currpkg->type, "binary"))
-                return binarypkg_install(pkgname, filetype);
+            if (!is_update) {
+                if (!strcmp(currpkg->type, "source"))
+                    return 0; // TODO: sourcepkg_install(name=pkgname)
+                else if (!strcmp(currpkg->type, "patch"))
+                    return 0; // TODO: sourcepkg_install(patch=pkgname)
+                else if (!strcmp(currpkg->type, "meta"))
+                    return metapkg_install(pkgname);
+                else if (!strcmp(currpkg->type, "binary"))
+                    return binarypkg_install(pkgname, filetype);
+            } else { // if action is update, use the update functions
+                if (!strcmp(currpkg->type, "source"))
+                    return 0; // TODO: sourcepkg_update(name=pkgname)
+                else if (!strcmp(currpkg->type, "patch"))
+                    return 0; // TODO: sourcepkg_update(patch=pkgname)
+                else if (!strcmp(currpkg->type, "meta"))
+                    return metapkg_update(pkgname);
+                else if (!strcmp(currpkg->type, "binary"))
+                    return binarypkg_update(pkgname, filetype);
+            }
             return 1;
         }
     }
