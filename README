@@ -4,6 +4,11 @@ kawa
 the package manager for the chiyoko linux distribution
 
 
+INSTALLATION:
+  - clone the repository
+  - make
+  - (root) make install
+
 REQUIRED FILES:
 - /etc/kawa.d/repos.conf, example:
 ```example
