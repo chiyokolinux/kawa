@@ -10,6 +10,7 @@ KAWA TODOs
 - -S (--sync) option DONE
 - -D (--no-depends) option DONE
 - -r (--reinstall) option DONE
+- -I (--ignore-updates) option DONE
 - kawa cacheclean DONE
 - re-write Installed.packages.db after update/remove DONE
 - re-resolve dependencies on update DONE
