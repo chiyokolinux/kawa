@@ -193,6 +193,10 @@ int download_archive(struct package *dlpackage, char filetype[], int force) {
     return retval;
 }
 
+int download_scripts(struct package *dlpackage) {
+    return 0;
+}
+
 int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update) {
     struct package *currpkg;
     for (int i = 0; i < database->pkg_count; i++) {
@@ -223,6 +227,9 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
             // do the actual installation
             if (download_archive(currpkg, filetype, is_update))
                 return 1;
+            if (download_scripts(currpkg))
+                return 1;
+            
             if (!is_update) {
                 if (!strcmp(currpkg->type, "source"))
                     return 0; // TODO: sourcepkg_install(name=pkgname)
