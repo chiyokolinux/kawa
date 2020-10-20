@@ -193,8 +193,62 @@ int download_archive(struct package *dlpackage, char filetype[], int force) {
     return retval;
 }
 
-int download_scripts(struct package *dlpackage) {
-    return 0;
+int download_scripts(struct package *dlpackage, char *baseurl) {
+    // initialize vars
+    char path[strlen(INSTALLPREFIX)+32+strlen(dlpackage->name)];
+    char scripturl[strlen(baseurl)+32+strlen(dlpackage->name)];
+    
+    int retval = 0;
+
+    for (int i = 0; i < dlpackage->scripts->retc; i++) {
+        char *script = dlpackage->scripts->retval[i];
+        
+        // construct current path
+        strcpy(path, "");
+        strcat(path, INSTALLPREFIX);
+        strcat(path, "/etc/kawa.d/kawafiles/");
+        strcat(path, dlpackage->name);
+        strcat(path, "/");
+        strcat(path, script);
+        
+        // construct url
+        strcpy(scripturl, "");
+        strcat(scripturl, baseurl);
+        if (scripturl[strlen(scripturl)-1] != '/')
+            strcat(scripturl, "/");
+        strcat(scripturl, dlpackage->name);
+        strcat(scripturl, "/");
+        strcat(scripturl, script);
+        
+        CURL *curl;
+        CURLcode res;
+
+        curl = curl_easy_init();
+        if (curl) {
+            curl_easy_setopt(curl, CURLOPT_URL, scripturl);
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            
+            // do the download thing
+            FILE* sfile = fopen(path, "w+");
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, sfile);
+
+            res = curl_easy_perform(curl);
+            if (res != CURLE_OK) {
+                fprintf(stderr, "Downloading script %s of package %s failed: %s\n", script, dlpackage->name, curl_easy_strerror(res));
+                retval++;
+            }
+
+            curl_easy_cleanup(curl);
+            fclose(sfile);
+        } else {
+            fprintf(stderr, "Downloading script %s of package %s failed: Cannot create cURL object\n", script, dlpackage->name);
+            return ++retval;
+        }
+
+        printf(" Done\n");
+    }
+    
+    return retval;
 }
 
 int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update) {
