@@ -194,12 +194,15 @@ int download_archive(struct package *dlpackage, char filetype[], int force) {
 }
 
 int download_scripts(struct package *dlpackage, char *baseurl) {
+    printf("Downloading scripts for package %s.", dlpackage->name);
+    fflush(stdout);
+    
     // initialize vars
     char path[strlen(INSTALLPREFIX)+32+strlen(dlpackage->name)];
     char scripturl[strlen(baseurl)+32+strlen(dlpackage->name)];
     
     int retval = 0;
-
+    
     for (int i = 0; i < dlpackage->scripts->retc; i++) {
         char *script = dlpackage->scripts->retval[i];
         
@@ -244,9 +247,12 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
             fprintf(stderr, "Downloading script %s of package %s failed: Cannot create cURL object\n", script, dlpackage->name);
             return ++retval;
         }
-
-        printf(" Done\n");
+        
+        printf(".");
+        fflush(stdout);
     }
+    
+    printf(" Done\n");
     
     return retval;
 }
