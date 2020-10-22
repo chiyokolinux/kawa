@@ -194,6 +194,9 @@ int download_archive(struct package *dlpackage, char filetype[], int force) {
 }
 
 int download_scripts(struct package *dlpackage, char *baseurl) {
+    if (!dlpackage->scripts.retc)
+        return 0;
+    
     printf("Downloading scripts for package %s.", dlpackage->name);
     fflush(stdout);
     
@@ -203,8 +206,8 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     
     int retval = 0;
     
-    for (int i = 0; i < dlpackage->scripts->retc; i++) {
-        char *script = dlpackage->scripts->retval[i];
+    for (int i = 0; i < dlpackage->scripts.retc; i++) {
+        char *script = dlpackage->scripts.retval[i];
         
         // construct current path
         strcpy(path, "");
