@@ -5,7 +5,7 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
     // so that it can safely returned, even if a local variable was used
     // to initialize some parameter
 
-    // TODO: should be strnlen insteaf of srtlen
+    // TODO: should be strnlen insteaf of strlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
     char *name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1);
     strcpy(name, nameParam);
