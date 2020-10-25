@@ -5,27 +5,27 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
     // so that it can safely returned, even if a local variable was used
     // to initialize some parameter
 
-    // TODO: should be strnlen insteaf of strlen
+    // TODO: should be strnlen instead of strlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
-    char *name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1);
+    if (!(char *name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1))) malloc_fail();
     strcpy(name, nameParam);
-    char *description  = malloc(sizeof(char *) + sizeof(char) * strlen(descriptionParam  ) + 1);
+    if (!(char *description  = malloc(sizeof(char *) + sizeof(char) * strlen(descriptionParam  ) + 1))) malloc_fail();
     strcpy(description, descriptionParam);
-    char *version      = malloc(sizeof(char *) + sizeof(char) * strlen(versionParam      ) + 1);
+    if (!(char *version      = malloc(sizeof(char *) + sizeof(char) * strlen(versionParam      ) + 1))) malloc_fail();
     strcpy(version, versionParam);
-    char *archiveurl   = malloc(sizeof(char *) + sizeof(char) * strlen(archiveurlParam   ) + 1);
+    if (!(char *archiveurl   = malloc(sizeof(char *) + sizeof(char) * strlen(archiveurlParam   ) + 1))) malloc_fail();
     strcpy(archiveurl, archiveurlParam);
-    char *maintainer   = malloc(sizeof(char *) + sizeof(char) * strlen(maintainerParam   ) + 1);
+    if (!(char *maintainer   = malloc(sizeof(char *) + sizeof(char) * strlen(maintainerParam   ) + 1))) malloc_fail();
     strcpy(maintainer, maintainerParam);
-    char *configurecmd = malloc(sizeof(char *) + sizeof(char) * strlen(configurecmdParam ) + 1);
+    if (!(char *configurecmd = malloc(sizeof(char *) + sizeof(char) * strlen(configurecmdParam ) + 1))) malloc_fail();
     strcpy(configurecmd, configurecmdParam);
-    char *type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1);
+    if (!(char *type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1))) malloc_fail();
     strcpy(type, typeParam);
-    char *sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1);
+    if (!(char *sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1))) malloc_fail();
     strcpy(sepbuild, sepbuildParam);
-    char *uninstallcmd = malloc(sizeof(char *) + sizeof(char) * strlen(uninstallcmdParam ) + 1);
+    if (!(char *uninstallcmd = malloc(sizeof(char *) + sizeof(char) * strlen(uninstallcmdParam ) + 1))) malloc_fail();
     strcpy(uninstallcmd, uninstallcmdParam);
-    char *license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1);
+    if (!(char *license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1))) malloc_fail();
     strcpy(license, licenseParam);
 
     // copy every pointer to struct object
