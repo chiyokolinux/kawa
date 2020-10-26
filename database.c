@@ -50,8 +50,8 @@ struct strarr_retval split_space(char to_split[]) {
     int spacecount = 0;
     
     // count spaces
-    for(int i = 0; to_split[i]; i++) {
-        if(to_split[i] == ' ') {
+    for (int i = 0; to_split[i]; i++) {
+        if (to_split[i] == ' ') {
             spacecount++;
         }
     }
@@ -68,12 +68,12 @@ struct strarr_retval split_space(char to_split[]) {
     int i = 0;
     while (1) {
         char *p2 = strchr(p, ' ');
-        if(p2 != NULL)
+        if (p2 != NULL)
             *p2 = '\0';
         retval[i] = malloc(sizeof(char[64]));
         // important, do not remove
         strcpy(retval[i], p);
-        if(p2 == NULL)
+        if (p2 == NULL)
             break;
         p = p2 + 1;
         i++;
@@ -93,10 +93,10 @@ void parse_csv_line(char line[], struct package* retval) {
     int index = 0;
     while (1) {
         char *p2 = strchr(p, ';');
-        if(p2 != NULL)
+        if (p2 != NULL)
             *p2 = '\0';
         strcpy(parsed[index], p);
-        if(p2 == NULL)
+        if (p2 == NULL)
             break;
         p = p2 + 1;
         index++;
