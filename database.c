@@ -7,27 +7,47 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
 
     // TODO: should be strnlen instead of strlen
     // TODO: I know that this is horrible spaghetti code, please forgive me
-    if (!(char *name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1))) malloc_fail();
+    char *name;
+    if (!(name         = malloc(sizeof(char *) + sizeof(char) * strlen(nameParam         ) + 1))) malloc_fail();
     strcpy(name, nameParam);
-    if (!(char *description  = malloc(sizeof(char *) + sizeof(char) * strlen(descriptionParam  ) + 1))) malloc_fail();
+    
+    char *description;
+    if (!(description  = malloc(sizeof(char *) + sizeof(char) * strlen(descriptionParam  ) + 1))) malloc_fail();
     strcpy(description, descriptionParam);
-    if (!(char *version      = malloc(sizeof(char *) + sizeof(char) * strlen(versionParam      ) + 1))) malloc_fail();
+    
+    char *version;
+    if (!(version      = malloc(sizeof(char *) + sizeof(char) * strlen(versionParam      ) + 1))) malloc_fail();
     strcpy(version, versionParam);
-    if (!(char *archiveurl   = malloc(sizeof(char *) + sizeof(char) * strlen(archiveurlParam   ) + 1))) malloc_fail();
+    
+    char *archiveurl;
+    if (!(archiveurl   = malloc(sizeof(char *) + sizeof(char) * strlen(archiveurlParam   ) + 1))) malloc_fail();
     strcpy(archiveurl, archiveurlParam);
-    if (!(char *maintainer   = malloc(sizeof(char *) + sizeof(char) * strlen(maintainerParam   ) + 1))) malloc_fail();
+    
+    char *maintainer;
+    if (!(maintainer   = malloc(sizeof(char *) + sizeof(char) * strlen(maintainerParam   ) + 1))) malloc_fail();
     strcpy(maintainer, maintainerParam);
-    if (!(char *configurecmd = malloc(sizeof(char *) + sizeof(char) * strlen(configurecmdParam ) + 1))) malloc_fail();
+    
+    char *configurecmd;
+    if (!(configurecmd = malloc(sizeof(char *) + sizeof(char) * strlen(configurecmdParam ) + 1))) malloc_fail();
     strcpy(configurecmd, configurecmdParam);
-    if (!(char *type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1))) malloc_fail();
+    
+    char *type;
+    if (!(type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1))) malloc_fail();
     strcpy(type, typeParam);
-    if (!(char *sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1))) malloc_fail();
+    
+    char *sepbuild;
+    if (!(sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1))) malloc_fail();
     strcpy(sepbuild, sepbuildParam);
-    if (!(char *uninstallcmd = malloc(sizeof(char *) + sizeof(char) * strlen(uninstallcmdParam ) + 1))) malloc_fail();
+    
+    char *uninstallcmd;
+    if (!(uninstallcmd = malloc(sizeof(char *) + sizeof(char) * strlen(uninstallcmdParam ) + 1))) malloc_fail();
     strcpy(uninstallcmd, uninstallcmdParam);
-    if (!(char *license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1))) malloc_fail();
+    
+    char *license;
+    if (!(license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1))) malloc_fail();
     strcpy(license, licenseParam);
 
+    
     // copy every pointer to struct object
     struct package retval = (struct package) {
         .name         = name          ,
