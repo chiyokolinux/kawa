@@ -77,7 +77,8 @@ struct strarr_retval split_space(char to_split[]) {
     }
     
     // alloc memory
-    char **retval = malloc(sizeof(char *) * (spacecount + 1));
+    char **retval;
+    if (!(retval = malloc(sizeof(char *) * (spacecount + 1)))) malloc_fail();
     
     // end at newline
     size_t ln = strlen(p) - 1;
@@ -90,7 +91,7 @@ struct strarr_retval split_space(char to_split[]) {
         char *p2 = strchr(p, ' ');
         if (p2 != NULL)
             *p2 = '\0';
-        retval[i] = malloc(sizeof(char[64]));
+        if (!(retval[i] = malloc(sizeof(char[64])))) malloc_fail();
         // important, do not remove
         strcpy(retval[i], p);
         if (p2 == NULL)
@@ -145,19 +146,22 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
     fseek(indexfile, 0L, SEEK_END);
     int fsize = ftell(indexfile);
     fseek(indexfile, 0L, SEEK_SET);
-    struct package **packages = malloc(sizeof(struct package*) + sizeof(char) * fsize);
+    struct package **packages;
+    if (!(packages = malloc(sizeof(struct package*) + sizeof(char) * fsize))) malloc_fail();
     int pkg_count = 0;
     
     // parse every package
     char buffer[4096];
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
-        struct package *newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15) + sizeof(struct strarr_retval *) * 5);
+        struct package *newpkg;
+        if (!(newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15) + sizeof(struct strarr_retval *) * 5))) malloc_fail();
         parse_csv_line(buffer, newpkg);
         packages[pkg_count++] = newpkg;
     }
 
     // construct return value struct pkglist
-    struct pkglist *retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize);
+    struct pkglist *retval;
+    if (!(retval = malloc(sizeof(struct pkglist*) + sizeof(char) * fsize))) malloc_fail();
     retval->pkg_count = pkg_count;
     retval->packages = packages;
     
@@ -169,7 +173,8 @@ struct pkglist *get_packages_from_repo(char reponame[]) {
 struct pkglist *get_all_packages() {
     // all repos together probably won't exceed 16MiB. If they do, I'll just release a kawa update making this limit bigger
     // I just checked, 16MiB could cover more than 45,000 packages. Yeah, 16MiB is enough
-    struct package **packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096);
+    struct package **packages;
+    if (!(packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096))) malloc_fail();
     int pkg_count = 0;
     long total_size = 0L;
 
@@ -199,7 +204,8 @@ struct pkglist *get_all_packages() {
     fclose(fp);
     
     // construct return value
-    struct pkglist *retval = malloc(sizeof(struct pkglist*) + total_size);
+    struct pkglist *retval;
+    if (!(retval = malloc(sizeof(struct pkglist*) + total_size))) malloc_fail();
     retval->pkg_count = pkg_count;
     retval->packages = packages;
     
