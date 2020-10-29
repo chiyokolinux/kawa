@@ -25,8 +25,10 @@ int update() {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkg[installed->pkg_count];
-    struct package **packages = malloc(sizeof(char)*database->pkg_count*512);
-    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+sizeof(char)*database->pkg_count*512);
+    struct package **packages;
+    if (!(packages = malloc(sizeof(char) * database->pkg_count * 512))) malloc_fail();
+    struct pkglist *nodelist;
+    if (!(nodelist = malloc(sizeof(struct pkglist) + sizeof(char) * database->pkg_count * 512))) malloc_fail();
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
     int remote_i = 0;
