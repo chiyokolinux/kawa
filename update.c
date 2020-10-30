@@ -9,7 +9,8 @@ struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, stru
     while (strcmp(currpkg_l->name, database->packages[remote_i]->name))
         remote_i++; // this should work because the package lists are sorted (hopefully)
     if (strcmp(currpkg_l->version, database->packages[remote_i]->version)) {
-        struct pkg_update *pkgupdt = malloc(sizeof(struct pkg_update));
+        struct pkg_update *pkgupdt;
+        if (!(pkgupdt= malloc(sizeof(struct pkg_update)))) malloc_fail();
         *pkgupdt = (struct pkg_update) {
             .name = currpkg_l->name,
             .version_local = currpkg_l->version,
@@ -38,7 +39,8 @@ int update() {
         while (strcmp(currpkg_l->name, database->packages[remote_i]->name))
             remote_i++; // this should work because the package lists are sorted (hopefully)
         if (strcmp(currpkg_l->version, database->packages[remote_i]->version)) {
-            struct pkg_update *pkgupdt = malloc(sizeof(struct pkg_update));
+            struct pkg_update *pkgupdt;
+            if (!(pkgupdt = malloc(sizeof(struct pkg_update)))) malloc_fail();
             *pkgupdt = (struct pkg_update) {
                 .name = currpkg_l->name,
                 .version_local = currpkg_l->version,
