@@ -15,3 +15,4 @@ KAWA TODOs
 - kawa cacheclean DONE
 - re-write Installed.packages.db after update/remove DONE
 - re-resolve dependencies on update DONE
+- check malloc() return values DONE
