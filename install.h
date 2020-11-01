@@ -13,6 +13,7 @@
 #include "depresolve.h"
 #include "kawafile.h"
 #include "reposync.h"
+#include "error.h"
 
 #include "metapkg.h"
 #include "binarypkg.h"

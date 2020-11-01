@@ -23,11 +23,14 @@ int install(int pkgc, char *pkgnames[]) {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkgs[installed->pkg_count];
-    struct package **packages = malloc(sizeof(char)*database->pkg_count*1024);
-    struct pkglist *nodelist = malloc(sizeof(struct pkglist)+sizeof(char)*database->pkg_count*1024);
+    struct package **packages;
+    if (!(packages = malloc(sizeof(char) * database->pkg_count * 1024))) malloc_fail();
+    struct pkglist *nodelist;
+    if (!(nodelist = malloc(sizeof(struct pkglist) + sizeof(char) * database->pkg_count * 1024))) malloc_fail();
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
-    int *updatec = malloc(sizeof(int));
+    int *updatec;
+    if (!(updatec = malloc(sizeof(int)))) malloc_fail();
     *updatec = 0;
     printf("\n");
     
@@ -266,7 +269,8 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
         currpkg = database->packages[i];
         if (!strcmp(currpkg->name, pkgname)) {
             // compute filetype
-            char *p = malloc(strlen(currpkg->archiveurl)+1);
+            char *p;
+            if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
             strcpy(p, currpkg->archiveurl);
             size_t ln = strlen(p) - 1;
             char filetype[8];
@@ -381,6 +385,7 @@ char *str_replace(char *orig, char *rep, char *with) {
     }
     
     tmp = result = malloc(strlen(orig) * sizeof(char) + (len_with - len_rep) * count * sizeof(char) + 1);
+    if (!tmp) malloc_fail();
 
     if (!result)
         return NULL;
@@ -400,7 +405,8 @@ char *whitespace_join(struct strarr_retval to_join) {
     int charc = 0;
     for (int i = 0; i < to_join.retc; i++)
         charc += strlen(to_join.retval[i]);
-    char *joined = malloc(sizeof(char) * charc + sizeof(char) * to_join.retc);
+    char *joined;
+    if (!(joined = malloc(sizeof(char) * charc + sizeof(char) * to_join.retc))) malloc_fail();
     strcpy(joined, ""); // this seems to fix some stuff
     for (int i = 0; i < to_join.retc; i++) {
         strcat(joined, to_join.retval[i]);
