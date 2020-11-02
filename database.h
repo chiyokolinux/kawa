@@ -11,8 +11,8 @@
 #include "error.h"
 
 struct strarr_retval split_space(char to_split[]);
-void parse_csv_line(char line[], struct package* retval);
-struct pkglist *get_packages_from_repo(char reponame[]);
+void parse_csv_line(char line[], struct package* retval, int repoindex);
+struct pkglist *get_packages_from_repo(char reponame[], int repoindex);
 struct pkglist *get_all_packages();
 struct pkglist *get_installed_packages();
 int compare_strings(const void* a, const void* b);

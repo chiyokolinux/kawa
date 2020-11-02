@@ -109,7 +109,7 @@ struct strarr_retval split_space(char to_split[]) {
     return sarv;
 }
 
-void parse_csv_line(char line[], struct package* retval) {
+void parse_csv_line(char line[], struct package* retval, int repoindex) {
     // see split_space for explanation
     char *p = line;
     size_t ln = strlen(p) - 1;
@@ -129,7 +129,7 @@ void parse_csv_line(char line[], struct package* retval) {
     }
     
     // construct the package
-    *retval = package_constructor(parsed[0],parsed[1],parsed[2],parsed[3],parsed[4],parsed[7],parsed[9],parsed[10],parsed[11],parsed[12]);
+    *retval = package_constructor(parsed[0],parsed[1],parsed[2],parsed[3],parsed[4],parsed[7],parsed[9],parsed[10],parsed[11],parsed[12],repoindex);
 
         retval->depends        = split_space(parsed[5]);
         retval->conflicts      = split_space(parsed[6]);
@@ -137,7 +137,7 @@ void parse_csv_line(char line[], struct package* retval) {
         retval->scripts        = split_space(parsed[13]);
 }
 
-struct pkglist *get_packages_from_repo(char reponame[]) {
+struct pkglist *get_packages_from_repo(char reponame[], int repoindex) {
     // init path variable
     char path[strlen(INSTALLPREFIX)+25+strlen(reponame)];
     strcpy(path, "");
@@ -182,6 +182,7 @@ struct pkglist *get_all_packages() {
     if (!(packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096))) malloc_fail();
     int pkg_count = 0;
     long total_size = 0L;
+    currepoidx = 0;
 
     FILE *fp;
     char reponame[127];
@@ -198,7 +199,7 @@ struct pkglist *get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...", reponame);
         fflush(stdout);
-        struct pkglist *currepo = get_packages_from_repo(reponame);
+        struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx++);
         printf(" Read %d packages\n", currepo->pkg_count);
         for (int i = 0; i < currepo->pkg_count; i++) {
             packages[pkg_count++] = currepo->packages[i];
@@ -219,7 +220,7 @@ struct pkglist *get_all_packages() {
 
 struct pkglist *get_installed_packages() {
     printf("Querying installed packages...\n");
-    return sort_package_list(get_packages_from_repo("Installed"));
+    return sort_package_list(get_packages_from_repo("Installed", 0));
 }
 
 int compare_strings(const void* a, const void* b) {
