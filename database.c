@@ -160,7 +160,7 @@ struct pkglist *get_packages_from_repo(char reponame[], int repoindex) {
     while (fgets(buffer, 4096, (FILE*)indexfile) != NULL) {
         struct package *newpkg;
         if (!(newpkg = malloc(sizeof(struct package*) + (sizeof(char *) * 15) + sizeof(struct strarr_retval *) * 5))) malloc_fail();
-        parse_csv_line(buffer, newpkg);
+        parse_csv_line(buffer, newpkg, repoindex);
         packages[pkg_count++] = newpkg;
     }
 
@@ -182,7 +182,10 @@ struct pkglist *get_all_packages() {
     if (!(packages = malloc(sizeof(struct pkglist*) + sizeof(char) * 4096 * 4096))) malloc_fail();
     int pkg_count = 0;
     long total_size = 0L;
-    currepoidx = 0;
+
+    int currepoidx = 0;
+    struct repository **repos;
+    if (!(repos = malloc(sizeof(struct repository*) + sizeof(char) * (127 + 511) * 127))) malloc_fail();
 
     FILE *fp;
     char reponame[127];
@@ -199,12 +202,21 @@ struct pkglist *get_all_packages() {
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...", reponame);
         fflush(stdout);
-        struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx++);
+        struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx);
+
+        // set repolist variables
+        strcpy(repos[currepoidx]->reponame, reponame);
+        strcpy(repos[currepoidx]->repourl, repourl);
+        strcpy(repos[currepoidx]->baseurl, str_replace(repourl, "packages.db", "/")); // TODO: free this after copying
+
+        // append packages to pkglist
         printf(" Read %d packages\n", currepo->pkg_count);
         for (int i = 0; i < currepo->pkg_count; i++) {
             packages[pkg_count++] = currepo->packages[i];
             total_size += sizeof(currepo->packages[i]);
         }
+
+        currepoidx++;
     }
     
     fclose(fp);
@@ -214,6 +226,12 @@ struct pkglist *get_all_packages() {
     if (!(retval = malloc(sizeof(struct pkglist*) + total_size))) malloc_fail();
     retval->pkg_count = pkg_count;
     retval->packages = packages;
+
+    struct repolist *repolist;
+    if (!(repolist = malloc(sizeof(struct repolist)  + sizeof(char) * (127 + 511) * 127))) malloc_fail();
+    repolist->repo_count = currepoidx;
+    repolist->repos = repos;
+    retval->repos = repolist;
     
     return sort_package_list(retval);
 }

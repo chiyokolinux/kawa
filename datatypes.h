@@ -16,11 +16,12 @@ struct strarr_retval {
 struct repository {
     char reponame[127];
     char repourl[511];
+    char baseurl[511];
 };
 
 struct repolist {
     int repo_count;
-    struct repository repos[];
+    struct repository **repos;
 };
 
 struct package {

@@ -294,7 +294,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
             // do the actual installation
             if (download_archive(currpkg, filetype, is_update))
                 return 1;
-            if (download_scripts(currpkg))
+            if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
                 return 1;
             
             if (!is_update) {
