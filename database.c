@@ -207,7 +207,7 @@ struct pkglist *get_all_packages() {
         // set repolist variables
         strcpy(repos[currepoidx]->reponame, reponame);
         strcpy(repos[currepoidx]->repourl, repourl);
-        strcpy(repos[currepoidx]->baseurl, str_replace(repourl, "packages.db", "/")); // TODO: free this after copying
+        strcpy(repos[currepoidx]->baseurl, str_replace(repourl, "packages.db", "")); // TODO: free this after copying
 
         // append packages to pkglist
         printf(" Read %d packages\n", currepo->pkg_count);
