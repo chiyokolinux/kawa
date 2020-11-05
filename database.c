@@ -185,7 +185,7 @@ struct pkglist *get_all_packages() {
 
     int currepoidx = 0;
     struct repository **repos;
-    if (!(repos = malloc(sizeof(struct repository*) + sizeof(char) * (127 + 511) * 127))) malloc_fail();
+    if (!(repos = malloc(sizeof(struct repository*) + sizeof(char) * (127 + 511 + 511) * 127))) malloc_fail();
 
     FILE *fp;
     char reponame[127];
