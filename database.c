@@ -1,6 +1,6 @@
 #include "database.h"
 
-struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam) {
+struct package package_constructor(char* nameParam, char* descriptionParam, char* versionParam, char* archiveurlParam, char* maintainerParam, char* configurecmdParam, char* typeParam, char* sepbuildParam, char* uninstallcmdParam, char* licenseParam, int repoindexParam) {
     // this constructs a struct package with malloc,
     // so that it can safely returned, even if a local variable was used
     // to initialize some parameter
@@ -34,7 +34,7 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
     char *type;
     if (!(type         = malloc(sizeof(char *) + sizeof(char) * strlen(typeParam         ) + 1))) malloc_fail();
     strcpy(type, typeParam);
-    
+
     char *sepbuild;
     if (!(sepbuild     = malloc(sizeof(char *) + sizeof(char) * strlen(sepbuildParam     ) + 1))) malloc_fail();
     strcpy(sepbuild, sepbuildParam);
@@ -46,6 +46,10 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
     char *license;
     if (!(license      = malloc(sizeof(char *) + sizeof(char) * strlen(licenseParam      ) + 1))) malloc_fail();
     strcpy(license, licenseParam);
+
+    int *repoindex;
+    if (!(repoindex    = malloc(sizeof(int *)  + sizeof(int)                                  ))) malloc_fail();
+    *repoindex = repoindexParam;
 
     
     // copy every pointer to struct object
@@ -59,7 +63,8 @@ struct package package_constructor(char* nameParam, char* descriptionParam, char
         .type         = type          ,
         .sepbuild     = sepbuild      ,
         .uninstallcmd = uninstallcmd  ,
-        .license      = license       
+        .license      = license       ,
+        .repoindex    = repoindex
     };
 
     return retval;

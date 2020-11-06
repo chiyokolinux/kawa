@@ -13,6 +13,16 @@ struct strarr_retval {
     char **retval;
 };
 
+struct repository {
+    char reponame[127];
+    char repourl[511];
+};
+
+struct repolist {
+    int repo_count;
+    struct repository repos[];
+};
+
 struct package {
     char *name;
     char *description;
@@ -28,10 +38,12 @@ struct package {
     char *uninstallcmd;
     char *license;
     struct strarr_retval scripts;
+    int *repoindex;
 };
 
 struct pkglist {
     int pkg_count;
+    struct repolist *repos;
     struct package **packages;
 };
 
@@ -51,16 +63,6 @@ struct ll_node_update {
     struct pkg_update current;
     struct ll_node_update *next;
     struct ll_node_update *prev;
-};
-
-struct repository {
-    char reponame[127];
-    char repourl[511];
-};
-
-struct repolist {
-    int repo_count;
-    struct repository repos[];
 };
 
 #endif // DATATYPES_H
