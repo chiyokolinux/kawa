@@ -23,6 +23,7 @@ int show(char pkgname[]) {
             printf("Version     : %s\n", currpkg->version);
             printf("Installed   : %s\n", package_installed);
             printf("Maintainer  : %s\n", currpkg->maintainer);
+            printf("Repository  : %s\n", database->repos->repos[*currpkg->repoindex]->reponame);
             printf("Type        : %s\n", currpkg->type);
             printf("License     : %s\n", currpkg->license);
             printf("Description :\n    %s\n", currpkg->description);

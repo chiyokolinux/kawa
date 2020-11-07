@@ -185,7 +185,7 @@ struct pkglist *get_all_packages() {
 
     int currepoidx = 0;
     struct repository **repos;
-    if (!(repos = malloc(sizeof(struct repository*) + sizeof(char) * (127 + 511 + 511) * 127))) malloc_fail();
+    if (!(repos = malloc(sizeof(struct repository*)))) malloc_fail();
 
     FILE *fp;
     char reponame[127];
@@ -205,6 +205,7 @@ struct pkglist *get_all_packages() {
         struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx);
 
         // set repolist variables
+        if (!(repos[currepoidx] = malloc(sizeof(struct repository*) + sizeof(struct repository)))) malloc_fail();
         strcpy(repos[currepoidx]->reponame, reponame);
         strcpy(repos[currepoidx]->repourl, repourl);
         strcpy(repos[currepoidx]->baseurl, str_replace(repourl, "packages.db", "")); // TODO: free this after copying
