@@ -272,11 +272,12 @@ void pkglist_free(struct pkglist *packages) {
         free(currpkg->conflicts.retval);
         free(currpkg->configureopts.retval);
         free(currpkg->scripts.retval);
+        free(currpkg->repoindex);
         free(currpkg);
     }
 }
 
-int write_installed_packages(struct pkglist *installed) {
+int write_installed_packages(struct pkglist *installed, struct pkglist *database) {
     // no sort, cause already and will be done on read
     // speed should only be a problem when you literally install the entire
     // chiyoko linux repo (and also I'll optimize this later)
@@ -298,7 +299,7 @@ int write_installed_packages(struct pkglist *installed) {
         if (currpkg == NULL)
             continue;
         // write the package to the index file
-        retval += fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", currpkg->name, currpkg->description, currpkg->version, currpkg->archiveurl, currpkg->maintainer, whitespace_join(currpkg->depends), whitespace_join(currpkg->conflicts), currpkg->configurecmd, whitespace_join(currpkg->configureopts), currpkg->type, currpkg->sepbuild, currpkg->uninstallcmd, currpkg->license, whitespace_join(currpkg->scripts));
+        retval += fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", currpkg->name, currpkg->description, currpkg->version, currpkg->archiveurl, database->repos->repos[*currpkg->repoindex]->reponame, whitespace_join(currpkg->depends), whitespace_join(currpkg->conflicts), currpkg->configurecmd, whitespace_join(currpkg->configureopts), currpkg->type, currpkg->sepbuild, currpkg->uninstallcmd, currpkg->license, whitespace_join(currpkg->scripts));
     }
     
     fclose(indexfile);

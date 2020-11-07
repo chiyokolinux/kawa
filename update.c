@@ -104,6 +104,6 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     }
     
     curl_global_cleanup();
-    retval += write_installed_packages(installed);
+    retval += write_installed_packages(installed, database);
     return retval;
 }

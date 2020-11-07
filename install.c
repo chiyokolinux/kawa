@@ -122,7 +122,7 @@ int install(int pkgc, char *pkgnames[]) {
         
         // re-write installed if packages were updated
         if (*updatec)
-            write_installed_packages(installed);
+            write_installed_packages(installed, database);
 
         // after updating, install all new packages
         for (int i = 0; i < nodelist->pkg_count; i++) {

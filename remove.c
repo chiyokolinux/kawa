@@ -1,6 +1,7 @@
 #include "remove.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]) {
+    struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     
     // check if packages *can* be uninstalled
@@ -37,7 +38,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
             retval += remove_single(pkgnames[i], installed);
         }
         
-        retval += write_installed_packages(installed);
+        retval += write_installed_packages(installed, database);
         
         return retval;
     } else
