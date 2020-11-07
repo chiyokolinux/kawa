@@ -78,6 +78,24 @@ int install(int pkgc, char *pkgnames[]) {
             }
         }
     }
+
+    // check for Non-Free installs and warn the user
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        if (!strcmp(nodelist->packages[i]->license, "OTHER") || !strcmp(nodelist->packages[i]->license, "NONFREE")) {
+            printf("The package %s is licensed under a Non-Free license,\n"
+            "meaning the author might restrict what you can do with the software.\n"
+            "Do you wish to install it anyways? [y/N] ", nodelist->packages[i]->name);
+            fflush(stdout);
+
+            char response = getchar();
+            if (response == 'n' || response == 'N' || response == '\n') {
+                return 0;
+            }
+            getchar();
+            fflush(stdin);
+            printf("\n");
+        }
+    }
     
     // user dialogue
     if (!nodelist->pkg_count && !*updatec) {
@@ -288,7 +306,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
             }
             
             // register & prepare package
-            add_db_entry(currpkg, manual_installed);
+            add_db_entry(currpkg, manual_installed, database);
             kawafile_dir_create(pkgname);
             
             // do the actual installation
@@ -323,9 +341,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
     return 1;
 }
 
-int add_db_entry(struct package *package, int manual_installed) {
-    // files are for tomorrow
-    
+int add_db_entry(struct package *package, int manual_installed, struct pkglist *database) {
     struct stat st = {0};
     
     // compute path
@@ -355,7 +371,7 @@ int add_db_entry(struct package *package, int manual_installed) {
         strcpy(manual, "auto");
     
     // write entry
-    fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, package->maintainer, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
+    fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, database->repos->repos[*package->repoindex]->reponame, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
     
     fclose(indexfile);
     return 0;

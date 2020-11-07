@@ -23,7 +23,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
 int download_archive(struct package *dlpackage, char filetype[], int force);
 int download_scripts(struct package *dlpackage, char *baseurl);
 char *str_replace(char *orig, char *rep, char *with);
-int add_db_entry(struct package *package, int manual_installed);
+int add_db_entry(struct package *package, int manual_installed, struct pkglist *database);
 char *whitespace_join(struct strarr_retval to_join);
 
 #endif // INSTALL_H

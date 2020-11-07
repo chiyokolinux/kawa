@@ -78,7 +78,7 @@ void remove_db_entry(struct package *package, struct pkglist *installed) {
     struct package *currpkg;
     for (int i = 0; i < installed->pkg_count; i++) {
         currpkg = installed->packages[i];
-        // we're comparing pointers this (should) work(s).
+        // we're comparing pointers, so this (should) work(s).
         if (currpkg == package) {
             installed->packages[i] = NULL;
             // free(package); caused problems
