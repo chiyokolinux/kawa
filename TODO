@@ -16,3 +16,4 @@ KAWA TODOs
 - re-write Installed.packages.db after update/remove DONE
 - re-resolve dependencies on update DONE
 - check malloc() return values DONE
+- remove /etc/kawa.d/kawafiles/<pkgname> when removing package
