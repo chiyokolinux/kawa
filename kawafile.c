@@ -44,3 +44,38 @@ void kawafile_dir_create(char pkgname[]) {
         mkdir(path, 0700);
     }
 }
+
+void kawafile_dir_remove(struct package pkg[]) {
+    struct stat st = {0};
+
+    char path[strlen(INSTALLPREFIX)+23+strlen(pkg->name)];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/kawafiles/");
+    strcat(path, pkgname);
+
+    if (stat(path, &st) == -1) {
+        return;
+    }
+
+    char path_appendable[strlen(INSTALLPREFIX)+56+strlen(pkg->name)];
+    strcpy(path_appendable, path);
+    strcat(path_appendable, "/");
+    int null_byte_index = strlen(path_appendable);
+
+    // delete all script files
+    for (int i = 0; i < pkg->scripts.retc; i++) {
+        strcat(path_appendable, pkg->scripts.retval[i]);
+
+        unlink(path_appendable);
+
+        path_appendable[null_byte_index] = '\0';
+    }
+
+    // delete kawafile
+    strcat(path_appendable, "Kawafile");
+    unlink(path_appendable);
+
+    // remove the parent directory which contained all the files
+    rmdir(path);
+}
