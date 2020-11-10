@@ -13,20 +13,26 @@ int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
     strcpy(dir, path);
     strcat(path, "/Kawafile");
     
-    char cmdline[492+strlen(path)+strlen(dir)+strlen(filetype)];
+    char cmdline[738+strlen(path)+strlen(dir)*2+strlen(filetype)*2];
     strcpy(cmdline, "");
     // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
+    // do.install.sh is not supported for binary pkgs (why should it be?), maybe in the future (although unlikely)
+    // TODO: fix install scripts being run on update
     sprintf(cmdline, "(echo \"#!/bin/sh\"; "
                      "echo \"cd %3$s\"; "
                      "echo \"do_install() {\"; "
+                     "echo \"    [[ -f pre.install.sh ]] && ./pre.install.sh\"; "
                      "echo \"    tar xf package.tar.%2$s -C /\"; "
+                     "echo \"    [[ -f post.install.sh ]] && ./post.install.sh\"; "
                      "echo \"}\"; "
                      "echo \"do_remove() {\"; "
                      "tar -tf %3$s/package.tar.%2$s | sed '/\\/$/d' | sed -e 's/^/    rm -f \\//'; "
                      "echo \"}\"; "
                      "echo \"do_update() {\"; "
+                     "echo \"    [[ -f pre.update.sh ]] && ./pre.update.sh\"; "
                      "echo \"    do_remove\"; "
                      "echo \"    do_install\"; "
+                     "echo \"    [[ -f post.update.sh ]] && ./post.update.sh\"; "
                      "echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                      "echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") "
                      "> %1$s", path, filetype, dir);
