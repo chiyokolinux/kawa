@@ -16,10 +16,13 @@ int metapkg_gen_kawafile(char pkgname[]) {
     fp = fopen(path, "w");
     fputs("#!/bin/sh\n", fp);
     fclose(fp);
+
+    int retval = 0;
+    retval += chmod(path, S_IRWXU);
     
     printf(" Done\n");
     
-    return 0;
+    return retval;
 }
 
 int metapkg_install(char pkgname[]) {
