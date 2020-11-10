@@ -271,6 +271,8 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
             fprintf(stderr, "Downloading script %s of package %s failed: Cannot create cURL object\n", script, dlpackage->name);
             return ++retval;
         }
+
+        retval += chmod(path, S_IRWXU);
         
         printf(".");
         fflush(stdout);
