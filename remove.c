@@ -54,7 +54,7 @@ int remove_single(char pkgname[], struct pkglist *installed) {
         if (!strcmp(currpkg->name, pkgname)) {
             // unregister package
             remove_db_entry(currpkg, installed);
-            kawafile_dir_remove(pkgname);
+            kawafile_dir_remove(currpkg);
             
             // remove the package using the function provided by the package type class
             if (!strcmp(currpkg->type, "source"))

@@ -52,7 +52,7 @@ void kawafile_dir_remove(struct package pkg[]) {
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/kawafiles/");
-    strcat(path, pkgname);
+    strcat(path, pkg->name);
 
     if (stat(path, &st) == -1) {
         return;
