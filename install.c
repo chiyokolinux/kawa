@@ -289,6 +289,8 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
     for (int i = 0; i < database->pkg_count; i++) {
         currpkg = database->packages[i];
         if (!strcmp(currpkg->name, pkgname)) {
+            // TODO: package source needs to be a param for this
+
             // compute filetype
             char *p;
             if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
