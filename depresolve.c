@@ -55,7 +55,46 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
         }
     }
     
-    printf("Error: Package %s not found, but required by another package.\n", current);
-    printf("This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
+    fprintf(stderr, "Error: Package %s not found, but required by another package.\n", current);
+    fprintf(stderr, "This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
     exit(-3);
+}
+
+void check_package_source(struct package *currpkg, int database_i, struct pkglist *database, struct pkglist *installed, int is_installed) {
+    // if there are no packages with the same name (remember: pkglists are always sorted!), just leave currpkg alone
+    if (strcmp(currpkg->name, database->packages[database_i + 1]->name) && strcmp(currpkg->name, database->packages[database_i - 1]->name))
+        return;
+
+    // if the installed status hasn't already been calculated, do it now
+    int installed_i = -1;
+    if (is_installed == -1) {
+        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+            if (!strcmp(currpkg->name, installed->packages[i2]->name)) {
+                is_installed = 1;
+                installed_i = i2;
+                break;
+            }
+        }
+        if (is_installed == -1)
+            is_installed = 0;
+    }
+
+    if (is_installed) {
+        if (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed_i->packages[installed_i]->maintainer)) {
+            // go back to first package with searched name
+            while (!strcmp(currpkg->name, database->packages[database_i - 1]->name))
+                database_i--;
+
+            while (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed_i->packages[installed_i]->maintainer))
+                database_i++;
+
+            if (strcmp(currpkg->name, database->packages[i]->name)) {
+                fprintf(stderr, "Package %s not found in preassigned repository %s\n", currpkg->name, installed_i->packages[installed_i]->maintainer);
+                exit(-4);
+            }
+
+            currpkg = database->packages[database_i];
+            return;
+        }
+    }
 }

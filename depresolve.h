@@ -10,5 +10,6 @@
 #include "datatypes.h"
 
 void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates);
+void check_package_source(struct package *currpkg, int database_i, struct pkglist *database, struct pkglist *installed, int is_installed);
 
 #endif // DEPRESOLVE_H

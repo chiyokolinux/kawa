@@ -57,6 +57,7 @@ int install(int pkgc, char *pkgnames[]) {
                             }
                         }
                     }
+                    check_package_source(currpkg, i, database, installed, current_installed);
                     if (current_installed) {
                         struct pkg_update *pkgupdt = pkg_has_update(pkgnames[ii], database, installed);
                         if (pkgupdt != NULL) {
