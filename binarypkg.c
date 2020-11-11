@@ -16,7 +16,7 @@ int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
     char cmdline[798+strlen(path)+strlen(dir)*2+strlen(filetype)*2];
     strcpy(cmdline, "");
     // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
-    // do.install.sh is not supported for binary pkgs (why should it be?), maybe in the future (although unlikely)
+    // do.install.sh and do.build.sh are not supported for binary pkgs (why should it be?), maybe in the future (although unlikely)
     sprintf(cmdline, "(echo \"#!/bin/sh\"; "
                      "echo \"cd %3$s\"; "
                      "echo \"perform_install() {\"; "
