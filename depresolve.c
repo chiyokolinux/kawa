@@ -23,6 +23,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
                     }
                 }
             }
+            check_package_source(currpkg, i, database, installed, current_installed);
             
             if (current_installed && !ignore_updates) {
                 struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
