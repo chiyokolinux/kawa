@@ -35,7 +35,8 @@ int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
                      "echo \"    do_remove\"; "
                      "echo \"    perform_install\"; "
                      "echo \"    [[ -f post.update.sh ]] && ./post.update.sh\"; "
-                     "echo \"}\"; echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
+                     "echo \"}\"; "
+                     "echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                      "echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") "
                      "> %1$s", path, filetype, dir);
     

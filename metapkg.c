@@ -14,7 +14,9 @@ int metapkg_gen_kawafile(char pkgname[]) {
     
     // We just want to create the file without writing anything
     fp = fopen(path, "w");
-    fputs("#!/bin/sh\n", fp);
+    fputs("#!/bin/sh\n"
+          "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
+          "echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac ", fp);
     fclose(fp);
 
     int retval = 0;
@@ -29,9 +31,17 @@ int metapkg_install(char pkgname[]) {
     // meta packages only install their depends and remove them on uninstall,
     // but that's handled without Kawafiles,
     // so we only need to generate an empty Kawafile
+    int retval = 0;
     printf("Installing %s...", pkgname);
     fflush(stdout);
-    return metapkg_gen_kawafile(pkgname);
+
+    retval += metapkg_gen_kawafile(pkgname);
+    kawafile_run(pkgname, "install");
+    printf(".");
+    fflush(stdout);
+    printf(" Done\n");
+
+    return retval;
 }
 
 int metapkg_remove(struct package *package) {
