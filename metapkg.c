@@ -21,7 +21,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     // a (binary) package as dependency with all the files you need to add
     fp = fopen(path, "w");
     fprintf(fp, "#!/bin/sh\n"
-                "cd %3$s\n"
+                "cd %1$s\n"
                 "perform_install() {\n"
                 "    :\n"
                 "}\n"
