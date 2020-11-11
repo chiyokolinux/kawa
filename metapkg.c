@@ -4,6 +4,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     kawafile_dir_create(pkgname);
     
     FILE *fp;
+    int retval = 0;
 
     char path[strlen(INSTALLPREFIX)+32+strlen(pkgname)];
     char dir[strlen(INSTALLPREFIX)+23+strlen(pkgname)];
@@ -20,30 +21,29 @@ int metapkg_gen_kawafile(char pkgname[]) {
     // if you need you metapkg to install something, for example a configuration file, add
     // a (binary) package as dependency with all the files you need to add
     fp = fopen(path, "w");
-    fprintf(fp, "#!/bin/sh\n"
-                "cd %1$s\n"
-                "perform_install() {\n"
-                "    :\n"
-                "}\n"
-                "do_install() {\n"
-                "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
-                "    perform_install\n"
-                "    [[ -f post.install.sh ]] && ./post.install.sh\n"
-                "}\n"
-                "do_remove() {\n"
-                "    :\n"
-                "}\n"
-                "do_update() {\n"
-                "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
-                "    do_remove\n"
-                "    perform_install\n"
-                "    [[ -f post.update.sh ]] && ./post.update.sh\n"
-                "}\n"
-                "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
-                "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
-    fclose(fp);
+    retval += fprintf(fp, "#!/bin/sh\n"
+                          "cd %1$s\n"
+                          "perform_install() {\n"
+                          "    :\n"
+                          "}\n"
+                          "do_install() {\n"
+                          "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
+                          "    perform_install\n"
+                          "    [[ -f post.install.sh ]] && ./post.install.sh\n"
+                          "}\n"
+                          "do_remove() {\n"
+                          "    :\n"
+                          "}\n"
+                          "do_update() {\n"
+                          "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
+                          "    do_remove\n"
+                          "    perform_install\n"
+                          "    [[ -f post.update.sh ]] && ./post.update.sh\n"
+                          "}\n"
+                          "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
+                          "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
+    retval += fclose(fp);
 
-    int retval = 0;
     retval += chmod(path, S_IRWXU);
     
     printf(" Done\n");
