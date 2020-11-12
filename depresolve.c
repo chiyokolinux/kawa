@@ -81,16 +81,16 @@ void check_package_source(struct package *currpkg, int database_i, struct pkglis
     }
 
     if (is_installed) {
-        if (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed_i->packages[installed_i]->maintainer)) {
+        if (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed->packages[installed_i]->maintainer)) {
             // go back to first package with searched name
             while (!strcmp(currpkg->name, database->packages[database_i - 1]->name))
                 database_i--;
 
-            while (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed_i->packages[installed_i]->maintainer))
+            while (strcmp(database->repos->repos[*currpkg->repoindex]->reponame, installed->packages[installed_i]->maintainer))
                 database_i++;
 
-            if (strcmp(currpkg->name, database->packages[i]->name)) {
-                fprintf(stderr, "Package %s not found in preassigned repository %s\n", currpkg->name, installed_i->packages[installed_i]->maintainer);
+            if (strcmp(currpkg->name, database->packages[database_i]->name)) {
+                fprintf(stderr, "Package %s not found in preassigned repository %s\n", currpkg->name, installed->packages[installed_i]->maintainer);
                 exit(-4);
             }
 
