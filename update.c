@@ -73,6 +73,7 @@ int update() {
     }
     
     printf("\n\nDo you wish to install these updates now? [Y/n] ");
+    fflush(stdout);
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;

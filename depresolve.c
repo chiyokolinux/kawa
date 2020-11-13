@@ -97,5 +97,24 @@ void check_package_source(struct package *currpkg, int database_i, struct pkglis
             currpkg = database->packages[database_i];
             return;
         }
+    } else {
+        // go back to first package with searched name
+        while (!strcmp(currpkg->name, database->packages[database_i - 1]->name))
+            database_i--;
+
+        printf("Package %s has been found in multiple repositories.\n", currpkg->name);
+        printf("Please choose one of the following repositories:\n");
+        
+        printf(" * [1] %s\n", database->repos->repos[database->packages[database_i]->repoindex]->reponame);
+
+        int repoidx = 2;
+        while (strcmp(currpkg->name, database->packages[database_i]->name)) {
+            printf("   [%d] %s\n", repoidx, database->repos->repos[database->packages[database_i]->repoindex]->reponame);
+            repoidx++;
+            database_i++;
+        }
+
+        printf("Select one [1]: ");
+        fflush(stdout);
     }
 }
