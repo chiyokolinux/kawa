@@ -90,7 +90,7 @@ void check_package_source(struct package *currpkg, int database_i, struct pkglis
                 database_i++;
 
             if (strcmp(currpkg->name, database->packages[database_i]->name)) {
-                fprintf(stderr, "Package %s not found in preassigned repository %s\n", currpkg->name, installed->packages[installed_i]->maintainer);
+                fprintf(stderr, "\nPackage %s not found in preassigned repository %s\n", currpkg->name, installed->packages[installed_i]->maintainer);
                 exit(-4);
             }
 
@@ -102,19 +102,34 @@ void check_package_source(struct package *currpkg, int database_i, struct pkglis
         while (!strcmp(currpkg->name, database->packages[database_i - 1]->name))
             database_i--;
 
-        printf("Package %s has been found in multiple repositories.\n", currpkg->name);
+        printf("\nPackage %s has been found in multiple repositories.\n", currpkg->name);
         printf("Please choose one of the following repositories:\n");
         
-        printf(" * [1] %s\n", database->repos->repos[database->packages[database_i]->repoindex]->reponame);
+        printf(" * [1] %s\n", database->repos->repos[*database->packages[database_i]->repoindex]->reponame);
 
         int repoidx = 2;
         while (strcmp(currpkg->name, database->packages[database_i]->name)) {
-            printf("   [%d] %s\n", repoidx, database->repos->repos[database->packages[database_i]->repoindex]->reponame);
+            printf("   [%d] %s\n", repoidx, database->repos->repos[*database->packages[database_i]->repoindex]->reponame);
             repoidx++;
             database_i++;
         }
 
-        printf("Select one [1]: ");
+        printf("Select one: ");
         fflush(stdout);
+        scanf("%d", &repoidx); // TODO: allow default value in a non-stupid way
+        printf("\n");
+        // we allow values over the max, if the user is stupid enough to enter an invalid number
+        // it's really their own fault i guess
+        // acutally this is just a bad excuse to not allocate one more integer
+
+        // go back to first package with searched name
+        while (!strcmp(currpkg->name, database->packages[database_i - 1]->name))
+            database_i--;
+
+        for (int i = 1; i < repoidx; i++)
+            database_i++;
+        
+        currpkg = database->packages[database_i];
+        return;
     }
 }
