@@ -22,8 +22,8 @@ KWFLOBJ = kawafile.o
 CACLOBJ = cacheclean.o
 EERROBJ = error.o
 
-OBJECTS = $(PROGOBJ) $(BINAOBJ) $(CACLOBJ) $(DFSAOBJ) $(DTBSOBJ) $(EERROBJ) $(HELPOBJ) $(INSTOBJ) $(KWFLOBJ) $(METAOBJ) $(MKPGOBJ) $(REMVOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h binarypkg.h cacheclean.h datatypes.h depresolve.h error.h help.h install.h kawafile.h makepackages.h metapkg.h remove.h repoadd.h reposync.h database.h update.h search.h show.h
+OBJECTS = $(PROGOBJ) $(BINAOBJ) $(CACLOBJ) $(DFSAOBJ) $(DTBSOBJ) $(EERROBJ) $(HELPOBJ) $(INSTOBJ) $(KWFLOBJ) $(METAOBJ) $(MKPGOBJ) $(REMVOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SAUCOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h binarypkg.h cacheclean.h datatypes.h depresolve.h error.h help.h install.h kawafile.h makepackages.h metapkg.h remove.h repoadd.h reposync.h database.h update.h search.h show.h sourcepkg.h
 
 all: $(PROGBIN)
 

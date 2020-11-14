@@ -45,9 +45,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     retval += fclose(fp);
 
     retval += chmod(path, S_IRWXU);
-    
-    printf(" Done\n");
-    
+        
     return retval;
 }
 
