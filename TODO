@@ -2,7 +2,7 @@ KAWA TODOs
 ----------
 
 - add scripts detection, download DONE
-- add scripts Kawafile integration
+- add scripts Kawafile integration DONE
 - add remove capability DONE
 - add source pkg capability
 - add patch pkg capability
@@ -15,6 +15,8 @@ KAWA TODOs
 - kawa cacheclean DONE
 - re-write Installed.packages.db after update/remove DONE
 - re-resolve dependencies on update DONE
-- check malloc() return values DONE
+- check malloc() return values (see #2) DONE
 - remove /etc/kawa.d/kawafiles/<pkgname> when removing package DONE
 - handle errors (errno)
+- check & ask package source (see #4) DONE
+- binary search packages
