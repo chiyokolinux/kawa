@@ -60,7 +60,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "}\n"
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
-                          dir, THREADNUM, package->configurecmd, package->configureopts, package->uninstallcmd,
+                          dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
                           filetype, enterbuilddir, exitbuilddir);
     retval += fclose(fp);
 

@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 
 #include "config.h"
+#include "install.h"
 #include "kawafile.h"
 
 int sourcepkg_gen_kawafile(struct package *package, char filetype[]);
