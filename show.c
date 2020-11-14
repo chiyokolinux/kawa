@@ -14,6 +14,7 @@ int show(char pkgname[]) {
                     break;
                 }
             }
+            check_package_source(currpkg, i, database, installed, (package_installed[0] == 'y'));
             printf("\nInformation for package %s:\n-------------------------", pkgname);
             int dashes_total = strlen(pkgname);
             for (int dash = 0; dash < dashes_total; dash++)

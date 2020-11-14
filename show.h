@@ -6,6 +6,7 @@
 
 #include "datatypes.h"
 #include "database.h"
+#include "depresolve.h"
 
 int show(char pkgname[]);
 
