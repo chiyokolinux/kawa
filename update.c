@@ -38,13 +38,15 @@ int update() {
         struct package *currpkg_l = installed->packages[i];
         while (strcmp(currpkg_l->name, database->packages[remote_i]->name))
             remote_i++; // this should work because the package lists are sorted (hopefully)
-        if (strcmp(currpkg_l->version, database->packages[remote_i]->version)) {
+        struct package *currpkg_r = database->packages[remote_i];
+        check_package_source(currpkg_r, remote_i, database, installed, 1);
+        if (strcmp(currpkg_l->version, currpkg_r->version)) {
             struct pkg_update *pkgupdt;
             if (!(pkgupdt = malloc(sizeof(struct pkg_update)))) malloc_fail();
             *pkgupdt = (struct pkg_update) {
                 .name = currpkg_l->name,
                 .version_local = currpkg_l->version,
-                .version_remote = database->packages[remote_i]->version
+                .version_remote = currpkg_r->version
             };
             updatepkg[updatec++] = pkgupdt;
         }
