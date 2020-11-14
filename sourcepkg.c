@@ -15,6 +15,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     strcpy(dir, path);
     strcat(path, "/Kawafile");
     
+    // TODO: support dedicated build/ directory
     fp = fopen(path, "w");
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
