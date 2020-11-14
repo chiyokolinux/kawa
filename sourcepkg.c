@@ -15,6 +15,16 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     strcpy(dir, path);
     strcat(path, "/Kawafile");
     
+    char enterbuilddir[30];
+    char exitbuilddir[15];
+    if (!strcmp(package->sepbuild, "yes")) {
+        strcpy(enterbuilddir, "    mkdir build && cd build\n");
+        strcpy(exitbuilddir, "    cd ../..\n");
+    } else {
+        strcpy(enterbuilddir, "");
+        strcpy(exitbuilddir, "    cd ..\n");
+    }
+
     // TODO: support dedicated build/ directory
     fp = fopen(path, "w");
     retval += fprintf(fp, "#!/bin/sh\n"
@@ -22,6 +32,11 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "prepare_files() {\n"
                           "    tar xf package.tar.%6$s\n"
                           "    cd $(tar tf package.tar.%6$s | head -n1)\n"
+                          "%7$s"
+                          "}\n"
+                          "cleanup() {\n"
+                          "%8$s"
+                          "    rm -rf $(tar tf package.tar.%6$s | head -n1)\n"
                           "}\n"
                           "perform_install() {\n"
                           "    %3$s %4$s\n"
@@ -32,6 +47,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
                           "    perform_install\n"
                           "    [[ -f post.install.sh ]] && ./post.install.sh\n"
+                          "    cleanup\n"
                           "}\n"
                           "do_remove() {\n"
                           "    %5$s\n"
@@ -40,10 +56,12 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
                           "    perform_install\n"
                           "    [[ -f post.update.sh ]] && ./post.update.sh\n"
+                          "    cleanup\n"
                           "}\n"
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
-                          dir, THREADNUM, package->configurecmd, package->configureopts, package->uninstallcmd);
+                          dir, THREADNUM, package->configurecmd, package->configureopts, package->uninstallcmd,
+                          filetype, enterbuilddir, exitbuilddir);
     retval += fclose(fp);
 
     retval += chmod(path, S_IRWXU);
