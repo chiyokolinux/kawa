@@ -25,7 +25,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
         strcpy(exitbuilddir, "    cd ..\n");
     }
 
-    // TODO: support dedicated build/ directory
+    // TODO: properly cd before do_remove
     fp = fopen(path, "w");
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"

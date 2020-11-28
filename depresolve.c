@@ -1,5 +1,13 @@
 #include "depresolve.h"
 
+/**
+ * recursive DFS implementation
+ * resolves dependencies of one package into
+ * a nodelist.
+ * the nodelist is order-sorted (first package first)
+ * it cannot handle dependency circles, that is up to
+ * the packager to handle.
+**/
 void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates) {
     if (depth >= MAXDEPTH) {
         printf("Error: maximum recursion depth of %d reached during dependency resolving.\n", MAXDEPTH);
@@ -61,6 +69,13 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
     exit(-3);
 }
 
+/**
+ * this function looks up which repository should be used
+ * as the source of a package.
+ * if the user has already once selected a source for the package
+ * (e.g. during installation), this source is used again.
+ * otherwise, the user is prompted to select one manually.
+**/
 void check_package_source(struct package *currpkg, int database_i, struct pkglist *database, struct pkglist *installed, int is_installed) {
     // if there are no packages with the same name (remember: pkglists are always sorted!), just leave currpkg alone
     if (strcmp(currpkg->name, database->packages[database_i + 1]->name) && strcmp(currpkg->name, database->packages[database_i - 1]->name))
@@ -132,4 +147,41 @@ void check_package_source(struct package *currpkg, int database_i, struct pkglis
         currpkg = database->packages[database_i];
         return;
     }
+}
+
+/**
+ * returns the highest set bit of a 32bit int
+**/
+int hibit_xor(unsigned int n) {
+    n |= (n >>  1);
+    n |= (n >>  2);
+    n |= (n >>  4);
+    n |= (n >>  8);
+    n |= (n >> 16);
+    return n ^ (n >> 1);
+}
+
+/**
+ * simple linear bsort implementation for struct package's
+ * also returns where the match was found
+ * this addons is not present in any standard libc bsort,
+ * that's why I wrote this
+**/
+struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i) {
+    *i = database->pkg_count / 2;
+    int modifier = hibit_xor(*i);
+    int cmpres = 0;
+    while ((cmpres = strcmp(database->packages[*i]->name, pkgname))) {
+        modifier /= 2;
+        if (cmpres < 0) {
+            *i += modifier;
+        } else {
+            *i -= modifier;
+        }
+        if (modifier == 0) {
+            fprintf(stderr, "Error: Package %s not found (try kawa sync)\n", pkgname);
+            exit(1);
+        }
+    }
+    return database->packages[*i];
 }
