@@ -78,8 +78,14 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
 **/
 void check_package_source(struct package *currpkg, int database_i, struct pkglist *database, struct pkglist *installed, int is_installed) {
     // if there are no packages with the same name (remember: pkglists are always sorted!), just leave currpkg alone
-    if (strcmp(currpkg->name, database->packages[database_i + 1]->name) && strcmp(currpkg->name, database->packages[database_i - 1]->name))
-        return;
+    if (database_i != database->pkg_count - 1) {
+        if (strcmp(currpkg->name, database->packages[database_i + 1]->name))
+            return;
+    }
+    if (database_i != 0) {
+        if (strcmp(currpkg->name, database->packages[database_i - 1]->name))
+            return;
+    }
 
     // if the installed status hasn't already been calculated, do it now
     int installed_i = -1;
@@ -169,7 +175,7 @@ int hibit_xor(unsigned int n) {
 **/
 struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i) {
     *i = database->pkg_count / 2;
-    int modifier = hibit_xor(*i);
+    int modifier = hibit_xor(*i) << 1;
     int cmpres = 0;
     while ((cmpres = strcmp(database->packages[*i]->name, pkgname))) {
         modifier /= 2;
@@ -178,6 +184,9 @@ struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i) {
         } else {
             *i -= modifier;
         }
+        if (*i < 0) *i = 0;
+        else if (*i >= database->pkg_count) *i = database->pkg_count - 1;
+        printf("%s %d %s %d\n", pkgname, *i, database->packages[*i]->name, modifier);
         if (modifier == 0) {
             fprintf(stderr, "Error: Package %s not found (try kawa sync)\n", pkgname);
             exit(1);
