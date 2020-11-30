@@ -23,6 +23,7 @@ struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, stru
 
 int update() {
     sync_all();
+
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkg[installed->pkg_count];
@@ -34,6 +35,7 @@ int update() {
     nodelist->packages = packages;
     int remote_i = 0;
     int updatec = 0;
+
     for (int i = 0; i < installed->pkg_count; i++) {
         struct package *currpkg_l = installed->packages[i];
         while (strcmp(currpkg_l->name, database->packages[remote_i]->name))
