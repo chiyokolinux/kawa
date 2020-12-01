@@ -6,7 +6,7 @@ int show(char pkgname[]) {
     struct package *currpkg;
 
     int *i = malloc(sizeof(int));
-    currpkg = bsearch_pkg(pkgname, database, i);
+    currpkg = bsearch_pkg(pkgname, database, i, 0);
 
     char package_installed[4] = "no";
     for (int i2 = 0; i2 < installed->pkg_count; i2++) {

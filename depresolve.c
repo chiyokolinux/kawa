@@ -19,54 +19,48 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
         return;
     
     struct package *currpkg;
-    for (int i = 0; i < database->pkg_count; i++) {
-        currpkg = database->packages[i];
-        if (!strcmp(currpkg->name, current)) {
-            int current_installed = 0;
-            if (!force_install) {
-                for (int i2 = 0; i2 < installed->pkg_count; i2++) {
-                    if (!strcmp(current, installed->packages[i2]->name)) {
-                        current_installed = 1;
-                        break;
-                    }
-                }
+    int *i = malloc(sizeof(int));
+    currpkg = bsearch_pkg(current, database, i, depth);
+
+    int current_installed = 0;
+    if (!force_install) {
+        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+            if (!strcmp(current, installed->packages[i2]->name)) {
+                current_installed = 1;
+                break;
             }
-            check_package_source(currpkg, i, database, installed, current_installed);
-            
-            if (current_installed && !ignore_updates) {
-                struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
-                if (pkgupdt != NULL) {
-                    updatepkgs[*updatec] = pkgupdt;
-                    *updatec = *updatec + 1;
-                }
-            }
-            
-            if (!currpkg->depends.retval[0][0] == '\0') {
-                for (int i = 0; i < currpkg->depends.retc; i++) {
-                    int in_queue = 0;
-                    for (int i3 = 0; i3 < nodelist->pkg_count; i3++) {
-                        if (!strcmp(currpkg->depends.retval[i], nodelist->packages[i3]->name)) {
-                            in_queue = 1;
-                            break;
-                        }
-                    }
-                    
-                    if (!in_queue)
-                        resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i], database, installed, depth + 1, updatec, force_install, ignore_updates);
-                }
-            }
-            
-            if (!current_installed) {
-                nodelist->packages[nodelist->pkg_count] = currpkg;
-                nodelist->pkg_count++;
-            }
-            return;
+        }
+    }
+    check_package_source(currpkg, *i, database, installed, current_installed);
+    
+    if (current_installed && !ignore_updates) {
+        struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
+        if (pkgupdt != NULL) {
+            updatepkgs[*updatec] = pkgupdt;
+            *updatec = *updatec + 1;
         }
     }
     
-    fprintf(stderr, "Error: Package %s not found, but required by another package.\n", current);
-    fprintf(stderr, "This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
-    exit(-3);
+    if (!currpkg->depends.retval[0][0] == '\0') {
+        for (int i2 = 0; i2 < currpkg->depends.retc; i2++) {
+            int in_queue = 0;
+            for (int i3 = 0; i3 < nodelist->pkg_count; i3++) {
+                if (!strcmp(currpkg->depends.retval[i2], nodelist->packages[i3]->name)) {
+                    in_queue = 1;
+                    break;
+                }
+            }
+            
+            if (!in_queue)
+                resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i2], database, installed, depth + 1, updatec, force_install, ignore_updates);
+        }
+    }
+    
+    if (!current_installed) {
+        nodelist->packages[nodelist->pkg_count] = currpkg;
+        nodelist->pkg_count++;
+    }
+    return;
 }
 
 /**
@@ -173,23 +167,31 @@ int hibit_xor(unsigned int n) {
  * this addons is not present in any standard libc bsort,
  * that's why I wrote this
 **/
-struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i) {
+struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i, int pkg_is_dependency) {
     *i = database->pkg_count / 2;
     int modifier = hibit_xor(*i) << 1;
     int cmpres = 0;
     while ((cmpres = strcmp(database->packages[*i]->name, pkgname))) {
         modifier /= 2;
+
         if (cmpres < 0) {
             *i += modifier;
         } else {
             *i -= modifier;
         }
+
         if (*i < 0) *i = 0;
         else if (*i >= database->pkg_count) *i = database->pkg_count - 1;
-        printf("%s %d %s %d\n", pkgname, *i, database->packages[*i]->name, modifier);
+
         if (modifier == 0) {
-            fprintf(stderr, "Error: Package %s not found (try kawa sync)\n", pkgname);
-            exit(1);
+            if (pkg_is_dependency == 0) {
+                fprintf(stderr, "Error: Package %s not found (try kawa sync)\n", pkgname);
+                exit(1);
+            } else {
+                fprintf(stderr, "Error: Package %s not found, but required by another package.\n", pkgname);
+                fprintf(stderr, "This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
+                exit(-3);
+            }
         }
     }
     return database->packages[*i];
