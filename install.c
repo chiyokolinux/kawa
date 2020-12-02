@@ -43,39 +43,34 @@ int install(int pkgc, char *pkgnames[]) {
         for (int ii = 2; ii < pkgc; ii++) {
             if (pkgnames[ii][0] == '-')
                 continue;
+
             struct package *currpkg;
-            int success = 0;
-            for (int i = 0; i < database->pkg_count; i++) {
-                currpkg = database->packages[i];
-                if (!strcmp(currpkg->name, pkgnames[ii])) {
-                    int current_installed = 0;
-                    if (!force_install) {
-                        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
-                            if (!strcmp(pkgnames[ii], installed->packages[i2]->name)) {
-                                current_installed = 1;
-                                break;
-                            }
-                        }
+            int *i = malloc(sizeof(int));
+            currpkg = bsearch_pkg(pkgnames[ii], database, i, 0);
+
+            int current_installed = 0;
+            if (!force_install) {
+                for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+                    if (!strcmp(pkgnames[ii], installed->packages[i2]->name)) {
+                        current_installed = 1;
+                        break;
                     }
-                    check_package_source(currpkg, i, database, installed, current_installed);
-                    if (current_installed) {
-                        struct pkg_update *pkgupdt = pkg_has_update(pkgnames[ii], database, installed);
-                        if (pkgupdt != NULL) {
-                            updatepkgs[*updatec] = pkgupdt;
-                            *updatec = *updatec + 1;
-                        }
-                    }
-                    if (!current_installed) {
-                        nodelist->packages[nodelist->pkg_count] = currpkg;
-                        nodelist->pkg_count++;
-                    }
-                    success = 1;
                 }
             }
-            if (!success) {
-                printf("Error: Package %s not found.\n", pkgnames[ii]);
-                printf("This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
-                exit(-3);
+
+            check_package_source(currpkg, *i, database, installed, current_installed);
+
+            if (current_installed) {
+                struct pkg_update *pkgupdt = pkg_has_update(pkgnames[ii], database, installed);
+                if (pkgupdt != NULL) {
+                    updatepkgs[*updatec] = pkgupdt;
+                    *updatec = *updatec + 1;
+                }
+            }
+
+            if (!current_installed) {
+                nodelist->packages[nodelist->pkg_count] = currpkg;
+                nodelist->pkg_count++;
             }
         }
     }
@@ -286,63 +281,58 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
 
 int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update) {
     struct package *currpkg;
-    for (int i = 0; i < database->pkg_count; i++) {
-        currpkg = database->packages[i];
-        if (!strcmp(currpkg->name, pkgname)) {
-            // TODO: package source needs to be a param for this
+    int *i = malloc(sizeof(int));
+    currpkg = bsearch_pkg(pkgname, database, i, 0);
+    // TODO: package source needs to be a param for this
 
-            // compute filetype
-            char *p;
-            if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
-            strcpy(p, currpkg->archiveurl);
-            size_t ln = strlen(p) - 1;
-            char filetype[8];
-            if (p[ln] == '\n')
-                p[ln] = '\0';
-            while (1) {
-                char *p2 = strchr(p, '.');
-                if(p2 != NULL)
-                    *p2 = '\0';
-                if (strlen(p) < 8)
-                    strcpy(filetype, p);
-                if(p2 == NULL)
-                    break;
-                p = p2 + 1;
-            }
-            
-            // register & prepare package
-            add_db_entry(currpkg, manual_installed, database);
-            kawafile_dir_create(pkgname);
-            
-            // do the actual installation
-            if (download_archive(currpkg, filetype, is_update))
-                return 1;
-            if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
-                return 1;
-            
-            if (!is_update) {
-                if (!strcmp(currpkg->type, "source"))
-                    return 0; // TODO: sourcepkg_install(name=pkgname)
-                else if (!strcmp(currpkg->type, "patch"))
-                    return 0; // TODO: sourcepkg_install(patch=pkgname)
-                else if (!strcmp(currpkg->type, "meta"))
-                    return metapkg_install(pkgname);
-                else if (!strcmp(currpkg->type, "binary"))
-                    return binarypkg_install(pkgname, filetype);
-            } else { // if action is update, use the update functions
-                if (!strcmp(currpkg->type, "source"))
-                    return 0; // TODO: sourcepkg_update(name=pkgname)
-                else if (!strcmp(currpkg->type, "patch"))
-                    return 0; // TODO: sourcepkg_update(patch=pkgname)
-                else if (!strcmp(currpkg->type, "meta"))
-                    return metapkg_update(pkgname);
-                else if (!strcmp(currpkg->type, "binary"))
-                    return binarypkg_update(pkgname, filetype);
-            }
-            return 1;
-        }
+    // compute filetype
+    char *p;
+    if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
+    strcpy(p, currpkg->archiveurl);
+    size_t ln = strlen(p) - 1;
+    char filetype[8];
+    if (p[ln] == '\n')
+        p[ln] = '\0';
+    while (1) {
+        char *p2 = strchr(p, '.');
+        if(p2 != NULL)
+            *p2 = '\0';
+        if (strlen(p) < 8)
+            strcpy(filetype, p);
+        if(p2 == NULL)
+            break;
+        p = p2 + 1;
     }
-    printf("Error: Package %s not found (try kawa sync)\n", pkgname);
+    
+    // register & prepare package
+    add_db_entry(currpkg, manual_installed, database);
+    kawafile_dir_create(pkgname);
+    
+    // do the actual installation
+    if (download_archive(currpkg, filetype, is_update))
+        return 1;
+    if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
+        return 1;
+    
+    if (!is_update) {
+        if (!strcmp(currpkg->type, "source"))
+            return 0; // TODO: sourcepkg_install(name=pkgname)
+        else if (!strcmp(currpkg->type, "patch"))
+            return 0; // TODO: sourcepkg_install(patch=pkgname)
+        else if (!strcmp(currpkg->type, "meta"))
+            return metapkg_install(pkgname);
+        else if (!strcmp(currpkg->type, "binary"))
+            return binarypkg_install(pkgname, filetype);
+    } else { // if action is update, use the update functions
+        if (!strcmp(currpkg->type, "source"))
+            return 0; // TODO: sourcepkg_update(name=pkgname)
+        else if (!strcmp(currpkg->type, "patch"))
+            return 0; // TODO: sourcepkg_update(patch=pkgname)
+        else if (!strcmp(currpkg->type, "meta"))
+            return metapkg_update(pkgname);
+        else if (!strcmp(currpkg->type, "binary"))
+            return binarypkg_update(pkgname, filetype);
+    }
     return 1;
 }
 
