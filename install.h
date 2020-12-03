@@ -20,7 +20,7 @@
 #include "binarypkg.h"
 
 int install(int pkgc, char *pkgnames[]);
-int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update);
+int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update);
 int download_archive(struct package *dlpackage, char filetype[], int force);
 int download_scripts(struct package *dlpackage, char *baseurl);
 char *str_replace(char *orig, char *rep, char *with);

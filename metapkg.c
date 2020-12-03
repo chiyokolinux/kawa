@@ -2,7 +2,7 @@
 
 int metapkg_gen_kawafile(char pkgname[]) {
     kawafile_dir_create(pkgname);
-    
+
     FILE *fp;
     int retval = 0;
 
@@ -14,7 +14,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     strcat(path, pkgname);
     strcpy(dir, path);
     strcat(path, "/Kawafile");
-    
+
     // We just want to create a basic kawafile that just executes our scripts
     // neither do.build.sh nor do.install.sh are executed in metapkgs, as metapkgs should
     // only install dependencies and not do anything by themselves.
@@ -45,7 +45,7 @@ int metapkg_gen_kawafile(char pkgname[]) {
     retval += fclose(fp);
 
     retval += chmod(path, S_IRWXU);
-        
+
     return retval;
 }
 
@@ -67,6 +67,7 @@ int metapkg_install(char pkgname[]) {
 }
 
 int metapkg_remove(struct package *package) {
+    // TODO: find a way to display removed deps in user dialog
     printf("Removing %s...", package->name);
     fflush(stdout);
     for (int i = 0; i < package->depends.retc; i++) {
