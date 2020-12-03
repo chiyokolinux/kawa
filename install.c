@@ -121,11 +121,15 @@ int install(int pkgc, char *pkgnames[]) {
         int retval = 0;
         // first, update all packages that need to be updated
         for (int i = 0; i < *updatec; i++) {
+            struct package *currpkg;
+            int *ii = malloc(sizeof(int));
+            currpkg = bsearch_pkg(updatepkgs[i]->name, database, ii, 0);
+            free(ii);
+
             // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-            retval += install_no_deps(updatepkgs[i]->name, database, 0, 1);
+            retval += install_no_deps(currpkg, database, 0, 1);
             
             // re-wire version variables
-            struct package *currpkg;
             for (int i2 = 0; i2 < installed->pkg_count; i2++) {
                 currpkg = installed->packages[i2];
                 if (!strcmp(currpkg->name, updatepkgs[i]->name)) {
@@ -147,7 +151,7 @@ int install(int pkgc, char *pkgnames[]) {
                     break;
                 }
             }
-            retval += install_no_deps(nodelist->packages[i]->name, database, maninst, 0);
+            retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
         }
 
         curl_global_cleanup();
@@ -279,12 +283,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     return retval;
 }
 
-int install_no_deps(char pkgname[], struct pkglist *database, int manual_installed, int is_update) {
-    struct package *currpkg;
-    int *i = malloc(sizeof(int));
-    currpkg = bsearch_pkg(pkgname, database, i, 0);
-    // TODO: package source needs to be a param for this
-
+int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update) {
     // compute filetype
     char *p;
     if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
@@ -306,7 +305,7 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
     
     // register & prepare package
     add_db_entry(currpkg, manual_installed, database);
-    kawafile_dir_create(pkgname);
+    kawafile_dir_create(currpkg->name);
     
     // do the actual installation
     if (download_archive(currpkg, filetype, is_update))
@@ -320,18 +319,18 @@ int install_no_deps(char pkgname[], struct pkglist *database, int manual_install
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_install(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
-            return metapkg_install(pkgname);
+            return metapkg_install(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_install(pkgname, filetype);
+            return binarypkg_install(currpkg->name, filetype);
     } else { // if action is update, use the update functions
         if (!strcmp(currpkg->type, "source"))
             return 0; // TODO: sourcepkg_update(name=pkgname)
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_update(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
-            return metapkg_update(pkgname);
+            return metapkg_update(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_update(pkgname, filetype);
+            return binarypkg_update(currpkg->name, filetype);
     }
     return 1;
 }

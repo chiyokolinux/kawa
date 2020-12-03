@@ -93,13 +93,18 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     
     // before updating, install all new dependencies
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        retval += install_no_deps(nodelist->packages[i]->name, database, 0, 0);
+        retval += install_no_deps(nodelist->packages[i], database, 0, 0);
     }
     
     // install updates and re-wire version pointers
     for (int i = 0; i < updatec; i++) {
-        retval += install_no_deps(updpkglst[i]->name, database, 0, 1);
         struct package *currpkg;
+        int *ii = malloc(sizeof(int));
+        currpkg = bsearch_pkg(updpkglst[i]->name, database, ii, 0);
+        free(ii);
+
+        retval += install_no_deps(currpkg, database, 0, 1);
+
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
             currpkg = installed->packages[i2];
             if (!strcmp(currpkg->name, updpkglst[i]->name)) {
