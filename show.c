@@ -5,7 +5,8 @@ int show(char pkgname[]) {
     struct pkglist *installed = get_installed_packages();
     struct package *currpkg;
 
-    int *i = malloc(sizeof(int));
+    int *i;
+    if (!(i = malloc(sizeof(int)))) malloc_fail();
     currpkg = bsearch_pkg(pkgname, database, i, 0);
 
     char package_installed[4] = "no";
