@@ -99,7 +99,8 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     // install updates and re-wire version pointers
     for (int i = 0; i < updatec; i++) {
         struct package *currpkg;
-        int *ii = malloc(sizeof(int));
+        int *ii;
+        if (!(ii = malloc(sizeof(int)))) malloc_fail();
         currpkg = bsearch_pkg(updpkglst[i]->name, database, ii, 0);
         free(ii);
 

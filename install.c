@@ -45,7 +45,8 @@ int install(int pkgc, char *pkgnames[]) {
                 continue;
 
             struct package *currpkg;
-            int *i = malloc(sizeof(int));
+            int *i;
+            if (!(i = malloc(sizeof(int)))) malloc_fail();
             currpkg = bsearch_pkg(pkgnames[ii], database, i, 0);
 
             int current_installed = 0;
@@ -122,7 +123,8 @@ int install(int pkgc, char *pkgnames[]) {
         // first, update all packages that need to be updated
         for (int i = 0; i < *updatec; i++) {
             struct package *currpkg;
-            int *ii = malloc(sizeof(int));
+            int *ii;
+            if (!(ii = malloc(sizeof(int)))) malloc_fail();
             currpkg = bsearch_pkg(updatepkgs[i]->name, database, ii, 0);
             free(ii);
 
