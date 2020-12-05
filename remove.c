@@ -49,27 +49,24 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
 
 int remove_single(char pkgname[], struct pkglist *installed) {
     struct package *currpkg;
-    for (int i = 0; i < installed->pkg_count; i++) {
-        currpkg = installed->packages[i];
-        if (!strcmp(currpkg->name, pkgname)) {
-            // unregister package
-            remove_db_entry(currpkg, installed);
-            kawafile_dir_remove(currpkg);
-            
-            // remove the package using the function provided by the package type class
-            if (!strcmp(currpkg->type, "source"))
-                return 0; // TODO: sourcepkg_install(name=pkgname)
-            else if (!strcmp(currpkg->type, "patch"))
-                return 0; // TODO: sourcepkg_install(patch=pkgname)
-            else if (!strcmp(currpkg->type, "meta"))
-                return metapkg_remove(currpkg);
-            else if (!strcmp(currpkg->type, "binary"))
-                return binarypkg_remove(pkgname);
-            return 1;
-        }
-    }
-    // this should not happen. if it does, oh well.
-    printf("Error: Package %s not found (try kawa sync)\n", pkgname);
+    int *i;
+    if (!(i = malloc(sizeof(int)))) malloc_fail();
+    currpkg = bsearch_pkg(pkgname, installed, i, 0);
+    free(i);
+
+    // unregister package
+    remove_db_entry(currpkg, installed);
+    kawafile_dir_remove(currpkg);
+    
+    // remove the package using the function provided by the package type class
+    if (!strcmp(currpkg->type, "source"))
+        return 0; // TODO: sourcepkg_install(name=pkgname)
+    else if (!strcmp(currpkg->type, "patch"))
+        return 0; // TODO: sourcepkg_install(patch=pkgname)
+    else if (!strcmp(currpkg->type, "meta"))
+        return metapkg_remove(currpkg);
+    else if (!strcmp(currpkg->type, "binary"))
+        return binarypkg_remove(pkgname);
     return 1;
 }
 
