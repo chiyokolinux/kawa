@@ -60,7 +60,7 @@ int remove_single(char pkgname[], struct pkglist *installed) {
     
     // remove the package using the function provided by the package type class
     if (!strcmp(currpkg->type, "source"))
-        return 0; // TODO: sourcepkg_install(name=pkgname)
+        return sourcepkg_remove(currpkg);
     else if (!strcmp(currpkg->type, "patch"))
         return 0; // TODO: sourcepkg_install(patch=pkgname)
     else if (!strcmp(currpkg->type, "meta"))
