@@ -25,7 +25,6 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
         strcpy(exitbuilddir, "    cd ..\n");
     }
 
-    // TODO: properly cd before do_remove
     fp = fopen(path, "w");
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
@@ -44,15 +43,19 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "    [[ -f do.install.sh ]] && ./do.install.sh || make -j%2$s install\n"
                           "}\n"
                           "do_install() {\n"
+                          "    prepare_files\n"
                           "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
                           "    perform_install\n"
                           "    [[ -f post.install.sh ]] && ./post.install.sh\n"
                           "    cleanup\n"
                           "}\n"
                           "do_remove() {\n"
+                          "    prepare_files\n"
                           "    %5$s\n"
+                          "    cleanup\n"
                           "}\n"
                           "do_update() {\n"
+                          "    prepare_files\n"
                           "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
                           "    perform_install\n"
                           "    [[ -f post.update.sh ]] && ./post.update.sh\n"
