@@ -7,6 +7,7 @@
 #include "kawafile.h"
 #include "binarypkg.h"
 #include "metapkg.h"
+#include "sourcepkg.h"
 
 int pkg_remove(int pkgc, char *pkgnames[]);
 int remove_single(char pkgname[], struct pkglist *installed);

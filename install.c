@@ -317,7 +317,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
     
     if (!is_update) {
         if (!strcmp(currpkg->type, "source"))
-            return 0; // TODO: sourcepkg_install(name=pkgname)
+            return sourcepkg_install(currpkg, filetype);
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_install(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
@@ -326,7 +326,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
             return binarypkg_install(currpkg->name, filetype);
     } else { // if action is update, use the update functions
         if (!strcmp(currpkg->type, "source"))
-            return 0; // TODO: sourcepkg_update(name=pkgname)
+            return sourcepkg_update(currpkg, filetype);
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_update(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
