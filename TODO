@@ -19,4 +19,4 @@ KAWA TODOs
 - remove /etc/kawa.d/kawafiles/<pkgname> when removing package DONE
 - handle errors (errno)
 - check & ask package source (see #4) DONE
-- binary search packages
+- binary search packages DONE
