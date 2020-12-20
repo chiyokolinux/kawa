@@ -68,18 +68,46 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     retval += fclose(fp);
 
     retval += chmod(path, S_IRWXU);
+
+    printf(".");
+    fflush(stdout);
     
     return retval;
 }
 
 int sourcepkg_install(struct package *package, char filetype[]) {
-    return 0;
+    int retval = 0;
+    printf("Installing %s.", package->name);
+    fflush(stdout);
+    // generate kawafile
+    retval += sourcepkg_gen_kawafile(package, filetype);
+    // run kawafile install
+    kawafile_run(package->name, "install");
+    printf(".");
+    fflush(stdout);
+    printf(" Done\n");
+    return retval;
 }
 
 int sourcepkg_remove(struct package *package) {
+    printf("Removing %s...", package->name);
+    fflush(stdout);
+    // run kawafile remove
+    kawafile_run(package->name, "remove");
+    printf(" Done\n");
     return 0;
 }
 
 int sourcepkg_update(struct package *package, char filetype[]) {
-    return 0;
+    int retval = 0;
+    printf("Updating %s.", package->name);
+    fflush(stdout);
+    // update kawafile
+    retval += binarypkg_gen_kawafile(package->name, filetype);
+    // run kawafile update
+    kawafile_run(package->name, "update");
+    printf(".");
+    fflush(stdout);
+    printf(" Done\n");
+    return retval;
 }
