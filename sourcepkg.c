@@ -65,9 +65,10 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
                           filetype, enterbuilddir, exitbuilddir);
-    retval += fclose(fp);
 
-    retval += chmod(path, S_IRWXU);
+    retval += fchmod(fileno(fp), S_IRWXU);
+
+    retval += fclose(fp);
 
     printf(".");
     fflush(stdout);

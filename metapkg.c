@@ -42,9 +42,10 @@ int metapkg_gen_kawafile(char pkgname[]) {
                           "}\n"
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
-    retval += fclose(fp);
 
-    retval += chmod(path, S_IRWXU);
+    retval += fchmod(fileno(fp), S_IRWXU);
+
+    retval += fclose(fp);
 
     return retval;
 }

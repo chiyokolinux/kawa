@@ -268,6 +268,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
             }
 
             curl_easy_cleanup(curl);
+            retval += fchmod(fileno(sfile), S_IRWXU);
             fclose(sfile);
         } else {
             fprintf(stderr, "Downloading script %s of package %s failed: Cannot create cURL object\n", script, dlpackage->name);
