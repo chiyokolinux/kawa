@@ -41,7 +41,10 @@ int binarypkg_gen_kawafile(char pkgname[], char filetype[]) {
                      "> %1$s", path, filetype, dir);
     
     int retval = system(cmdline);
-    retval += chmod(path, S_IRWXU);
+
+    if (chmod(path, S_IRWXU) != 0)
+        perror("chmod");
+
     printf(".");
     fflush(stdout);
     

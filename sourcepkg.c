@@ -26,6 +26,12 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     }
 
     fp = fopen(path, "w");
+
+    if (fp == NULL) {
+        perror("fopen");
+        exit(4);
+    }
+
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
                           "prepare_files() {\n"
@@ -66,7 +72,8 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
                           filetype, enterbuilddir, exitbuilddir);
 
-    retval += fchmod(fileno(fp), S_IRWXU);
+    if (fchmod(fileno(fp), S_IRWXU) != 0)
+        perror("fchmod");
 
     retval += fclose(fp);
 
