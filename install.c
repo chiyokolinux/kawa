@@ -33,11 +33,27 @@ int install(int pkgc, char *pkgnames[]) {
     if (!(updatec = malloc(sizeof(int)))) malloc_fail();
     *updatec = 0;
     printf("\n");
+
+    // dependency types
+    unsigned int *deptypes;
+    if (!(deptypes = malloc(sizeof(unsigned int) * 5))) malloc_fail();
+    int current_deptype = 0, current_bytepos = 0, current_char = 0;
+
+    while (DEPTYPES[current_char++] != '\0') {
+        if (DEPTYPES[current_char] == ' ') {
+            current_deptype++;
+            current_bytepos = 0;
+        } else {
+            deptypes[current_deptype] |= DEPTYPES[current_char] << current_bytepos;
+            current_bytepos += 8;
+        }
+    }
+    deptypes[++current_deptype] = 0;
     
     // resolve dependencies
     if (resolve_depends) {
         for (int i = 2; i < pkgc; i++) {
-            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec, force_install, ignore_updates);
+            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec, force_install, ignore_updates, deptypes);
         }
     } else {
         for (int ii = 2; ii < pkgc; ii++) {

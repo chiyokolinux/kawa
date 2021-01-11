@@ -8,7 +8,7 @@
  * it cannot handle dependency circles, that is up to
  * the packager to handle.
 **/
-void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates) {
+void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates, unsigned int *dependency_types) {
     if (depth >= MAXDEPTH) {
         printf("Error: maximum recursion depth of %d reached during dependency resolving.\n", MAXDEPTH);
         printf("This is most commonly caused by cyclic dependencies, please contact the maintainer of the package you want to install.\n");
@@ -52,7 +52,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
             }
             
             if (!in_queue)
-                resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i2], database, installed, depth + 1, updatec, force_install, ignore_updates);
+                resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i2], database, installed, depth + 1, updatec, force_install, ignore_updates, dependency_types);
         }
     }
     
