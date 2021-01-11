@@ -146,6 +146,11 @@ struct pkglist *get_packages_from_repo(char reponame[], int repoindex) {
     strcat(path, reponame);
     strcat(path, ".packages.db");
     FILE* indexfile = fopen(path, "r");
+
+    if (indexfile == NULL) {
+        perror("fopen");
+        exit(4);
+    }
     
     // get file size (for malloc)
     fseek(indexfile, 0L, SEEK_END);
@@ -197,6 +202,11 @@ struct pkglist *get_all_packages() {
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
+
+    if (fp == NULL) {
+        perror("fopen");
+        exit(4);
+    }
 
     // go through every repo and parse it using get_packages_from_repo
     while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
@@ -288,6 +298,11 @@ int write_installed_packages(struct pkglist *installed, struct pkglist *database
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/Installed.packages.db");
     FILE* indexfile = fopen(path, "w");
+
+    if (indexfile == NULL) {
+        perror("fopen");
+        exit(4);
+    }
     
     int retval = 0;
     

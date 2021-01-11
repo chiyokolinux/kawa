@@ -164,7 +164,7 @@ int hibit_xor(unsigned int n) {
 /**
  * simple linear bsort implementation for struct package's
  * also returns where the match was found
- * this addons is not present in any standard libc bsort,
+ * this addon is not present in any standard libc bsort,
  * that's why I wrote this
 **/
 struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i, int pkg_is_dependency) {

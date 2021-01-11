@@ -21,6 +21,12 @@ int metapkg_gen_kawafile(char pkgname[]) {
     // if you need you metapkg to install something, for example a configuration file, add
     // a (binary) package as dependency with all the files you need to add
     fp = fopen(path, "w");
+
+    if (fp == NULL) {
+        perror("fopen");
+        exit(4);
+    }
+
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
                           "perform_install() {\n"
@@ -43,7 +49,8 @@ int metapkg_gen_kawafile(char pkgname[]) {
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
 
-    retval += fchmod(fileno(fp), S_IRWXU);
+    if (fchmod(fileno(fp), S_IRWXU) != 0)
+        perror("fchmod");
 
     retval += fclose(fp);
 
