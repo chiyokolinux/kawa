@@ -59,8 +59,24 @@ int update() {
         return 0;
     }
     
+    // dependency types
+    unsigned int *deptypes;
+    if (!(deptypes = malloc(sizeof(unsigned int) * 5))) malloc_fail();
+    int current_deptype = 0, current_bytepos = 0, current_char = 0;
+
+    while (DEPTYPES[current_char++] != '\0') {
+        if (DEPTYPES[current_char] == ' ') {
+            current_deptype++;
+            current_bytepos = 0;
+        } else {
+            deptypes[current_deptype] |= DEPTYPES[current_char] << current_bytepos;
+            current_bytepos += 8;
+        }
+    }
+    deptypes[++current_deptype] = 0;
+
     for (int i = 0; i < updatec; i++) {
-        resolve_recursive(nodelist, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1);
+        resolve_recursive(nodelist, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1, deptypes);
     }
     
     printf("\nThe following packages can be updated:\n  ");
