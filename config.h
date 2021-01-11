@@ -20,4 +20,10 @@
 #define THREADNUM "$(nproc)"
 // ex.: #define THREADNUM "8" // for 8 jobs
 
+// dependency types that will be included with every installation
+// (by default of course, they can still be switched on/off)
+// some examples: [req]uired [rec]ommended [opt]ional [doc]umentation
+// must be 3 chars long per type, for now
+#define DEPTYPES "req rec"
+
 #endif // CONFIG_H
