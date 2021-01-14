@@ -76,6 +76,8 @@ void kawafile_dir_remove(struct package pkg[]) {
     strcat(path_appendable, "Kawafile");
     unlink(path_appendable);
 
+    // TODO: delete cached package file
+
     // remove the parent directory which contained all the files
     rmdir(path);
 }

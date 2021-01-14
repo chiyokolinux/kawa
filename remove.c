@@ -61,19 +61,22 @@ int remove_single(char pkgname[], struct pkglist *installed, struct pkglist *dat
 
     // unregister package
     remove_db_entry(currpkg, installed);
-    kawafile_dir_remove(currpkg);
+    
+    int retval = 0;
     
     // remove the package using the function provided by the package type class
     // use database version because of the way metapkg handle dependency removal
     if (!strcmp(currpkg->type, "source"))
-        return sourcepkg_remove(currpkg_db);
+        retval = sourcepkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "patch"))
-        return 0; // TODO: sourcepkg_install(patch=pkgname)
+        retval = 0; // TODO: sourcepkg_install(patch=pkgname)
     else if (!strcmp(currpkg->type, "meta"))
-        return metapkg_remove(currpkg_db);
+        retval = metapkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "binary"))
-        return binarypkg_remove(pkgname);
-    return 1;
+        retval = binarypkg_remove(pkgname);
+
+    kawafile_dir_remove(currpkg);
+    return retval;
 }
 
 void remove_db_entry(struct package *package, struct pkglist *installed) {
