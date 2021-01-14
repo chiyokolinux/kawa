@@ -14,7 +14,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
             }
         }
         if (!package_installed) {
-            printf("Error: package %s is not installed", pkgnames[i]);
+            fprintf(stderr, "Error: package %s is not installed", pkgnames[i]);
             return 1;
         }
     }
@@ -35,7 +35,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
         
         // remove requested packages
         for (int i = 2; i < pkgc; i++) {
-            retval += remove_single(pkgnames[i], installed);
+            retval += remove_single(pkgnames[i], installed, database);
         }
         
         retval += write_installed_packages(installed, database);
@@ -47,11 +47,16 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
     return 0;
 }
 
-int remove_single(char pkgname[], struct pkglist *installed) {
+int remove_single(char pkgname[], struct pkglist *installed, struct pkglist *database) {
     struct package *currpkg;
     int *i;
     if (!(i = malloc(sizeof(int)))) malloc_fail();
     currpkg = bsearch_pkg(pkgname, installed, i, 0);
+    free(i);
+
+    struct package *currpkg_db;
+    if (!(i = malloc(sizeof(int)))) malloc_fail();
+    currpkg_db = bsearch_pkg(pkgname, database, i, 0);
     free(i);
 
     // unregister package
@@ -59,12 +64,13 @@ int remove_single(char pkgname[], struct pkglist *installed) {
     kawafile_dir_remove(currpkg);
     
     // remove the package using the function provided by the package type class
+    // use database version because of the way metapkg handle dependency removal
     if (!strcmp(currpkg->type, "source"))
-        return sourcepkg_remove(currpkg);
+        return sourcepkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "patch"))
         return 0; // TODO: sourcepkg_install(patch=pkgname)
     else if (!strcmp(currpkg->type, "meta"))
-        return metapkg_remove(currpkg);
+        return metapkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "binary"))
         return binarypkg_remove(pkgname);
     return 1;

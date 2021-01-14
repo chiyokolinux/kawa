@@ -35,7 +35,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
     
     if (current_installed && !ignore_updates) {
         struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
-        if (pkgupdt != NULL) {
+        if (pkgupdt != NULL && updatepkgs != NULL) {
             updatepkgs[*updatec] = pkgupdt;
             *updatec = *updatec + 1;
         }

@@ -355,6 +355,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
 }
 
 int add_db_entry(struct package *package, int manual_installed, struct pkglist *database) {
+    // TODO: Write Dependency Types to package->depends field
     struct stat st = {0};
     
     // compute path
