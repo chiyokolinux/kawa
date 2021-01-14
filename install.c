@@ -49,6 +49,8 @@ int install(int pkgc, char *pkgnames[]) {
         }
     }
     deptypes[++current_deptype] = 0;
+
+    struct strarr_retval pkg_deptypes = split_space(DEPTYPES);
     
     // resolve dependencies
     if (resolve_depends) {
@@ -169,6 +171,7 @@ int install(int pkgc, char *pkgnames[]) {
                     break;
                 }
             }
+            nodelist->packages[i]->depends = pkg_deptypes;
             retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
         }
 

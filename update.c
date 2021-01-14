@@ -76,6 +76,7 @@ int update() {
     deptypes[++current_deptype] = 0;
 
     for (int i = 0; i < updatec; i++) {
+        // TODO: pass deptype array from pkg deptype
         resolve_recursive(nodelist, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1, deptypes);
     }
     
@@ -109,6 +110,7 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     
     // before updating, install all new dependencies
     for (int i = 0; i < nodelist->pkg_count; i++) {
+        nodelist->packages[i]->depends = split_space(DEPTYPES);
         retval += install_no_deps(nodelist->packages[i], database, 0, 0);
     }
     
