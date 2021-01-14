@@ -43,15 +43,32 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
     
     if (!currpkg->depends.retval[0][0] == '\0') {
         for (int i2 = 0; i2 < currpkg->depends.retc; i2++) {
-            int in_queue = 0;
+            int in_queue = 0, in_deptypes = 0;
             for (int i3 = 0; i3 < nodelist->pkg_count; i3++) {
                 if (!strcmp(currpkg->depends.retval[i2], nodelist->packages[i3]->name)) {
                     in_queue = 1;
                     break;
                 }
             }
+
+            // dependency type checking
+            unsigned int pkg_deptype = 0;
+            int i4 = 0;
+
+            for (; current[i4] != '\0' && current[i4] != ':'; i4++) {
+                pkg_deptype |= current[i4] << (i4 * 8);
+            }
+
+            // if there is no dependency type given, always install the dependency
+            if (current[i4] != ':') {
+                in_deptypes = 1;
+            } else {
+                for (int i5 = 0; dependency_types[i5] != 0; i5++) {
+                    in_deptypes |= (pkg_deptype == dependency_types[i5]);
+                }
+            }
             
-            if (!in_queue)
+            if (!in_queue && in_deptypes)
                 resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i2], database, installed, depth + 1, updatec, force_install, ignore_updates, dependency_types);
         }
     }
