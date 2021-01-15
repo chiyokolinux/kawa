@@ -17,6 +17,6 @@ KAWA TODOs
 - re-resolve dependencies on update DONE
 - check malloc() return values (see #2) DONE
 - remove /etc/kawa.d/kawafiles/<pkgname> when removing package DONE
-- handle errors (errno)
+- handle errors (errno) DONE
 - check & ask package source (see #4) DONE
 - binary search packages DONE
