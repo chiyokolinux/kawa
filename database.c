@@ -209,7 +209,7 @@ struct pkglist *get_all_packages() {
     }
 
     // go through every repo and parse it using get_packages_from_repo
-    while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
+    while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
         printf("Reading Repo %s...", reponame);
         fflush(stdout);
         struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx);
