@@ -55,7 +55,7 @@ int sync_all() {
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
-    while (fscanf(fp, "%s %s", reponame, repourl) != EOF) {
+    while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
         printf("Syncing Repo %s...\n", reponame);
         retval += sync_repo(reponame, repourl);
     }
