@@ -3,6 +3,7 @@
 int search(char searchterm[]) {
     struct pkglist *database = get_all_packages();
     struct pkglist *installed = get_installed_packages();
+    putchar('\n');
     printf("Inst | Name                       | Version        | Type\n");
     printf("-----|----------------------------|----------------|-------\n");
     for (int i = 0; i < database->pkg_count; i++) {
