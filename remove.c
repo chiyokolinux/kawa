@@ -14,12 +14,12 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
             }
         }
         if (!package_installed) {
-            fprintf(stderr, "Error: package %s is not installed", pkgnames[i]);
+            fprintf(stderr, "Error: package %s is not installed\n", pkgnames[i]);
             return 1;
         }
     }
     
-    printf("The following packages will be removed:\n ");
+    printf("\nThe following packages will be removed:\n ");
     for (int i = 2; i < pkgc; i++) {
         printf(" %s", pkgnames[i]);
     }
