@@ -110,7 +110,7 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     
     // before updating, install all new dependencies
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        nodelist->packages[i]->depends = split_space(DEPTYPES);
+        nodelist->packages[i]->depends = split_space(strdup(DEPTYPES));
         retval += install_no_deps(nodelist->packages[i], database, 0, 0);
     }
     

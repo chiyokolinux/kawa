@@ -50,7 +50,7 @@ int install(int pkgc, char *pkgnames[]) {
     }
     deptypes[++current_deptype] = 0;
 
-    struct strarr_retval pkg_deptypes = split_space(DEPTYPES);
+    struct strarr_retval pkg_deptypes = split_space(strdup(DEPTYPES));
     
     // resolve dependencies
     if (resolve_depends) {
