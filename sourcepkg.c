@@ -17,12 +17,15 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     
     char enterbuilddir[30];
     char exitbuilddir[15];
+    char installdestdir[20];
     if (!strcmp(package->sepbuild, "yes")) {
         strcpy(enterbuilddir, "    mkdir build && cd build\n");
         strcpy(exitbuilddir, "    cd ../..\n");
+        strcpy(installdestdir, "../../install");
     } else {
         strcpy(enterbuilddir, "");
         strcpy(exitbuilddir, "    cd ..\n");
+        strcpy(installdestdir, "../install");
     }
 
     fp = fopen(path, "w");
@@ -38,6 +41,8 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "    tar xf package.tar.%6$s\n"
                           "    cd $(tar tf package.tar.%6$s | head -n1)\n"
                           "%7$s"
+                          "    rm -rf %9$s\n"
+                          "    mkdir %9$s\n"
                           "}\n"
                           "cleanup() {\n"
                           "%8$s"
@@ -45,14 +50,14 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "}\n"
                           "perform_install() {\n"
                           "    %3$s %4$s\n"
-                          "    [[ -f do.build.sh ]] && ./do.build.sh || make -j%2$s\n"
-                          "    [[ -f do.install.sh ]] && ./do.install.sh || make -j%2$s install\n"
+                          "    [ -f do.build.sh ] && ./do.build.sh || make -j%2$s\n"
+                          "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%9$s\n"
                           "}\n"
                           "do_install() {\n"
                           "    prepare_files\n"
-                          "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
+                          "    [ -f pre.install.sh ] && ./pre.install.sh\n"
                           "    perform_install\n"
-                          "    [[ -f post.install.sh ]] && ./post.install.sh\n"
+                          "    [ -f post.install.sh ] && ./post.install.sh\n"
                           "    cleanup\n"
                           "}\n"
                           "do_remove() {\n"
@@ -70,7 +75,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
-                          filetype, enterbuilddir, exitbuilddir);
+                          filetype, enterbuilddir, exitbuilddir, installdestdir);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
