@@ -135,66 +135,95 @@ int install(int pkgc, char *pkgnames[]) {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
-        // install everything
-        curl_global_init(CURL_GLOBAL_DEFAULT);
-        int retval = 0;
-        // first, update all packages that need to be updated
-        for (int i = 0; i < *updatec; i++) {
-            struct package *currpkg;
-            int *ii;
-            if (!(ii = malloc(sizeof(int)))) malloc_fail();
-            currpkg = bsearch_pkg(updatepkgs[i]->name, database, ii, 0);
-            free(ii);
-
-            // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-            retval += install_no_deps(currpkg, database, 0, 1);
-            
-            // re-wire version variables
-            for (int i2 = 0; i2 < installed->pkg_count; i2++) {
-                currpkg = installed->packages[i2];
-                if (!strcmp(currpkg->name, updatepkgs[i]->name)) {
-                    currpkg->version = updatepkgs[i]->version_remote;
-                }
-            }
-        }
-        
-        // re-write installed if packages were updated
-        if (*updatec)
-            write_installed_packages(installed, database);
-
-        // after updating, install all new packages
-        for (int i = 0; i < nodelist->pkg_count; i++) {
-            int maninst = 0;
-            for (int i2 = 0; i2 < pkgc; i2++) {
-                if (!strcmp(nodelist->packages[i]->name, pkgnames[i2])) {
-                    maninst = 1;
-                    break;
-                }
-            }
-            nodelist->packages[i]->depends = pkg_deptypes;
-            retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
-        }
-
-        curl_global_cleanup();
-        return retval;
+        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, deptypes, pkg_deptypes, pkgc);
     } else
         return 1;
 }
 
-int download_archive(struct package *dlpackage, char filetype[], int force) {
+int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, unsigned int *deptypes, struct strarr_retval pkg_deptypes, int pkgc) {
+    // install everything
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    int retval = 0;
+
+    // first, download all package archives and register all packages
+    for (int i = 0; i < *updatec; i++) {
+        struct package *currpkg;
+        int *ii;
+        if (!(ii = malloc(sizeof(int)))) malloc_fail();
+        currpkg = bsearch_pkg(updatepkgs[i]->name, database, ii, 0);
+        free(ii);
+
+        retval += download_package(currpkg, database, 1);
+    }
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        nodelist->packages[i]->depends = pkg_deptypes;
+        retval += download_package(nodelist->packages[i], database, 0);
+    }
+
+    for (int i = 0; i < *updatec; i++) {
+        struct package *currpkg;
+        int *ii;
+        if (!(ii = malloc(sizeof(int)))) malloc_fail();
+        currpkg = bsearch_pkg(updatepkgs[i]->name, database, ii, 0);
+        free(ii);
+
+        // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
+        retval += install_no_deps(currpkg, database, 0, 1);
+        
+        // re-wire version variables
+        for (int i2 = 0; i2 < installed->pkg_count; i2++) {
+            currpkg = installed->packages[i2];
+            if (!strcmp(currpkg->name, updatepkgs[i]->name)) {
+                currpkg->version = updatepkgs[i]->version_remote;
+            }
+        }
+    }
+    
+    // re-write installed if packages were updated
+    if (*updatec)
+        write_installed_packages(installed, database);
+
+    // after updating, install all new packages
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        int maninst = 0;
+        for (int i2 = 0; i2 < pkgc; i2++) {
+            if (!strcmp(nodelist->packages[i]->name, pkgnames[i2])) {
+                maninst = 1;
+                break;
+            }
+        }
+        nodelist->packages[i]->depends = pkg_deptypes;
+        retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
+    }
+
+    curl_global_cleanup();
+}
+
+int download_package(struct package *currpkg, struct pkglist *database, int is_update) {
+    // register & prepare package
+    kawafile_dir_create(currpkg->name);
+
+    // download package & scripts
+    if (download_archive(currpkg, is_update))
+        return 1;
+    if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
+        return 1;
+    return 0;
+}
+
+int download_archive(struct package *dlpackage, int force) {
     printf("Downloading %s...", dlpackage->name);
     fflush(stdout);
     
     struct stat st = {0};
     
     // initialize path
-    char path[strlen(INSTALLPREFIX)+44+strlen(dlpackage->name)];
+    char path[strlen(INSTALLPREFIX)+45+strlen(dlpackage->name)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/kawafiles/");
     strcat(path, dlpackage->name);
-    strcat(path, "/package.tar.");
-    strcat(path, filetype);
+    strcat(path, "/package.src.kawapkg");
     
     // if dir already exists, skip download
     if (stat(path, &st) != -1 && !force) {
@@ -306,53 +335,26 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
 }
 
 int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update) {
-    // compute filetype
-    char *p;
-    if (!(p = malloc(strlen(currpkg->archiveurl)+1))) malloc_fail();
-    strcpy(p, currpkg->archiveurl);
-    size_t ln = strlen(p) - 1;
-    char filetype[8];
-    if (p[ln] == '\n')
-        p[ln] = '\0';
-    while (1) {
-        char *p2 = strchr(p, '.');
-        if(p2 != NULL)
-            *p2 = '\0';
-        if (strlen(p) < 8)
-            strcpy(filetype, p);
-        if(p2 == NULL)
-            break;
-        p = p2 + 1;
-    }
-    
-    // register & prepare package
     add_db_entry(currpkg, manual_installed, database);
-    kawafile_dir_create(currpkg->name);
-    
-    // do the actual installation
-    if (download_archive(currpkg, filetype, is_update))
-        return 1;
-    if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
-        return 1;
-    
+
     if (!is_update) {
         if (!strcmp(currpkg->type, "source"))
-            return sourcepkg_install(currpkg, filetype);
+            return sourcepkg_install(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_install(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
             return metapkg_install(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_install(currpkg->name, filetype);
+            return binarypkg_install(currpkg->name);
     } else { // if action is update, use the update functions
         if (!strcmp(currpkg->type, "source"))
-            return sourcepkg_update(currpkg, filetype);
+            return sourcepkg_update(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
             return 0; // TODO: sourcepkg_update(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
             return metapkg_update(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_update(currpkg->name, filetype);
+            return binarypkg_update(currpkg->name);
     }
     return 1;
 }

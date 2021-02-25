@@ -10,9 +10,9 @@
 #include "install.h"
 #include "kawafile.h"
 
-int sourcepkg_gen_kawafile(struct package *package, char filetype[]);
-int sourcepkg_install(struct package *package, char filetype[]);
+int sourcepkg_gen_kawafile(struct package *package);
+int sourcepkg_install(struct package *package);
 int sourcepkg_remove(struct package *package);
-int sourcepkg_update(struct package *package, char filetype[]);
+int sourcepkg_update(struct package *package);
 
 #endif // SOURCEPKG_H

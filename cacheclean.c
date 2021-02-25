@@ -9,7 +9,7 @@ int cacheclean() {
 
     // sprintf path variable into find & delete command
     char command[strlen(path)+45];
-    sprintf(command, "find %s -name package.tar.\\* -type f -delete", path);
+    sprintf(command, "find %s -name package.src.kawapkg -type f -delete", path);
     
     // execute find & delete command
     int retval = system(command);
