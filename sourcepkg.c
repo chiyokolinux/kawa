@@ -1,6 +1,6 @@
 #include "sourcepkg.h"
 
-int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
+int sourcepkg_gen_kawafile(struct package *package) {
     kawafile_dir_create(package->name);
     
     FILE *fp;
@@ -38,15 +38,15 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
                           "prepare_files() {\n"
-                          "    tar xf package.tar.%6$s\n"
-                          "    cd $(tar tf package.tar.%6$s | head -n1)\n"
+                          "    tar xf package.src.kawapkg\n"
+                          "    cd $(tar tf package.src.kawapkg | head -n1)\n"
                           "%7$s"
                           "    rm -rf %9$s\n"
                           "    mkdir %9$s\n"
                           "}\n"
                           "cleanup() {\n"
                           "%8$s"
-                          "    rm -rf $(tar tf package.tar.%6$s | head -n1)\n"
+                          "    rm -rf $(tar tf package.src.kawapkg | head -n1)\n"
                           "}\n"
                           "perform_install() {\n"
                           "    %3$s %4$s\n"
@@ -75,7 +75,7 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
-                          filetype, enterbuilddir, exitbuilddir, installdestdir);
+                          NULL, enterbuilddir, exitbuilddir, installdestdir);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -88,12 +88,12 @@ int sourcepkg_gen_kawafile(struct package *package, char filetype[]) {
     return retval;
 }
 
-int sourcepkg_install(struct package *package, char filetype[]) {
+int sourcepkg_install(struct package *package) {
     int retval = 0;
     printf("Installing %s.", package->name);
     fflush(stdout);
     // generate kawafile
-    retval += sourcepkg_gen_kawafile(package, filetype);
+    retval += sourcepkg_gen_kawafile(package);
     // run kawafile install
     kawafile_run(package->name, "install");
     printf(".");
@@ -111,12 +111,12 @@ int sourcepkg_remove(struct package *package) {
     return 0;
 }
 
-int sourcepkg_update(struct package *package, char filetype[]) {
+int sourcepkg_update(struct package *package) {
     int retval = 0;
     printf("Updating %s.", package->name);
     fflush(stdout);
     // update kawafile
-    retval += binarypkg_gen_kawafile(package->name, filetype);
+    retval += binarypkg_gen_kawafile(package->name);
     // run kawafile update
     kawafile_run(package->name, "update");
     printf(".");
