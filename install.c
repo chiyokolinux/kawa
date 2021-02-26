@@ -135,12 +135,12 @@ int install(int pkgc, char *pkgnames[]) {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
-        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, deptypes, pkg_deptypes, pkgc);
+        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, deptypes, pkg_deptypes, pkgc, pkgnames);
     } else
         return 1;
 }
 
-int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, unsigned int *deptypes, struct strarr_retval pkg_deptypes, int pkgc) {
+int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, unsigned int *deptypes, struct strarr_retval pkg_deptypes, int pkgc, char *pkgnames[]) {
     // install everything
     curl_global_init(CURL_GLOBAL_DEFAULT);
     int retval = 0;
