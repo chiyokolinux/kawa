@@ -135,12 +135,12 @@ int install(int pkgc, char *pkgnames[]) {
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
-        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, deptypes, pkg_deptypes, pkgc, pkgnames);
+        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, pkg_deptypes, pkgc, pkgnames);
     } else
         return 1;
 }
 
-int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, unsigned int *deptypes, struct strarr_retval pkg_deptypes, int pkgc, char *pkgnames[]) {
+int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, struct strarr_retval pkg_deptypes, int pkgc, char *pkgnames[]) {
     // install everything
     curl_global_init(CURL_GLOBAL_DEFAULT);
     int retval = 0;
@@ -156,10 +156,13 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
         retval += download_package(currpkg, database, 1);
     }
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        nodelist->packages[i]->depends = pkg_deptypes;
         retval += download_package(nodelist->packages[i], database, 0);
     }
 
+    // go offline, for long upgrades / upgrades where network software is changed
+    curl_global_cleanup();
+
+    // then, update packages
     for (int i = 0; i < *updatec; i++) {
         struct package *currpkg;
         int *ii;
@@ -178,7 +181,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
             }
         }
     }
-    
+
     // re-write installed if packages were updated
     if (*updatec)
         write_installed_packages(installed, database);
@@ -196,7 +199,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
         retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
     }
 
-    curl_global_cleanup();
+    return retval;
 }
 
 int download_package(struct package *currpkg, struct pkglist *database, int is_update) {
@@ -214,9 +217,9 @@ int download_package(struct package *currpkg, struct pkglist *database, int is_u
 int download_archive(struct package *dlpackage, int force) {
     printf("Downloading %s...", dlpackage->name);
     fflush(stdout);
-    
+
     struct stat st = {0};
-    
+
     // initialize path
     char path[strlen(INSTALLPREFIX)+45+strlen(dlpackage->name)];
     strcpy(path, "");
@@ -230,7 +233,7 @@ int download_archive(struct package *dlpackage, int force) {
         printf(" Done\n");
         return 0;
     }
-    
+
     CURL *curl;
     CURLcode res;
     int retval = 0;
@@ -242,7 +245,7 @@ int download_archive(struct package *dlpackage, int force) {
         char *archiveurl_name_replaced = str_replace(archiveurl_version_replaced, "${NAME}", dlpackage->name);
         curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        
+
         // do the download thing
         FILE* indexfile = fopen(path, "w+");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
