@@ -17,15 +17,18 @@ int sourcepkg_gen_kawafile(struct package *package) {
     
     char enterbuilddir[30];
     char exitbuilddir[15];
-    char installdestdir[20];
+    char installdestdir[15];
+    char filelistfile[15];
     if (!strcmp(package->sepbuild, "yes")) {
         strcpy(enterbuilddir, "    mkdir build && cd build\n");
         strcpy(exitbuilddir, "    cd ../..\n");
         strcpy(installdestdir, "../../install");
+        strcpy(filelistfile, "../../files.list");
     } else {
         strcpy(enterbuilddir, "");
         strcpy(exitbuilddir, "    cd ..\n");
         strcpy(installdestdir, "../install");
+        strcpy(filelistfile, "../files.list");
     }
 
     fp = fopen(path, "w");
@@ -35,6 +38,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
         exit(4);
     }
 
+    // TODO: move directory
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
                           "prepare_files() {\n"
@@ -48,10 +52,14 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "%8$s"
                           "    rm -rf $(tar tf package.src.kawapkg | head -n1)\n"
                           "}\n"
+                          "file_uninstall() {\n"
+                          "    rm -f $(xargs -a %10$s)\n"
+                          "}\n"
                           "perform_install() {\n"
                           "    %3$s %4$s\n"
                           "    [ -f do.build.sh ] && ./do.build.sh || make -j%2$s\n"
                           "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%9$s\n"
+                          "    find . -type f -print | cut -c 2- > %10$s\n"
                           "}\n"
                           "do_install() {\n"
                           "    prepare_files\n"
@@ -75,7 +83,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
-                          NULL, enterbuilddir, exitbuilddir, installdestdir);
+                          NULL, enterbuilddir, exitbuilddir, installdestdir, filelistfile);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -98,6 +106,12 @@ int sourcepkg_install(struct package *package) {
     kawafile_run(package->name, "install");
     printf(".");
     fflush(stdout);
+    // actually install package
+    retval += sourcepkg_extract(package);
+    printf(".");
+    fflush(stdout);
+    // run postinstall scripts
+    kawafile_run(package->name, "postinstall");
     printf(" Done\n");
     return retval;
 }
@@ -123,4 +137,8 @@ int sourcepkg_update(struct package *package) {
     fflush(stdout);
     printf(" Done\n");
     return retval;
+}
+
+int sourcepkg_extract(struct package *package) {
+
 }
