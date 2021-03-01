@@ -38,7 +38,6 @@ int sourcepkg_gen_kawafile(struct package *package) {
         exit(4);
     }
 
-    // TODO: move directory
     retval += fprintf(fp, "#!/bin/sh\n"
                           "cd %1$s\n"
                           "prepare_files() {\n"
@@ -59,7 +58,10 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "    %3$s %4$s\n"
                           "    [ -f do.build.sh ] && ./do.build.sh || make -j%2$s\n"
                           "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%9$s\n"
+                          "    pushd %9$s"
                           "    find . -type f -print | cut -c 2- > %10$s\n"
+                          "    mv ./* /"
+                          "    popd"
                           "}\n"
                           "do_install() {\n"
                           "    prepare_files\n"
