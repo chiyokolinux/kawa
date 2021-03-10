@@ -66,6 +66,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "do_install() {\n"
                           "    prepare_files\n"
                           "    [ -f pre.install.sh ] && ./pre.install.sh\n"
+                          "    [ -f patch.apply.sh ] && ./patch.apply.sh\n"
                           "    perform_install\n"
                           "    [ -f post.install.sh ] && ./post.install.sh\n"
                           "    cleanup\n"
