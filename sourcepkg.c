@@ -105,16 +105,10 @@ int sourcepkg_install(struct package *package) {
     fflush(stdout);
     // generate kawafile
     retval += sourcepkg_gen_kawafile(package);
+    printf(".");
+    fflush(stdout);
     // run kawafile install
     kawafile_run(package->name, "install");
-    printf(".");
-    fflush(stdout);
-    // actually install package
-    retval += sourcepkg_extract(package);
-    printf(".");
-    fflush(stdout);
-    // run postinstall scripts
-    kawafile_run(package->name, "postinstall");
     printf(" Done\n");
     return retval;
 }
@@ -140,8 +134,4 @@ int sourcepkg_update(struct package *package) {
     fflush(stdout);
     printf(" Done\n");
     return retval;
-}
-
-int sourcepkg_extract(struct package *package) {
-
 }
