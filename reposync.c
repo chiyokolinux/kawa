@@ -66,3 +66,37 @@ int sync_all() {
     
     return retval;
 }
+
+int sync_repo_cli(char reponame_target[]) {
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    int retval = 0, match_found = 0;
+
+    FILE *fp;
+    char reponame[127];
+    char repourl[511];
+
+    char path[strlen(INSTALLPREFIX)+23];
+    strcpy(path, "");
+    strcat(path, INSTALLPREFIX);
+    strcat(path, "/etc/kawa.d/repos.conf");
+    fp = fopen(path, "r");
+
+    while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
+        if (!strcmp(reponame, reponame_target)) {
+            printf("Syncing Repo %s...\n", reponame);
+            retval += sync_repo(reponame, repourl);
+            match_found = 1;
+        }
+    }
+
+    if (!match_found) {
+        fprintf(stderr, "Syncing repo %s failed: No such repository\n", reponame_target);
+    }
+
+    fclose(fp);
+
+    curl_global_cleanup();
+
+    return 0;
+}

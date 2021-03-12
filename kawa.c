@@ -18,8 +18,10 @@ int main(int argc, char *argv[]) {
     if (argc == 1)
         return help();
     // if args given, send to function
-    else if (!strcmp(argv[1], "sync") && argc == 2)
+    else if ((!strcmp(argv[1], "sync") && argc == 2) || (!strcmp(argv[1], "refresh") && argc == 2))
         return sync_all();
+    else if ((!strcmp(argv[1], "sync") && argc == 3) || (!strcmp(argv[1], "refresh") && argc == 3))
+        return sync_repo_cli(argv[2]);
     else if (!strcmp(argv[1], "install") && argc >= 3)
         return install(argc, argv);
     else if (!strcmp(argv[1], "update") && argc == 2)

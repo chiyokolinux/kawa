@@ -11,5 +11,6 @@
 
 int sync_repo(char reponame[], char repourl[]);
 int sync_all();
+int sync_repo_cli(char reponame_target[]);
 
 #endif
