@@ -70,11 +70,12 @@ int sync_all() {
 int sync_repo_cli(char reponame_target[]) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    int retval = 0, match_found = 0;
+    int retval = 0, match_found = 0, closest_offset = 2147483647;
 
     FILE *fp;
     char reponame[127];
     char repourl[511];
+    char closest_reponame[127];
 
     char path[strlen(INSTALLPREFIX)+23];
     strcpy(path, "");
@@ -83,15 +84,20 @@ int sync_repo_cli(char reponame_target[]) {
     fp = fopen(path, "r");
 
     while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
-        if (!strcmp(reponame, reponame_target)) {
+        int name_offset = strcmp(reponame, reponame_target);
+        if (name_offset == 0) {
             printf("Syncing Repo %s...\n", reponame);
             retval += sync_repo(reponame, repourl);
             match_found = 1;
+        } else if (name_offset < closest_offset) {
+            closest_offset = name_offset;
+            strncpy(closest_reponame, reponame, 126);
+            closest_reponame[126] = '\0';
         }
     }
 
     if (!match_found) {
-        fprintf(stderr, "Syncing repo %s failed: No such repository\n", reponame_target);
+        fprintf(stderr, "Syncing repo %s failed: No such repository\nDid you mean: %s ?\n", reponame_target, closest_reponame);
     }
 
     fclose(fp);
