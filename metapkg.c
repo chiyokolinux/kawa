@@ -62,13 +62,13 @@ int metapkg_install(char pkgname[]) {
     // but that's handled without Kawafiles,
     // so we only need to generate an empty Kawafile
     int retval = 0;
-    printf("Installing %s...", pkgname);
+    printf("Installing %s..", pkgname);
     fflush(stdout);
 
     retval += metapkg_gen_kawafile(pkgname);
-    kawafile_run(pkgname, "install");
     printf(".");
     fflush(stdout);
+    kawafile_run(pkgname, "install");
     printf(" Done\n");
 
     return retval;
