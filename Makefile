@@ -11,6 +11,7 @@ SRCHOBJ = search.o
 SHOWOBJ = show.o
 UPDTOBJ = update.o
 SAUCOBJ = sourcepkg.o
+PTCHOBJ = patchpkg.o
 PATCOBJ = patchpkg.o
 BINAOBJ = binarypkg.o
 METAOBJ = metapkg.o
@@ -22,8 +23,8 @@ KWFLOBJ = kawafile.o
 CACLOBJ = cacheclean.o
 EERROBJ = error.o
 
-OBJECTS = $(PROGOBJ) $(BINAOBJ) $(CACLOBJ) $(DFSAOBJ) $(DTBSOBJ) $(EERROBJ) $(HELPOBJ) $(INSTOBJ) $(KWFLOBJ) $(METAOBJ) $(MKPGOBJ) $(REMVOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SAUCOBJ) $(SHOWOBJ) $(SRCHOBJ)
-HEADERS = config.h binarypkg.h cacheclean.h datatypes.h depresolve.h error.h help.h install.h kawafile.h makepackages.h metapkg.h remove.h repoadd.h reposync.h database.h update.h search.h show.h sourcepkg.h
+OBJECTS = $(PROGOBJ) $(BINAOBJ) $(CACLOBJ) $(DFSAOBJ) $(DTBSOBJ) $(EERROBJ) $(HELPOBJ) $(INSTOBJ) $(KWFLOBJ) $(METAOBJ) $(MKPGOBJ) $(PTCHOBJ) $(REMVOBJ) $(REPOOBJ) $(RPADOBJ) $(UPDTOBJ) $(SAUCOBJ) $(SHOWOBJ) $(SRCHOBJ)
+HEADERS = config.h binarypkg.h cacheclean.h datatypes.h depresolve.h error.h help.h install.h kawafile.h makepackages.h metapkg.h patchpkg.h remove.h repoadd.h reposync.h database.h update.h search.h show.h sourcepkg.h
 
 all: $(PROGBIN)
 
