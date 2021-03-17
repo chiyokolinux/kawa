@@ -2,10 +2,7 @@
 
 int install(int pkgc, char *pkgnames[]) {
     // parse opts
-    int resolve_depends = 1;
-    int sync_before_install = 0;
-    int force_install = 0;
-    int ignore_updates = 0;
+    int resolve_depends = 1, sync_before_install = 0, force_install = 0, ignore_updates = 0, accept_nonfree = 0;
     for (int i = 0; i < pkgc; i++) {
         if (!strcmp(pkgnames[i], "-D") || !strcmp(pkgnames[i], "--no-depends"))
             resolve_depends = 0;
@@ -15,6 +12,8 @@ int install(int pkgc, char *pkgnames[]) {
             force_install = 1;
         if (!strcmp(pkgnames[i], "-I") || !strcmp(pkgnames[i], "--ignore-updates"))
             ignore_updates = 1;
+        if (!strcmp(pkgnames[i], "-N") || !strcmp(pkgnames[i], "--accept-nonfree"))
+            accept_nonfree = 1;
     }
     if (sync_before_install)
         sync_all();
@@ -95,20 +94,22 @@ int install(int pkgc, char *pkgnames[]) {
     }
 
     // check for Non-Free installs and warn the user
-    for (int i = 0; i < nodelist->pkg_count; i++) {
-        if (!strcmp(nodelist->packages[i]->license, "OTHER") || !strcmp(nodelist->packages[i]->license, "NONFREE")) {
-            printf("The package %s is licensed under a Non-Free license,\n"
-            "meaning the author might restrict what you can do with the software.\n"
-            "Do you wish to install it anyways? [y/N] ", nodelist->packages[i]->name);
-            fflush(stdout);
+    if (!accept_nonfree) {
+        for (int i = 0; i < nodelist->pkg_count; i++) {
+            if (!strcmp(nodelist->packages[i]->license, "OTHER") || !strcmp(nodelist->packages[i]->license, "NONFREE")) {
+                printf("The package %s is licensed under a Non-Free license,\n"
+                       "meaning the author might restrict what you can do with the software.\n"
+                       "Do you wish to install it anyways? [y/N] ", nodelist->packages[i]->name);
+                fflush(stdout);
 
-            char response = getchar();
-            if (response == 'n' || response == 'N' || response == '\n') {
-                return 0;
+                char response = getchar();
+                if (response == 'n' || response == 'N' || response == '\n') {
+                    return 0;
+                }
+                getchar();
+                fflush(stdin);
+                printf("\n");
             }
-            getchar();
-            fflush(stdin);
-            printf("\n");
         }
     }
     
