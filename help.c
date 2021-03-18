@@ -25,6 +25,8 @@ int help() {
     printf("                                for any of said packages are available.\n");
     printf("        -I, --ignore-updates  : Ignore packages that the to-be-installed package\n");
     printf("                                depends on that have available updates.\n");
+    printf("        -A, --accept-nonfree  : Do not warn before installing non-free packages.\n");
+    printf("                                Use this flag with caution.\n");
     return 0;
 }
 
