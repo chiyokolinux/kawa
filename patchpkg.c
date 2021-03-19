@@ -4,14 +4,8 @@ int patchpkg_gen_kawafile(struct package *package) {
     FILE *fp;
     int retval = 0;
 
-    char path[strlen(INSTALLPREFIX)+32+strlen(package->depends.retval[0])];
-    char dir[strlen(INSTALLPREFIX)+23+strlen(package->depends.retval[0])];
-    strcpy(path, "");
-    strcat(path, INSTALLPREFIX);
-    strcat(path, "/etc/kawa.d/kawafiles/");
-    strcat(path, package->depends.retval[0]);
-    strcpy(dir, path);
-    strcat(path, "/Kawafile");
+    char path[strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name)];
+    snprintf(path, strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name), "%s/etc/kawa.d/kawafiles/%s/%s.patch.sh", INSTALLPREFIX, package-depends->retval[0], package->name);
 
     fp = fopen(path, "w");
 
@@ -21,26 +15,8 @@ int patchpkg_gen_kawafile(struct package *package) {
     }
 
     retval += fprintf(fp, "#!/bin/sh\n"
-                          "cd %1$s\n"
-                          "perform_install() {\n"
-                          "    :\n"
-                          "}\n"
-                          "do_install() {\n"
-                          "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
-                          "    perform_install\n"
-                          "    [[ -f post.install.sh ]] && ./post.install.sh\n"
-                          "}\n"
-                          "do_remove() {\n"
-                          "    :\n"
-                          "}\n"
-                          "do_update() {\n"
-                          "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
-                          "    do_remove\n"
-                          "    perform_install\n"
-                          "    [[ -f post.update.sh ]] && ./post.update.sh\n"
-                          "}\n"
-                          "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
-                          "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
+                          "echo \"Applying %2$s ( %1$s )\"\n"
+                          "patch %4$s %3$s\n", package->name, package->description, package->configurecmd, package->configureopts);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -63,15 +39,20 @@ int patchapkg_install(struct package *package) {
 
 int patchpkg_remove(struct package *package) {
     printf("Removing %s...", package->name);
-    fflush(stdout);
-    for (int i = 0; i < package->depends.retc; i++) {
-        kawafile_run(package->depends.retval[i], "remove");
-    }
+    char path[strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name)];
+    snprintf(path, strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name), "%s/etc/kawa.d/kawafiles/%s/%s.patch.sh", INSTALLPREFIX, package-depends->retval[0], package->name);
+    int retval = remove(path);
     printf(" Done\n");
-    return 0;
+    return retval;
 }
 
 int patchpkg_update(struct package *package) {
+    int retval = 0;
     printf("Updating %s... Done", package->name);
-    return 0;
+    fflush(stdout);
+
+    retval += patchpkg_gen_kawafile(package);
+    printf(" Done\n");
+
+    return retval;
 }
