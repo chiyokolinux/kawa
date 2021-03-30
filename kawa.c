@@ -60,6 +60,6 @@ int main(int argc, char *argv[]) {
         return makepackages();
     else if (!strcmp(argv[1], "cacheclean") && argc == 2)
         return cacheclean();
-    // if no args lengths matched, just exit with help
-    return help()+1;
+    // if no args lengths matched, just exit with help and non-zero exit code.
+    return help() + 1;
 }
