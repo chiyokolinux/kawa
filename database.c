@@ -105,7 +105,7 @@ struct strarr_retval split_space(char to_split[]) {
     
     // end at newline
     size_t ln = strlen(p) - 1;
-    if (p[ln] == '\n')
+    if (p[ln] == '\n' || p[ln] == '\r')  // for CRLF
         p[ln] = '\0';
     
     // tokenize everything and put it into the array
