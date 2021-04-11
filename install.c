@@ -301,6 +301,9 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     
     for (int i = 0; i < dlpackage->scripts.retc; i++) {
         char *script = dlpackage->scripts.retval[i];
+
+        if (script[0] == '\0')  // fix for no scripts
+            continue;
         
         // construct current path
         strcpy(path, "");
@@ -318,7 +321,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
         strcat(scripturl, dlpackage->name);
         strcat(scripturl, "/");
         strcat(scripturl, script);
-        
+
         CURL *curl;
         CURLcode res;
 
