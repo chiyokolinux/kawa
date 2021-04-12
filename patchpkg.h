@@ -24,6 +24,7 @@
 #include "config.h"
 #include "datatypes.h"
 #include "kawafile.h"
+#include "install.h"
 
 int patchpkg_gen_kawafile(struct package *package);
 int patchpkg_install(struct package *package);
