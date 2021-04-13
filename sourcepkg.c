@@ -35,19 +35,19 @@ int sourcepkg_gen_kawafile(struct package *package) {
     
     char enterbuilddir[30];
     char exitbuilddir[15];
-    char installdestdir[15];
+    char installdestdir[strlen(dir)+9];
     char filelistfile[17];
     if (!strcmp(package->sepbuild, "yes")) {
         strcpy(enterbuilddir, "    mkdir build && cd build\n");
         strcpy(exitbuilddir, "    cd ../..\n");
-        strcpy(installdestdir, "../../install");
         strcpy(filelistfile, "../../files.list");
     } else {
         strcpy(enterbuilddir, "");
         strcpy(exitbuilddir, "    cd ..\n");
-        strcpy(installdestdir, "../install");
         strcpy(filelistfile, "../files.list");
     }
+    strcpy(installdestdir, dir);
+    strcat(installdestdir, "/install");
 
     fp = fopen(path, "w");
 
@@ -78,7 +78,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%8$s\n"
                           "    pushd %8$s\n"
                           "    find . -type f -print | cut -c 2- > %9$s\n"
-                          "    mv ./* /\n"
+                      //                          "    mv ./* /\n"
                           "    popd\n"
                           "}\n"
                           "do_install() {\n"
