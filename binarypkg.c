@@ -38,7 +38,7 @@ int binarypkg_gen_kawafile(char pkgname[]) {
     sprintf(cmdline, "(echo \"#!/bin/sh\"; "
                      "echo \"cd %2$s\"; "
                      "echo \"perform_install() {\"; "
-                     "echo \"    tar xf package.src.kawapkg -C /\"; "
+                     "echo \"    tar xf package.src.kawapkg -C %3$s/\"; "
                      "echo \"}\"; "
                      "echo \"do_install() {\"; "
                      "echo \"    [[ -f pre.install.sh ]] && ./pre.install.sh\"; "
@@ -56,7 +56,7 @@ int binarypkg_gen_kawafile(char pkgname[]) {
                      "echo \"}\"; "
                      "echo \"case \\\"\\$1\\\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                      "echo \\\"Usage: $0 {install|remove|update}\\\"; exit 1; ;; esac\") "
-                     "> %1$s", path, dir);
+                     "> %1$s", path, dir, INSTALLPREFIX);
     
     int retval = system(cmdline);
 

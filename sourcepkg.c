@@ -78,7 +78,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%8$s\n"
                           "    pushd %8$s\n"
                           "    find . -type f -print | cut -c 2- > %9$s\n"
-                      //                          "    mv ./* /\n"
+                          "    mv ./* %10$s/\n"
                           "    popd\n"
                           "}\n"
                           "do_install() {\n"
@@ -104,7 +104,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
                           dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
-                          enterbuilddir, exitbuilddir, installdestdir, filelistfile);
+                          enterbuilddir, exitbuilddir, installdestdir, filelistfile, INSTALLPREFIX);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
