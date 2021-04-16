@@ -78,7 +78,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%8$s\n"
                           "    pushd %8$s\n"
                           "    find . -type f -print | cut -c 2- > %9$s\n"
-                          "    mv ./* %10$s/\n"
+                          "    cp -RT . %10$s/\n"
                           "    popd\n"
                           "}\n"
                           "do_install() {\n"
