@@ -80,6 +80,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "    find . -type f -print | cut -c 2- > %9$s\n"
                           "    cp -RT . %10$s/\n"
                           "    popd\n"
+                          "    rm -rf %8$s\n"
                           "}\n"
                           "do_install() {\n"
                           "    prepare_files\n"
