@@ -37,6 +37,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
     char exitbuilddir[15];
     char installdestdir[strlen(dir)+9];
     char filelistfile[17];
+    char rmcmd[255];
     if (!strcmp(package->sepbuild, "yes")) {
         strcpy(enterbuilddir, "    mkdir build && cd build\n");
         strcpy(exitbuilddir, "    cd ../..\n");
@@ -48,6 +49,12 @@ int sourcepkg_gen_kawafile(struct package *package) {
     }
     strcpy(installdestdir, dir);
     strcat(installdestdir, "/install");
+    if (package->uninstallcmd[0] == '\0') {
+        strcpy(rmcmd, "file_uninstall");
+    } else {
+        strncpy(rmcmd, package->uninstallcmd, 254);
+        rmcmd[254] = '\0';
+    }
 
     fp = fopen(path, "w");
 
@@ -104,7 +111,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                           "}\n"
                           "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
                           "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
-                          dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), package->uninstallcmd,
+                          dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), rmcmd,
                           enterbuilddir, exitbuilddir, installdestdir, filelistfile, INSTALLPREFIX);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
