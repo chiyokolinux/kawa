@@ -20,3 +20,6 @@ KAWA TODOs
 - handle errors (errno) DONE
 - check & ask package source (see #4) DONE
 - binary search packages DONE
+- dependency types
+- add bspatch (individual files) capability
+- add dotfiles (per user installable) capability
