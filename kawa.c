@@ -36,29 +36,41 @@ int main(int argc, char *argv[]) {
     if (argc == 1)
         return help();
     // if args given, send to function
-    else if ((!strcmp(argv[1], "sync") && argc == 2) || (!strcmp(argv[1], "refresh") && argc == 2))
+    else if ((!strcmp(argv[1], "sync") && argc == 2) || (!strcmp(argv[1], "refresh") && argc == 2) ||
+             (!strcmp(argv[1], "sy") && argc == 2) || (!strcmp(argv[1], "rf") && argc == 2))
         return sync_all();
-    else if ((!strcmp(argv[1], "sync") && argc == 3) || (!strcmp(argv[1], "refresh") && argc == 3))
+    else if ((!strcmp(argv[1], "sync") && argc == 3) || (!strcmp(argv[1], "refresh") && argc == 3) ||
+             (!strcmp(argv[1], "sy") && argc == 3) || (!strcmp(argv[1], "rf") && argc == 3))
         return sync_repo_cli(argv[2]);
-    else if (!strcmp(argv[1], "install") && argc >= 3)
+    else if ((!strcmp(argv[1], "install") && argc >= 3) ||
+             (!strcmp(argv[1], "in") && argc >= 3))
         return install(argc, argv);
-    else if (!strcmp(argv[1], "update") && argc == 2)
+    else if ((!strcmp(argv[1], "update") && argc == 2) ||
+             (!strcmp(argv[1], "up") && argc == 2))
         return update();
-    else if (!strcmp(argv[1], "remove") && argc >= 3)
+    else if ((!strcmp(argv[1], "remove") && argc >= 3) ||
+             (!strcmp(argv[1], "rm") && argc >= 3))
         return pkg_remove(argc, argv);
-    else if (!strcmp(argv[1], "search") && argc == 3)
+    else if ((!strcmp(argv[1], "search") && argc == 3) ||
+             (!strcmp(argv[1], "se") && argc == 3))
         return search(argv[2]);
-    else if (!strcmp(argv[1], "show") && argc == 3)
+    else if ((!strcmp(argv[1], "show") && argc == 3) ||
+             (!strcmp(argv[1], "sh") && argc == 3))
         return show(argv[2]);
-    else if (!strcmp(argv[1], "help") && argc == 2)
+    else if ((!strcmp(argv[1], "help") && argc == 2) ||
+             (!strcmp(argv[1], "he") && argc == 2))
         return help();
-    else if (!strcmp(argv[1], "version") && argc == 2)
+    else if ((!strcmp(argv[1], "version") && argc == 2) ||
+             (!strcmp(argv[1], "ve") && argc == 2))
         return version();
-    else if (!strcmp(argv[1], "addrepo") && argc == 4)
+    else if ((!strcmp(argv[1], "addrepo") && argc == 4) ||
+             (!strcmp(argv[1], "ar") && argc == 4))
         return repoadd(argv[2], argv[3]);
-    else if (!strcmp(argv[1], "makepackages") && argc == 2)
+    else if ((!strcmp(argv[1], "makepackages") && argc == 2) ||
+             (!strcmp(argv[1], "mp") && argc == 2))
         return makepackages();
-    else if (!strcmp(argv[1], "cacheclean") && argc == 2)
+    else if ((!strcmp(argv[1], "cacheclean") && argc == 2) ||
+             (!strcmp(argv[1], "cc") && argc == 2))
         return cacheclean();
     // if no args lengths matched, just exit with help and non-zero exit code.
     return help() + 1;
