@@ -28,9 +28,9 @@
 #include "datatypes.h"
 #include "kawafile.h"
 
-int binarypkg_gen_kawafile(char pkgname[]);
-int binarypkg_install(char pkgname[]);
+int binarypkg_gen_kawafile(struct package *package);
+int binarypkg_install(struct package *package);
 int binarypkg_remove(char pkgname[]);
-int binarypkg_update(char pkgname[]);
+int binarypkg_update(struct package *package);
 
 #endif // BINARYPKG_H

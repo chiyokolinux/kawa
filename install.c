@@ -370,7 +370,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
         else if (!strcmp(currpkg->type, "meta"))
             return metapkg_install(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_install(currpkg->name);
+            return binarypkg_install(currpkg);
     } else { // if action is update, use the update functions
         if (!strcmp(currpkg->type, "source"))
             return sourcepkg_update(currpkg);
@@ -379,7 +379,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
         else if (!strcmp(currpkg->type, "meta"))
             return metapkg_update(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_update(currpkg->name);
+            return binarypkg_update(currpkg);
     }
     return 1;
 }
