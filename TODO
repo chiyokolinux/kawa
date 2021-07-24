@@ -24,3 +24,4 @@ KAWA TODOs
 - add bspatch (individual files) capability
 - add dotfiles (per user installable) capability
 - handle conflicting dependencies
+- post-install hooks
