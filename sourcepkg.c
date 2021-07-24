@@ -153,7 +153,7 @@ int sourcepkg_update(struct package *package) {
     printf("Updating %s.", package->name);
     fflush(stdout);
     // update kawafile
-    retval += binarypkg_gen_kawafile(package->name);
+    retval += sourcepkg_gen_kawafile(package);
     // run kawafile update
     kawafile_run(package->name, "update");
     printf(".");

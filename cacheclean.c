@@ -26,7 +26,7 @@ int cacheclean() {
     strcat(path, "/etc/kawa.d/kawafiles/");
 
     // sprintf path variable into find & delete command
-    char command[strlen(path)+45];
+    char command[strlen(path)+48];
     sprintf(command, "find %s -name package.src.kawapkg -type f -delete", path);
     
     // execute find & delete command
