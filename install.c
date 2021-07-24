@@ -190,7 +190,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
         free(ii);
 
         // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-        retval += install_no_deps(currpkg, database, 0, 1);
+        retval += install_no_deps(currpkg, database, installed, 0, 1);
         
         // re-wire version variables
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
@@ -215,7 +215,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
             }
         }
         nodelist->packages[i]->depends = pkg_deptypes;
-        retval += install_no_deps(nodelist->packages[i], database, maninst, 0);
+        retval += install_no_deps(nodelist->packages[i], database, installed, maninst, 0);
     }
 
     return retval;
@@ -359,8 +359,8 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     return retval;
 }
 
-int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update) {
-    add_db_entry(currpkg, manual_installed, database);
+int install_no_deps(struct package *currpkg, struct pkglist *database, struct pkglist *installed, int manual_installed, int is_update) {
+    add_db_entry(currpkg, manual_installed, database, installed);
 
     if (!is_update) {
         if (!strcmp(currpkg->type, "source"))
@@ -384,21 +384,18 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
     return 1;
 }
 
-int add_db_entry(struct package *package, int manual_installed, struct pkglist *database) {
+int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct pkglist *installed) {
     // TODO: Write Dependency Types to package->depends field
-    struct stat st = {0};
-    
-    // compute path
-    char path[strlen(INSTALLPREFIX)+23+strlen(package->name)];
-    strcpy(path, "");
-    strcat(path, INSTALLPREFIX);
-    strcat(path, "/etc/kawa.d/kawafiles/");
-    strcat(path, package->name);
-    
-    if (stat(path, &st) != -1) {
+
+    // check if already in installed db, i.e. Installed.packages.db
+    // that was parsed at program run does NOT contain package.
+    // if it does, just return
+    int *i;
+    if (!(i = malloc(sizeof(int)))) malloc_fail();
+    if (bsearch_pkg(package->name, installed, i, -1)) {
         return 0;
     }
-    
+
     // open file
     char indexpath[strlen(INSTALLPREFIX)+34];
     strcpy(indexpath, "");
@@ -406,17 +403,17 @@ int add_db_entry(struct package *package, int manual_installed, struct pkglist *
     strcat(indexpath, "/etc/kawa.d/Installed.packages.db");
 
     FILE* indexfile = fopen(indexpath, "a+");
-    
+
     // some stuff for detecting orphans later
     char manual[9];
     if (manual_installed)
         strcpy(manual, "manual");
     else
         strcpy(manual, "auto");
-    
+
     // write entry
     fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, database->repos->repos[*package->repoindex]->reponame, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
-    
+
     fclose(indexfile);
     return 0;
 }

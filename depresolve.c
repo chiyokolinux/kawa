@@ -222,6 +222,14 @@ struct package *bsearch_pkg(char pkgname[], struct pkglist *database, int *i, in
             if (pkg_is_dependency == 0) {
                 fprintf(stderr, "Error: Package %s not found (try kawa sync)\n", pkgname);
                 exit(1);
+            } else if (pkg_is_dependency == -1) {
+                /**
+                 * if pkg_is_dependency is -1, we return NULL
+                 * if we didn't find a matching package.
+                 * this works because depth will never be -1 and
+                 * other functions all just set this param to 0.
+                **/
+                return NULL;
             } else {
                 fprintf(stderr, "Error: Package %s not found, but required by another package.\n", pkgname);
                 fprintf(stderr, "This error may be solved by kawa sync, but if not, please contact the maintainer of the package you want to install.\n");
