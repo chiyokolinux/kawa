@@ -27,8 +27,8 @@ int help() {
     printf("    kawa up|update\n");
     printf("    kawa se|search [term]\n");
     printf("    kawa sh|show [package]\n");
-    printf("    kawa sy|sync\n");
-    printf("    kawa rf|refresh (alias for sync)\n");
+    printf("    kawa sy|sync <reponame>\n");
+    printf("    kawa rf|refresh <reponame> (alias for sync)\n");
     printf("    kawa cc|cacheclean\n");
     printf("    kawa he|help\n");
     printf("    kawa ve|version\n");
