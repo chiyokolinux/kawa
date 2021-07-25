@@ -76,11 +76,8 @@ int remove_single(char pkgname[], struct pkglist *installed, struct pkglist *dat
     if (!(i = malloc(sizeof(int)))) malloc_fail();
     currpkg_db = bsearch_pkg(pkgname, database, i, 0);
     free(i);
-
-    // unregister package
-    remove_db_entry(currpkg, installed);
     
-    int retval = 0;
+    int retval = 1;
     
     // remove the package using the function provided by the package type class
     // use database version because of the way metapkg handle dependency removal
@@ -93,7 +90,15 @@ int remove_single(char pkgname[], struct pkglist *installed, struct pkglist *dat
     else if (!strcmp(currpkg->type, "binary"))
         retval = binarypkg_remove(pkgname);
 
-    kawafile_dir_remove(currpkg);
+    if (!retval) {
+        // unregister package
+        remove_db_entry(currpkg, installed);
+        kawafile_dir_remove(currpkg);
+    } else {
+        fprintf(stderr, "\nThere were errors during the removal of %s. Aborting.\n", pkgname);
+        exit(retval);
+    }
+
     return retval;
 }
 

@@ -32,9 +32,10 @@ int patchpkg_gen_kawafile(struct package *package) {
         exit(4);
     }
 
-    retval += fprintf(fp, "#!/bin/sh\n"
-                          "echo \"Applying %2$s ( %1$s )\"\n"
-                      "patch %4$s %3$s\n", package->name, package->description, package->configurecmd, whitespace_join(package->configureopts));
+    fprintf(fp, "#!/bin/sh\n"
+                "echo \"Applying %2$s ( %1$s )\"\n"
+                "patch %4$s %3$s\n", package->name, package->description,
+                package->configurecmd, whitespace_join(package->configureopts));
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");

@@ -332,7 +332,7 @@ int write_installed_packages(struct pkglist *installed, struct pkglist *database
         if (currpkg == NULL)
             continue;
         // write the package to the index file
-        retval += fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", currpkg->name, currpkg->description, currpkg->version, currpkg->archiveurl, database->repos->repos[*currpkg->repoindex]->reponame, whitespace_join(currpkg->depends), whitespace_join(currpkg->conflicts), currpkg->configurecmd, whitespace_join(currpkg->configureopts), currpkg->type, currpkg->sepbuild, currpkg->uninstallcmd, currpkg->license, whitespace_join(currpkg->scripts));
+        fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", currpkg->name, currpkg->description, currpkg->version, currpkg->archiveurl, database->repos->repos[*currpkg->repoindex]->reponame, whitespace_join(currpkg->depends), whitespace_join(currpkg->conflicts), currpkg->configurecmd, whitespace_join(currpkg->configureopts), currpkg->type, currpkg->sepbuild, currpkg->uninstallcmd, currpkg->license, whitespace_join(currpkg->scripts));
     }
     
     fclose(indexfile);

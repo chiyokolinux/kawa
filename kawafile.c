@@ -18,24 +18,24 @@
 
 #include "kawafile.h"
 
-void spawnwait(char *const argv[]) { // copied from ichirou
+int spawnwait(char *const argv[]) {
+    int status;
     pid_t chpid = fork();
     switch (chpid) {
         case 0:
-            setsid();
             execvp(argv[0], argv);
             perror("execvp");
             _exit(1);
         case -1:
             perror("fork");
-            break;
+            return -1;
         default:
-            waitpid(chpid, NULL, WUNTRACED);
-            break;
+            waitpid(chpid, &status, 0);
+            return WIFSIGNALED(status) ? WTERMSIG(status) + 128 : WEXITSTATUS(status);
     }
 }
 
-void kawafile_run(char pkgname[], char operation[]) {
+int kawafile_run(char pkgname[], char operation[]) {
     // argv = INSTALLPREFIX + /etc/kawa.d/kawafiles/${pkgname}/Kawafile, ${operation}, NULL
     // Kawafiles only need script path and operation and do the rest by themselves, so there's no need for
     // complicated array prepending, NULL appending, type conversion or other stuff
@@ -46,7 +46,7 @@ void kawafile_run(char pkgname[], char operation[]) {
     strcat(path, "/etc/kawa.d/kawafiles/");
     strcat(path, pkgname);
     strcat(path, "/Kawafile");
-    spawnwait((char *const[]){ path, operation, NULL });
+    return spawnwait((char *const[]){ path, operation, NULL });
 }
 
 void kawafile_dir_create(char pkgname[]) {

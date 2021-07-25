@@ -34,18 +34,15 @@ int sourcepkg_gen_kawafile(struct package *package) {
     strcat(path, "/Kawafile");
     
     char enterbuilddir[30];
-    char exitbuilddir[15];
+    char exitbuilddir[8];
     char installdestdir[strlen(dir)+9];
-    char filelistfile[17];
     char rmcmd[255];
     if (!strcmp(package->sepbuild, "yes")) {
         strcpy(enterbuilddir, "    mkdir build && cd build\n");
-        strcpy(exitbuilddir, "    cd ../..\n");
-        strcpy(filelistfile, "../../files.list");
+        strcpy(exitbuilddir, "../..");
     } else {
         strcpy(enterbuilddir, "");
-        strcpy(exitbuilddir, "    cd ..\n");
-        strcpy(filelistfile, "../files.list");
+        strcpy(exitbuilddir, "..");
     }
     strcpy(installdestdir, dir);
     strcat(installdestdir, "/install");
@@ -63,56 +60,67 @@ int sourcepkg_gen_kawafile(struct package *package) {
         exit(4);
     }
 
-    retval += fprintf(fp, "#!/bin/sh\n"
-                          "cd %1$s\n"
-                          "prepare_files() {\n"
-                          "    tar xf package.src.kawapkg\n"
-                          "    cd $(tar tf package.src.kawapkg | head -n1)\n"
-                          "%6$s"
-                          "    rm -rf %8$s\n"
-                          "    mkdir %8$s\n"
-                          "}\n"
-                          "cleanup() {\n"
-                          "%7$s"
-                          "    rm -rf $(tar tf package.src.kawapkg | head -n1)\n"
-                          "}\n"
-                          "file_uninstall() {\n"
-                          "    rm -f $(xargs -a %9$s)\n"
-                          "}\n"
-                          "perform_install() {\n"
-                          "    %3$s %4$s\n"
-                          "    [ -f do.build.sh ] && ./do.build.sh || make -j%2$s\n"
-                          "    [ -f do.install.sh ] && ./do.install.sh || make -j%2$s install DESTDIR=%8$s\n"
-                          "    pushd %8$s\n"
-                          "    find . -type f -print | cut -c 2- > %9$s\n"
-                          "    cp -RT . %10$s/\n"
-                          "    popd\n"
-                          "    rm -rf %8$s\n"
-                          "}\n"
-                          "do_install() {\n"
-                          "    prepare_files\n"
-                          "    [ -f pre.install.sh ] && ./pre.install.sh\n"
-                          "    [ -f patch.apply.sh ] && ./patch.apply.sh\n"
-                          "    perform_install\n"
-                          "    [ -f post.install.sh ] && ./post.install.sh\n"
-                          "    cleanup\n"
-                          "}\n"
-                          "do_remove() {\n"
-                          "    prepare_files\n"
-                          "    %5$s\n"
-                          "    cleanup\n"
-                          "}\n"
-                          "do_update() {\n"
-                          "    prepare_files\n"
-                          "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
-                          "    perform_install\n"
-                          "    [[ -f post.update.sh ]] && ./post.update.sh\n"
-                          "    cleanup\n"
-                          "}\n"
-                          "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
-                          "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
-                          dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), rmcmd,
-                          enterbuilddir, exitbuilddir, installdestdir, filelistfile, INSTALLPREFIX);
+    fprintf(fp, "#!/bin/sh\n"
+                "cd %1$s\n"
+                "export DESTDIR=%8$s\n"
+                "export CC=cc\n"
+                "die() {\n"
+                "    popd; popd\n"
+                "    cleanup\n"
+                "    rm -rf %8$s\n"
+                "    exit 1\n"
+                "}\n"
+                "prepare_files() {\n"
+                "    tar xf package.src.kawapkg\n"
+                "    cd $(tar tf package.src.kawapkg | head -n1)\n"
+                "%6$s"
+                "    rm -rf %8$s\n"
+                "    mkdir %8$s\n"
+                "}\n"
+                "cleanup() {\n"
+                "    cd %7$s\n"
+                "    rm -rf $(tar tf package.src.kawapkg | head -n1)\n"
+                "}\n"
+                "file_uninstall() {\n"
+                "    rm -f $(xargs -a %7$s/files.list)\n"
+                "}\n"
+                "perform_install() {\n"
+                "    %3$s %4$s\n"
+                "    [ -f %7$s/do.build.sh ] && { %7$s/do.build.sh || die; } || make -j%2$s\n"
+                "    [ -f %7$s/do.install.sh ] && { %7$s/do.install.sh || die; } || make -j%2$s install\n"
+                "    pushd %8$s\n"
+                "    find . -type f -print | cut -c 2- > %7$s/files.list\n"
+                "    cp -RT . %9$s/\n"
+                "    popd\n"
+                "    rm -rf %8$s\n"
+                "}\n"
+                "do_install() {\n"
+                "    prepare_files\n"
+                "    [ -f %7$s/pre.install.sh ] && { %7$s/pre.install.sh || die; }\n"
+                "    [ -f %7$s/patch.apply.sh ] && { %7$s/patch.apply.sh || die; }\n"
+                "    perform_install\n"
+                "    [ -f %7$s/post.install.sh ] && { %7$s/post.install.sh || die; }\n"
+                "    cleanup\n"
+                "    return 0\n"
+                "}\n"
+                "do_remove() {\n"
+                "    prepare_files\n"
+                "    %5$s\n"
+                "    cleanup\n"
+                "    return 0\n"
+                "}\n"
+                "do_update() {\n"
+                "    prepare_files\n"
+                "    [[ -f %7$s/pre.update.sh ]] && { %7$s/pre.update.sh || die; }\n"
+                "    perform_install\n"
+                "    [[ -f %7$s/post.update.sh ]] && { %7$s/post.update.sh || die; }\n"
+                "    cleanup\n"
+                "    return 0\n"
+                "}\n"
+                "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
+                "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n",
+                dir, THREADNUM, package->configurecmd, whitespace_join(package->configureopts), rmcmd,
+                enterbuilddir, exitbuilddir, installdestdir, INSTALLPREFIX);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -134,7 +142,7 @@ int sourcepkg_install(struct package *package) {
     printf(".");
     fflush(stdout);
     // run kawafile install
-    kawafile_run(package->name, "install");
+    retval += kawafile_run(package->name, "install");
     printf(" Done\n");
     return retval;
 }
@@ -143,9 +151,9 @@ int sourcepkg_remove(struct package *package) {
     printf("Removing %s...", package->name);
     fflush(stdout);
     // run kawafile remove
-    kawafile_run(package->name, "remove");
+    int retval = kawafile_run(package->name, "remove");
     printf(" Done\n");
-    return 0;
+    return retval;
 }
 
 int sourcepkg_update(struct package *package) {
@@ -155,7 +163,7 @@ int sourcepkg_update(struct package *package) {
     // update kawafile
     retval += sourcepkg_gen_kawafile(package);
     // run kawafile update
-    kawafile_run(package->name, "update");
+    retval += kawafile_run(package->name, "update");
     printf(".");
     fflush(stdout);
     printf(" Done\n");

@@ -45,27 +45,29 @@ int metapkg_gen_kawafile(char pkgname[]) {
         exit(4);
     }
 
-    retval += fprintf(fp, "#!/bin/sh\n"
-                          "cd %1$s\n"
-                          "perform_install() {\n"
-                          "    :\n"
-                          "}\n"
-                          "do_install() {\n"
-                          "    [[ -f pre.install.sh ]] && ./pre.install.sh\n"
-                          "    perform_install\n"
-                          "    [[ -f post.install.sh ]] && ./post.install.sh\n"
-                          "}\n"
-                          "do_remove() {\n"
-                          "    :\n"
-                          "}\n"
-                          "do_update() {\n"
-                          "    [[ -f pre.update.sh ]] && ./pre.update.sh\n"
-                          "    do_remove\n"
-                          "    perform_install\n"
-                          "    [[ -f post.update.sh ]] && ./post.update.sh\n"
-                          "}\n"
-                          "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
-                          "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
+    fprintf(fp, "#!/bin/sh\n"
+                "cd %1$s\n"
+                "perform_install() {\n"
+                "    :\n"
+                "}\n"
+                "do_install() {\n"
+                "    [[ -f pre.install.sh ]] && { ./pre.install.sh || exit 1; }\n"
+                "    perform_install\n"
+                "    [[ -f post.install.sh ]] && { ./post.install.sh || exit 1; }\n"
+                "    return 0\n"
+                "}\n"
+                "do_remove() {\n"
+                "    :\n"
+                "}\n"
+                "do_update() {\n"
+                "    [[ -f pre.update.sh ]] && { ./pre.update.sh || exit 1; }\n"
+                "    do_remove\n"
+                "    perform_install\n"
+                "    [[ -f post.update.sh ]] && { ./post.update.sh || exit 1; }\n"
+                "    return 0\n"
+                "}\n"
+                "case \"$1\" in install) do_install; ;; remove) do_remove; ;; update) do_update; ;; *) "
+                "echo \"Usage: $0 {install|remove|update}\"; exit 1; ;; esac\n", dir);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -86,7 +88,7 @@ int metapkg_install(char pkgname[]) {
     retval += metapkg_gen_kawafile(pkgname);
     printf(".");
     fflush(stdout);
-    kawafile_run(pkgname, "install");
+    retval += kawafile_run(pkgname, "install");
     printf(" Done\n");
 
     return retval;
@@ -94,13 +96,14 @@ int metapkg_install(char pkgname[]) {
 
 int metapkg_remove(struct package *package) {
     // TODO: find a way to display removed deps in user dialog
+    int retval = 0;
     printf("Removing %s...", package->name);
     fflush(stdout);
     for (int i = 0; i < package->depends.retc; i++) {
-        kawafile_run(package->depends.retval[i], "remove");
+        retval += kawafile_run(package->depends.retval[i], "remove");
     }
     printf(" Done\n");
-    return 0;
+    return retval;
 }
 
 int metapkg_update(char pkgname[]) {

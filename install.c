@@ -295,7 +295,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     
     // initialize vars
     char path[strlen(INSTALLPREFIX)+32+strlen(dlpackage->name)];
-    char scripturl[strlen(baseurl)+32+strlen(dlpackage->name)];
+    char scripturl[strlen(baseurl)+56+strlen(dlpackage->name)];
     
     int retval = 0;
     
@@ -318,6 +318,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
         strcat(scripturl, baseurl);
         if (scripturl[strlen(scripturl)-1] != '/')
             strcat(scripturl, "/");
+        strcat(scripturl, "packages/");
         strcat(scripturl, dlpackage->name);
         strcat(scripturl, "/");
         strcat(scripturl, script);
@@ -360,28 +361,36 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
 }
 
 int install_no_deps(struct package *currpkg, struct pkglist *database, struct pkglist *installed, int manual_installed, int is_update) {
-    add_db_entry(currpkg, manual_installed, database, installed);
+    int retval = 1;
 
     if (!is_update) {
         if (!strcmp(currpkg->type, "source"))
-            return sourcepkg_install(currpkg);
+            retval = sourcepkg_install(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
-            return 0; // TODO: sourcepkg_install(patch=pkgname)
+            retval = 0; // TODO: sourcepkg_install(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
-            return metapkg_install(currpkg->name);
+            retval = metapkg_install(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_install(currpkg);
+            retval = binarypkg_install(currpkg);
     } else { // if action is update, use the update functions
         if (!strcmp(currpkg->type, "source"))
-            return sourcepkg_update(currpkg);
+            retval = sourcepkg_update(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
-            return 0; // TODO: sourcepkg_update(patch=pkgname)
+            retval = 0; // TODO: sourcepkg_update(patch=pkgname)
         else if (!strcmp(currpkg->type, "meta"))
-            return metapkg_update(currpkg->name);
+            retval = metapkg_update(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
-            return binarypkg_update(currpkg);
+            retval = binarypkg_update(currpkg);
     }
-    return 1;
+
+    if (!retval) {
+        add_db_entry(currpkg, manual_installed, database, installed);
+    } else {
+        fprintf(stderr, "\nThere were errors during the installation of %s. Aborting.\n", currpkg->name);
+        exit(retval);
+    }
+
+    return retval;
 }
 
 int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct pkglist *installed) {
