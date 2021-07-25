@@ -125,6 +125,23 @@ int update() {
 int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
     int retval = 0;
+
+    // first, download all package archives and register all packages
+    for (int i = 0; i < updatec; i++) {
+        struct package *currpkg;
+        int *ii;
+        if (!(ii = malloc(sizeof(int)))) malloc_fail();
+        currpkg = bsearch_pkg(updpkglst[i]->name, database, ii, 0);
+        free(ii);
+
+        retval += download_package(currpkg, database, 1);
+    }
+    for (int i = 0; i < nodelist->pkg_count; i++) {
+        retval += download_package(nodelist->packages[i], database, 0);
+    }
+
+    // go offline, for long upgrades / upgrades where network software is changed
+    curl_global_cleanup();
     
     // before updating, install all new dependencies
     for (int i = 0; i < nodelist->pkg_count; i++) {
@@ -149,8 +166,7 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
             }
         }
     }
-    
-    curl_global_cleanup();
+
     retval += write_installed_packages(installed, database);
     return retval;
 }
