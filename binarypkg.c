@@ -39,7 +39,7 @@ int binarypkg_gen_kawafile(struct package *package) {
         rmcmd[254] = '\0';
     }
     
-    char cmdline[972+strlen(path)+strlen(dir)*2];
+    char cmdline[984+strlen(path)+strlen(dir)*2];
     strcpy(cmdline, "");
     // we'll make clean-installing the default behaviour to avoid file conflicts and bloathing the system with stale files (for example when a file name changes)
     // do.install.sh and do.build.sh are not supported for binary pkgs (why should it be?), maybe in the future (although unlikely)
@@ -50,7 +50,7 @@ int binarypkg_gen_kawafile(struct package *package) {
                      "tar tf %2$s/package.src.kawapkg | sed '/\\/$/d' | sed -e 's/^/    rm -f \\${DESTDIR}\\//'; "
                      "echo \"}\"; "
                      "echo \"perform_install() {\"; "
-                     "echo \"    tar xf package.src.kawapkg -C %3$s/\"; "
+                     "echo \"    tar xf package.src.kawapkg -C %3$s/ || exit 1;\"; "
                      "echo \"}\"; "
                      "echo \"do_install() {\"; "
                      "echo \"    [ -f pre.install.sh ] && { ./pre.install.sh || exit 1; }\"; "

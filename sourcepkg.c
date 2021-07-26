@@ -71,7 +71,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "    exit 1\n"
                 "}\n"
                 "prepare_files() {\n"
-                "    tar xf package.src.kawapkg\n"
+                "    tar xf package.src.kawapkg || die\n"
                 "    cd $(tar tf package.src.kawapkg | head -n1)\n"
                 "%6$s"
                 "    rm -rf %8$s\n"
