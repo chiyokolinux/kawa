@@ -76,7 +76,7 @@ void kawafile_dir_remove(struct package pkg[]) {
         return;
     }
 
-    char path_appendable[strlen(INSTALLPREFIX)+56+strlen(pkg->name)];
+    char path_appendable[strlen(INSTALLPREFIX)+72+strlen(pkg->name)];
     strcpy(path_appendable, path);
     strcat(path_appendable, "/");
     int null_byte_index = strlen(path_appendable);
@@ -94,7 +94,10 @@ void kawafile_dir_remove(struct package pkg[]) {
     strcat(path_appendable, "Kawafile");
     unlink(path_appendable);
 
-    // TODO: delete cached package file
+    // delete cached package file
+    path_appendable[null_byte_index] = '\0';
+    strcat(path_appendable, "package.src.kawapkg");
+    unlink(path_appendable);
 
     // remove the parent directory which contained all the files
     rmdir(path);
