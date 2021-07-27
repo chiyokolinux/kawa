@@ -43,4 +43,10 @@
 // some examples: [req]uired [rec]ommended [opt]ional [doc]umentation
 #define DEPTYPES "req rec"
 
+// the maximum amount of times kawa will retry after a failed package
+// download. this is the amount of retries, meaning that if the package
+// download fails, kawa will then attempt the download n more times,
+// if you care about the exact number.
+#define MAXDOWNLOADRETRY 2
+
 #endif // CONFIG_H

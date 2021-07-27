@@ -124,7 +124,7 @@ int update() {
 
 int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    int retval = 0;
+    int retval = 0, failc = 0;
 
     // first, download all package archives and register all packages
     for (int i = 0; i < updatec; i++) {
@@ -134,10 +134,38 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
         currpkg = bsearch_pkg(updpkglst[i]->name, database, ii, 0);
         free(ii);
 
-        retval += download_package(currpkg, database, 1);
+        retval = download_package(currpkg, database, 1);
+
+        if (retval) {
+            if (failc < MAXDOWNLOADRETRY) {
+                fprintf(stderr, "Retrying download of package %s due to above error.\n", updpkglst[i]->name);
+                failc++;
+                i--;
+            } else {
+                fprintf(stderr, "Download of package %s failed. Aborting.\n", updpkglst[i]->name);
+                curl_global_cleanup();
+                return retval;
+            }
+        } else {
+            failc = 0;
+        }
     }
     for (int i = 0; i < nodelist->pkg_count; i++) {
-        retval += download_package(nodelist->packages[i], database, 0);
+        retval = download_package(nodelist->packages[i], database, 0);
+
+        if (retval) {
+            if (failc < MAXDOWNLOADRETRY) {
+                fprintf(stderr, "Retrying download of package %s due to above error.\n", nodelist->packages[i]->name);
+                failc++;
+                i--;
+            } else {
+                fprintf(stderr, "Download of package %s failed. Aborting.\n", nodelist->packages[i]->name);
+                curl_global_cleanup();
+                return retval;
+            }
+        } else {
+            failc = 0;
+        }
     }
 
     // go offline, for long upgrades / upgrades where network software is changed
