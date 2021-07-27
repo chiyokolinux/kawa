@@ -26,3 +26,4 @@ KAWA TODOs
 - handle conflicting dependencies
 - post-install hooks
 - always install patches before everything
+- download retries DONE
