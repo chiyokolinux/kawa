@@ -299,23 +299,41 @@ int download_archive(struct package *dlpackage, int force) {
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            fprintf(stderr, "Downloading package %s failed: %s\n", dlpackage->name, curl_easy_strerror(res));
-            retval++;
+            fprintf(stderr, "\nDownloading package %s failed: %s\n", dlpackage->name, curl_easy_strerror(res));
+            fclose(indexfile);
+            unlink(path);
+            curl_easy_cleanup(curl);
+            return 1;
+        }
+
+        // check response code
+        long respcode = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respcode);
+        if (respcode != 200) {
+            fprintf(stderr, "\nDownloading package %s failed: HTTP Error %ld\n", dlpackage->name, respcode);
+            fclose(indexfile);
+            unlink(path);
+            curl_easy_cleanup(curl);
+            return 2;
         }
 
         curl_easy_cleanup(curl);
         fclose(indexfile);
     } else {
-        fprintf(stderr, "Downloading package %s failed: Cannot create cURL object\n", dlpackage->name);
-        return ++retval;
+        fprintf(stderr, "\nDownloading package %s failed: Cannot create cURL object\n", dlpackage->name);
+        return 1;
     }
 
-    printf(" Done\n");
-    return retval;
+    if (retval == 0)
+        printf(" Done\n");
+
+    return 0;
 }
 
 int download_scripts(struct package *dlpackage, char *baseurl) {
     if (!dlpackage->scripts.retc)
+        return 0;
+    if (dlpackage->scripts.retval[0][0] == '\0')
         return 0;
     
     printf("Downloading scripts for package %s.", dlpackage->name);
