@@ -338,8 +338,8 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     fflush(stdout);
 
     // initialize vars
-    char path[strlen(INSTALLPREFIX)+32+strlen(dlpackage->name)];
-    char scripturl[strlen(baseurl)+56+strlen(dlpackage->name)];
+    char path[strlen(INSTALLPREFIX)+34+strlen(dlpackage->name)];
+    char scripturl[strlen(baseurl)+58+strlen(dlpackage->name)];
 
     for (int i = 0; i < dlpackage->scripts.retc; i++) {
         char *script = dlpackage->scripts.retval[i];
