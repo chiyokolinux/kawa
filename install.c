@@ -341,6 +341,16 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     char path[strlen(INSTALLPREFIX)+34+strlen(dlpackage->name)];
     char scripturl[strlen(baseurl)+58+strlen(dlpackage->name)];
 
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+
+    if (!curl) {
+        fprintf(stderr, "\nDownloading scripts of package %s failed: Cannot create cURL object\n", dlpackage->name);
+        return 3;
+    }
+
     for (int i = 0; i < dlpackage->scripts.retc; i++) {
         char *script = dlpackage->scripts.retval[i];
 
@@ -365,53 +375,47 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
         strcat(scripturl, "/");
         strcat(scripturl, script);
 
-        CURL *curl;
-        CURLcode res;
+        curl_easy_setopt(curl, CURLOPT_URL, scripturl);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-        curl = curl_easy_init();
-        if (curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, scripturl);
-            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        // do the download thing
+        FILE* sfile = fopen(path, "w+");
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, sfile);
 
-            // do the download thing
-            FILE* sfile = fopen(path, "w+");
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, sfile);
-
-            res = curl_easy_perform(curl);
-            if (res != CURLE_OK) {
-                fprintf(stderr, "\nDownloading script %s of package %s failed: %s\n", script, dlpackage->name, curl_easy_strerror(res));
-                fclose(sfile);
-                unlink(path);
-                curl_easy_cleanup(curl);
-                return 1;
-            }
-
-            // check response code
-            long respcode = 0;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respcode);
-            if (respcode != 200) {
-                fprintf(stderr, "\nDownloading package %s failed: HTTP Error %ld\n", dlpackage->name, respcode);
-                fclose(sfile);
-                unlink(path);
-                curl_easy_cleanup(curl);
-                return 2;
-            }
-
-            curl_easy_cleanup(curl);
-            retval += fchmod(fileno(sfile), S_IRWXU);
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            fprintf(stderr, "\nDownloading script %s of package %s failed: %s\n", script, dlpackage->name, curl_easy_strerror(res));
             fclose(sfile);
-        } else {
-            fprintf(stderr, "\nDownloading script %s of package %s failed: Cannot create cURL object\n", script, dlpackage->name);
-            return 3;
+            unlink(path);
+            curl_easy_cleanup(curl);
+            return 1;
         }
-        
+
+        // check response code
+        long respcode = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &respcode);
+        if (respcode != 200) {
+            fprintf(stderr, "\nDownloading script %s of package %s failed: HTTP Error %ld\n", script, dlpackage->name, respcode);
+            fclose(sfile);
+            unlink(path);
+            curl_easy_cleanup(curl);
+            return 2;
+        }
+
+        if (fchmod(fileno(sfile), S_IRWXU))
+            perror("fchmod");
+        fclose(sfile);
+
         printf(".");
         fflush(stdout);
     }
+
+    curl_easy_cleanup(curl);
+
     
     printf(" Done\n");
     
-    return retval;
+    return 0;
 }
 
 int install_no_deps(struct package *currpkg, struct pkglist *database, struct pkglist *installed, int manual_installed, int is_update) {
