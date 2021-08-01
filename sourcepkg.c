@@ -62,8 +62,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
 
     fprintf(fp, "#!/bin/sh\n"
                 "cd %1$s\n"
-                "export DESTDIR=%8$s\n"
-                "export CC=cc\n"
+                "export DESTDIR=\"%8$s\" CC=cc\n"
                 "die() {\n"
                 "    popd; popd\n"
                 "    cleanup\n"
