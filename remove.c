@@ -32,7 +32,7 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
             }
         }
         if (!package_installed) {
-            fprintf(stderr, "Error: package %s is not installed\n", pkgnames[i]);
+            fprintf(stderr, "\nError: package %s is not installed\n", pkgnames[i]);
             return 1;
         }
     }
@@ -84,7 +84,7 @@ int remove_single(char pkgname[], struct pkglist *installed, struct pkglist *dat
     if (!strcmp(currpkg->type, "source"))
         retval = sourcepkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "patch"))
-        retval = 0; // TODO: sourcepkg_install(patch=pkgname)
+        retval = patchpkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "meta"))
         retval = metapkg_remove(currpkg_db);
     else if (!strcmp(currpkg->type, "binary"))
@@ -110,7 +110,11 @@ void remove_db_entry(struct package *package, struct pkglist *installed) {
         currpkg = installed->packages[i];
         // we're comparing pointers, so this (should) work(s).
         if (currpkg == package) {
-            installed->packages[i] = NULL;
+            // retain installed database consistency for multi-package operations
+            for (i++; i < installed->pkg_count; i++) {
+                installed->packages[i - 1] = installed->packages[i];
+            }
+            break;
             // free(package); caused problems
         }
     }

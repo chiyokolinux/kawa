@@ -43,9 +43,15 @@ int install(int pkgc, char *pkgnames[]) {
     struct package **packages;
     if (!(packages = malloc(sizeof(char) * database->pkg_count * 1024))) malloc_fail();
     struct pkglist *nodelist;
-    if (!(nodelist = malloc(sizeof(struct pkglist) + sizeof(char) * database->pkg_count * 1024))) malloc_fail();
+    if (!(nodelist = malloc(sizeof(struct pkglist) + 4))) malloc_fail();
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
+    struct package **patches;
+    if (!(patches = malloc(sizeof(char) * database->pkg_count * 256))) malloc_fail();
+    struct pkglist *patchlist;
+    if (!(patchlist = malloc(sizeof(struct pkglist) + 4))) malloc_fail();
+    patchlist->pkg_count = 0;
+    patchlist->packages = patches;
     int *updatec;
     if (!(updatec = malloc(sizeof(int)))) malloc_fail();
     *updatec = 0;
@@ -72,7 +78,7 @@ int install(int pkgc, char *pkgnames[]) {
     // resolve dependencies
     if (resolve_depends) {
         for (int i = 2; i < pkgc; i++) {
-            resolve_recursive(nodelist, updatepkgs, pkgnames[i], database, installed, 0, updatec, force_install, ignore_updates, deptypes);
+            resolve_recursive(nodelist, updatepkgs, patchlist, pkgnames[i], "", database, installed, 0, updatec, force_install, ignore_updates, deptypes);
         }
     } else {
         for (int ii = 2; ii < pkgc; ii++) {
@@ -83,6 +89,10 @@ int install(int pkgc, char *pkgnames[]) {
             int *i;
             if (!(i = malloc(sizeof(int)))) malloc_fail();
             currpkg = bsearch_pkg(pkgnames[ii], database, i, 0);
+
+            if (!strcmp(currpkg->type, "patch")) {
+                fprintf(stderr, "Warning: Installing patch packages without dependency resolution will not recompile the patched packages. Please run kawa install -r -D %s later.\n", currpkg->depends.retval[0]);
+            }
 
             int current_installed = 0;
             if (!force_install) {
@@ -132,13 +142,18 @@ int install(int pkgc, char *pkgnames[]) {
     }
     
     // user dialogue
-    if (!nodelist->pkg_count && !*updatec) {
+    if (!nodelist->pkg_count && !patchlist->pkg_count && !*updatec) {
         printf("All packages are installed and all dependencies are satisfied.\n");
         return 0;
     }
-    printf("The following packages will be installed:\n ");
-    for (int i = 0; i < nodelist->pkg_count; i++) {
-        printf(" %s", nodelist->packages[i]->name);
+    if (nodelist->pkg_count || patchlist->pkg_count) {
+        printf("The following packages will be installed:\n ");
+        for (int i = 0; i < patchlist->pkg_count; i++) {
+            printf(" %s", patchlist->packages[i]->name);
+        }
+        for (int i = 0; i < nodelist->pkg_count; i++) {
+            printf(" %s", nodelist->packages[i]->name);
+        }
     }
     if (*updatec) {
         printf("\nThe following packages will be updated:\n ");
@@ -147,19 +162,19 @@ int install(int pkgc, char *pkgnames[]) {
         }
     }
     
-    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count, 0, *updatec);
+    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count + patchlist->pkg_count, 0, *updatec);
     printf("Do you wish to proceed? [Y/n] ");
     fflush(stdout);
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n') {
-        return download_install_packages(nodelist, updatepkgs, updatec, database, installed, pkg_deptypes, pkgc, pkgnames);
+        return download_install_packages(nodelist, patchlist, updatepkgs, updatec, database, installed, pkg_deptypes, pkgc, pkgnames);
     } else
         return 1;
 }
 
-int download_install_packages(struct pkglist *nodelist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, struct strarr_retval pkg_deptypes, int pkgc, char *pkgnames[]) {
+int download_install_packages(struct pkglist *nodelist, struct pkglist *patchlist, struct pkg_update **updatepkgs, int *updatec, struct pkglist *database, struct pkglist *installed, struct strarr_retval pkg_deptypes, int pkgc, char *pkgnames[]) {
     // install everything
     curl_global_init(CURL_GLOBAL_DEFAULT);
     int retval = 0, failc = 0;
@@ -205,9 +220,38 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
             failc = 0;
         }
     }
+    for (int i = 0; i < patchlist->pkg_count; i++) {
+        retval += download_package(patchlist->packages[i], database, 0);
+
+        if (retval) {
+            if (failc < MAXDOWNLOADRETRY) {
+                fprintf(stderr, "Retrying download of package %s due to above error.\n", patchlist->packages[i]->name);
+                failc++;
+                i--;
+            } else {
+                fprintf(stderr, "Download of package %s failed. Aborting.\n", patchlist->packages[i]->name);
+                curl_global_cleanup();
+                return retval;
+            }
+        } else {
+            failc = 0;
+        }
+    }
 
     // go offline, for long upgrades / upgrades where network software is changed
     curl_global_cleanup();
+
+    // second, we "install" (i.e. unpack & register) all patch packages
+    for (int i = 0; i < patchlist->pkg_count; i++) {
+        int maninst = 0;
+        for (int i2 = 0; i2 < pkgc; i2++) {
+            if (!strcmp(patchlist->packages[i]->name, pkgnames[i2])) {
+                maninst = 1;
+                break;
+            }
+        }
+        retval += install_no_deps(patchlist->packages[i], database, maninst, 0, &pkg_deptypes);
+    }
 
     // then, update packages
     for (int i = 0; i < *updatec; i++) {
@@ -218,7 +262,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
         free(ii);
 
         // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-        retval += install_no_deps(currpkg, database, installed, 0, 1);
+        retval += install_no_deps(currpkg, database, 0, 1, NULL);
         
         // re-wire version variables
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
@@ -242,8 +286,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkg_update **upda
                 break;
             }
         }
-        nodelist->packages[i]->depends = pkg_deptypes;
-        retval += install_no_deps(nodelist->packages[i], database, installed, maninst, 0);
+        retval += install_no_deps(nodelist->packages[i], database, maninst, 0, &pkg_deptypes);
     }
 
     return retval;
@@ -268,7 +311,7 @@ int download_archive(struct package *dlpackage, int force) {
     struct stat st = {0};
 
     // initialize path
-    char path[strlen(INSTALLPREFIX)+45+strlen(dlpackage->name)];
+    char path[strlen(INSTALLPREFIX)+46+strlen(dlpackage->name)];
     strcpy(path, "");
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/kawafiles/");
@@ -418,14 +461,14 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     return 0;
 }
 
-int install_no_deps(struct package *currpkg, struct pkglist *database, struct pkglist *installed, int manual_installed, int is_update) {
+int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update, struct strarr_retval *deptypes) {
     int retval = 1;
 
     if (!is_update) {
         if (!strcmp(currpkg->type, "source"))
             retval = sourcepkg_install(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
-            retval = 0; // TODO: sourcepkg_install(patch=pkgname)
+            retval = patchpkg_install(currpkg);
         else if (!strcmp(currpkg->type, "meta"))
             retval = metapkg_install(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
@@ -434,7 +477,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, struct pk
         if (!strcmp(currpkg->type, "source"))
             retval = sourcepkg_update(currpkg);
         else if (!strcmp(currpkg->type, "patch"))
-            retval = 0; // TODO: sourcepkg_update(patch=pkgname)
+            retval = patchpkg_update(currpkg);
         else if (!strcmp(currpkg->type, "meta"))
             retval = metapkg_update(currpkg->name);
         else if (!strcmp(currpkg->type, "binary"))
@@ -442,7 +485,8 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, struct pk
     }
 
     if (!retval) {
-        add_db_entry(currpkg, manual_installed, database, installed);
+        if (!is_update)
+            add_db_entry(currpkg, manual_installed, database, deptypes);
     } else {
         fprintf(stderr, "\nThere were errors during the installation of %s. Aborting.\n", currpkg->name);
         exit(retval);
@@ -451,17 +495,18 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, struct pk
     return retval;
 }
 
-int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct pkglist *installed) {
+int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct strarr_retval *deptypes) {
     // TODO: Write Dependency Types to package->depends field
 
     // check if already in installed db, i.e. Installed.packages.db
     // that was parsed at program run does NOT contain package.
     // if it does, just return
-    int *i;
+    // NOTE: we check this earlier now, so this check has been removed
+    /*int *i;
     if (!(i = malloc(sizeof(int)))) malloc_fail();
     if (bsearch_pkg(package->name, installed, i, -1)) {
         return 0;
-    }
+    }*/
 
     // open file
     char indexpath[strlen(INSTALLPREFIX)+34];
@@ -479,7 +524,7 @@ int add_db_entry(struct package *package, int manual_installed, struct pkglist *
         strcpy(manual, "auto");
 
     // write entry
-    fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, database->repos->repos[*package->repoindex]->reponame, whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
+    fprintf(indexfile, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n", package->name, manual, package->version, package->archiveurl, database->repos->repos[*package->repoindex]->reponame, deptypes != NULL ? whitespace_join(*deptypes) : whitespace_join(package->depends), whitespace_join(package->conflicts), package->configurecmd, whitespace_join(package->configureopts), package->type, package->sepbuild, package->uninstallcmd, package->license, whitespace_join(package->scripts));
 
     fclose(indexfile);
     return 0;

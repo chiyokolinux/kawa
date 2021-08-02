@@ -19,11 +19,16 @@
 #include "patchpkg.h"
 
 int patchpkg_gen_kawafile(struct package *package) {
+    // ensure that target dir is present
+    kawafile_dir_create(package->depends.retval[0]);
+
     FILE *fp;
     int retval = 0;
 
     char path[strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name)];
     snprintf(path, strlen(INSTALLPREFIX)+34+strlen(package->depends.retval[0])+strlen(package->name), "%s/etc/kawa.d/kawafiles/%s/%s.patch.sh", INSTALLPREFIX, package->depends.retval[0], package->name);
+
+    puts(path);
 
     fp = fopen(path, "w");
 
@@ -32,10 +37,13 @@ int patchpkg_gen_kawafile(struct package *package) {
         exit(4);
     }
 
+    // TODO: make patch be gzipped, unpack that into
+    // package->configurecmd and then apply *that* patch file
     fprintf(fp, "#!/bin/sh\n"
                 "echo \"Applying %2$s ( %1$s )\"\n"
-                "patch %4$s %3$s\n", package->name, package->description,
-                package->configurecmd, whitespace_join(package->configureopts));
+                "patch %3$s -i $1/../%1$s/package.src.kawapkg\n",
+                package->name, package->description,
+                whitespace_join(package->configureopts)); // , package->configurecmd);
 
     if (fchmod(fileno(fp), S_IRWXU) != 0)
         perror("fchmod");
@@ -45,7 +53,7 @@ int patchpkg_gen_kawafile(struct package *package) {
     return retval;
 }
 
-int patchapkg_install(struct package *package) {
+int patchpkg_install(struct package *package) {
     int retval = 0;
     printf("Installing %s...", package->name);
     fflush(stdout);

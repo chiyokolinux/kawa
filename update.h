@@ -30,7 +30,7 @@
 #include "error.h"
 
 int update();
-int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist);
+int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist, struct strarr_retval pkg_deptypes);
 struct pkg_update *pkg_has_update(char pkgname[], struct pkglist *database, struct pkglist *installed);
 
 #endif // UPDATE_H

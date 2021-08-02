@@ -19,8 +19,6 @@
 #include "sourcepkg.h"
 
 int sourcepkg_gen_kawafile(struct package *package) {
-    kawafile_dir_create(package->name);
-    
     FILE *fp;
     int retval = 0;
 
@@ -85,8 +83,8 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "}\n"
                 "perform_install() {\n"
                 "    %3$s %4$s\n"
-                "    [ -f %7$s/do.build.sh ] && { %7$s/do.build.sh || die; } || make -j%2$s\n"
-                "    [ -f %7$s/do.install.sh ] && { %7$s/do.install.sh || die; } || make -j%2$s install\n"
+                "    [ -f %7$s/do.build.sh ] && { %7$s/do.build.sh || die; } || { make -j%2$s || die; }\n"
+                "    [ -f %7$s/do.install.sh ] && { %7$s/do.install.sh || die; } || { make -j%2$s install || die; }\n"
                 "    pushd %8$s\n"
                 "    find . -type f -print | cut -c 2- > %7$s/files.list\n"
                 "    cp -RT . %9$s/\n"
@@ -96,7 +94,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "do_install() {\n"
                 "    prepare_files\n"
                 "    [ -f %7$s/pre.install.sh ] && { %7$s/pre.install.sh || die; }\n"
-                "    find . -name \"*.patch.sh\" -exec {} \\;\n"
+                "    find %7$s -name \"*.patch.sh\" -exec {} %7$s \\;\n"
                 "    perform_install\n"
                 "    [ -f %7$s/post.install.sh ] && { %7$s/post.install.sh || die; }\n"
                 "    cleanup\n"
@@ -104,7 +102,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "}\n"
                 "do_remove() {\n"
                 "    prepare_files\n"
-                "    %5$s\n"
+                "    { %5$s || die; }\n"
                 "    cleanup\n"
                 "    return 0\n"
                 "}\n"

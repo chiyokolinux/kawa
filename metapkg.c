@@ -19,8 +19,6 @@
 #include "metapkg.h"
 
 int metapkg_gen_kawafile(char pkgname[]) {
-    kawafile_dir_create(pkgname);
-
     FILE *fp;
     int retval = 0;
 

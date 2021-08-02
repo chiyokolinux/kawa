@@ -51,6 +51,12 @@ int update() {
     if (!(nodelist = malloc(sizeof(struct pkglist) + sizeof(char) * database->pkg_count * 512))) malloc_fail();
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
+    struct package **patches;
+    if (!(patches = malloc(sizeof(char) * database->pkg_count * 256))) malloc_fail();
+    struct pkglist *patchlist;
+    if (!(patchlist = malloc(sizeof(struct pkglist) + 4))) malloc_fail();
+    patchlist->pkg_count = 0;
+    patchlist->packages = patches;
     int remote_i = 0;
     int updatec = 0;
 
@@ -93,36 +99,41 @@ int update() {
     }
     deptypes[++current_deptype] = 0;
 
+    struct strarr_retval pkg_deptypes = split_space(strdup(DEPTYPES));
+
     for (int i = 0; i < updatec; i++) {
         // TODO: pass deptype array from pkg deptype
-        resolve_recursive(nodelist, NULL, updatepkg[i]->name, database, installed, 0, &updatec, 0, 1, deptypes);
+        resolve_recursive(nodelist, NULL, patchlist, updatepkg[i]->name, "", database, installed, 0, &updatec, 0, 1, deptypes);
     }
     
-    printf("\nThe following packages can be updated:\n  ");
-    
+    printf("\nThe following packages will be updated:\n  ");
     for (int i = 0; i < updatec; i++) {
         printf("%s (%s -> %s) ", updatepkg[i]->name, updatepkg[i]->version_local, updatepkg[i]->version_remote);
     }
     
-    if (nodelist->pkg_count) {
-        printf("\n\nThe following packages will be installed:\n ");
+    if (nodelist->pkg_count || patchlist->pkg_count) {
+        printf("\nThe following packages will be installed:\n ");
+        for (int i = 0; i < patchlist->pkg_count; i++) {
+            printf(" %s", patchlist->packages[i]->name);
+        }
         for (int i = 0; i < nodelist->pkg_count; i++) {
             printf(" %s", nodelist->packages[i]->name);
         }
     }
-    
-    printf("\n\nDo you wish to install these updates now? [Y/n] ");
+
+    printf("\n\n%d package(s) will be installed, %d package(s) will be removed and %d package(s) will be updated.\n", nodelist->pkg_count + patchlist->pkg_count, 0, updatec);
+    printf("\n\nDo you wish to proceed? [Y/n] ");
     fflush(stdout);
     char response = getchar();
     if (response == 'n' || response == 'N')
         return 0;
     else if (response == 'y' || response == 'Y' || response == '\n')
-        return upgrade(updatepkg, updatec, database, installed, nodelist);
+        return upgrade(updatepkg, updatec, database, installed, nodelist, pkg_deptypes);
     else
         return 1;
 }
 
-int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist) {
+int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *database, struct pkglist *installed, struct pkglist *nodelist, struct strarr_retval pkg_deptypes) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
     int retval = 0, failc = 0;
 
@@ -174,7 +185,7 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
     // before updating, install all new dependencies
     for (int i = 0; i < nodelist->pkg_count; i++) {
         nodelist->packages[i]->depends = split_space(strdup(DEPTYPES));
-        retval += install_no_deps(nodelist->packages[i], database, installed, 0, 0);
+        retval += install_no_deps(nodelist->packages[i], database, 0, 0, &pkg_deptypes);
     }
     
     // install updates and re-wire version pointers
@@ -185,7 +196,7 @@ int upgrade(struct pkg_update *updpkglst[], int updatec, struct pkglist *databas
         currpkg = bsearch_pkg(updpkglst[i]->name, database, ii, 0);
         free(ii);
 
-        retval += install_no_deps(currpkg, database, installed, 0, 1);
+        retval += install_no_deps(currpkg, database, 0, 1, NULL);
 
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
             currpkg = installed->packages[i2];

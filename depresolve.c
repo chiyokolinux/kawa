@@ -26,21 +26,21 @@
  * it cannot handle dependency circles, that is up to
  * the packager to handle.
 **/
-void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], char *current, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates, unsigned int *dependency_types) {
+void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[], struct pkglist *patchlist, char *current, char *previous, struct pkglist *database, struct pkglist *installed, int depth, int *updatec, int force_install, int ignore_updates, unsigned int *dependency_types) {
     if (depth >= MAXDEPTH) {
-        printf("Error: maximum recursion depth of %d reached during dependency resolving.\n", MAXDEPTH);
+        printf("Error: maximum recursion depth of %d reached during dependency resolution.\n", MAXDEPTH);
         printf("This is most commonly caused by cyclic dependencies, please contact the maintainer of the package you want to install.\n");
         exit(-2);
     }
-    
+
     if (current[0] == '-')
         return;
-    
+
     struct package *currpkg;
     int *i = malloc(sizeof(int));
     currpkg = bsearch_pkg(current, database, i, depth);
 
-    int current_installed = 0;
+    int current_installed = 0, current_is_patch = !strcmp(currpkg->type, "patch");
     if (!force_install) {
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
             if (!strcmp(current, installed->packages[i2]->name)) {
@@ -50,17 +50,24 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
         }
     }
     check_package_source(currpkg, *i, database, installed, current_installed);
-    
-    if (current_installed && !ignore_updates) {
+
+    if (current_installed && !ignore_updates && updatepkgs != NULL) {
         struct pkg_update *pkgupdt = pkg_has_update(current, database, installed);
-        if (pkgupdt != NULL && updatepkgs != NULL) {
+        if (pkgupdt != NULL) {
             updatepkgs[*updatec] = pkgupdt;
             *updatec = *updatec + 1;
         }
     }
-    
+
     if (!currpkg->depends.retval[0][0] == '\0') {
-        for (int i2 = 0; i2 < currpkg->depends.retc; i2++) {
+        int i2 = 0;
+        // patch only for patch packages that are required by a
+        // package, other cyclic dependencies should always fail
+        // but this case is the only one allowed.
+        if (current_is_patch && !strcmp(currpkg->depends.retval[0], previous)) {
+            i2 = 1;
+        }
+        for (; i2 < currpkg->depends.retc; i2++) {
             int in_queue = 0, in_deptypes = 0;
             for (int i3 = 0; i3 < nodelist->pkg_count; i3++) {
                 if (!strcmp(currpkg->depends.retval[i2], nodelist->packages[i3]->name)) {
@@ -85,15 +92,22 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
                     in_deptypes |= (pkg_deptype == dependency_types[i5]);
                 }
             }
-            
+
             if (!in_queue && in_deptypes)
-                resolve_recursive(nodelist, updatepkgs, currpkg->depends.retval[i2], database, installed, depth + 1, updatec, force_install, ignore_updates, dependency_types);
+                resolve_recursive(nodelist, updatepkgs, patchlist, currpkg->depends.retval[i2], current, database, installed, depth + 1, updatec, (current_is_patch && (i2 == 0)) ? 2 : (force_install == 1 ? 1 : 0), ignore_updates, dependency_types);
+            // NOTE: we do force_install == 1 ? 1 : 0 because force = 2 should force the next package to be reinstalled but not its dependencies
         }
     }
-    
+
     if (!current_installed) {
-        nodelist->packages[nodelist->pkg_count] = currpkg;
-        nodelist->pkg_count++;
+        if (!current_is_patch) {
+            // not a patch package
+            nodelist->packages[nodelist->pkg_count] = currpkg;
+            nodelist->pkg_count++;
+        } else {
+            patchlist->packages[patchlist->pkg_count] = currpkg;
+            patchlist->pkg_count++;
+        }
     }
     return;
 }
