@@ -95,21 +95,23 @@ int metapkg_install(char pkgname[]) {
 }
 
 int metapkg_remove(struct package *package) {
-    // TODO: find a way to display removed deps in user dialog
-    int retval = 0;
-    printf("Removing %s...", package->name);
-    fflush(stdout);
-    for (int i = 0; i < package->depends.retc; i++) {
-        retval += kawafile_run(package->depends.retval[i], "remove");
-    }
-    printf(" Done\n");
-    return retval;
+    printf("Removing %s... Done", package->name);
+    return 0;
 }
 
 int metapkg_update(char pkgname[]) {
     // meta packages may update depends, but I don't care
     // not because I don't want to, but because I don't need to
     // that stuff is handled in the dependency resolver
-    printf("Updating %s... Done", pkgname);
-    return 0;
+    int retval = 0;
+    printf("Updating %s..", pkgname);
+    fflush(stdout);
+
+    retval += metapkg_gen_kawafile(pkgname);
+    printf(".");
+    fflush(stdout);
+    retval += kawafile_run(pkgname, "update");
+    printf(" Done\n");
+
+    return retval;
 }
