@@ -46,9 +46,9 @@ int update() {
     struct pkglist *installed = get_installed_packages();
     struct pkg_update *updatepkg[installed->pkg_count];
     struct package **packages;
-    if (!(packages = malloc(sizeof(char) * database->pkg_count * 512))) malloc_fail();
+    if (!(packages = malloc(sizeof(char) * database->pkg_count * 768))) malloc_fail();
     struct pkglist *nodelist;
-    if (!(nodelist = malloc(sizeof(struct pkglist) + sizeof(char) * database->pkg_count * 512))) malloc_fail();
+    if (!(nodelist = malloc(sizeof(struct pkglist) + 4))) malloc_fail();
     nodelist->pkg_count = 0;
     nodelist->packages = packages;
     struct package **patches;
