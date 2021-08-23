@@ -27,3 +27,4 @@ KAWA TODOs
 - post-install hooks
 - always install patches before everything
 - download retries DONE
+- hash download urls and symlink into kawafile dirs
