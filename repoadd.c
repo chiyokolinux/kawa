@@ -38,7 +38,7 @@ int repoadd(char reponame[], char repourl[]) {
 
         if (!fp) {
             perror("fopen");
-            return 3;
+            exit(3);
         }
 
         fprintf(fp, "%s %s\n", reponame, repourl);

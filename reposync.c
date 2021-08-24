@@ -43,7 +43,7 @@ int sync_repo(char reponame[], char repourl[]) {
 
         if (!indexfile) {
             perror("fopen");
-            return 3;
+            exit(3);
         }
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
@@ -80,7 +80,7 @@ int sync_all() {
 
     if (!fp) {
         perror("fopen");
-        return 3;
+        exit(3);
     }
 
     while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
@@ -113,7 +113,7 @@ int sync_repo_cli(char reponame_target[]) {
 
     if (!fp) {
         perror("fopen");
-        return 3;
+        exit(3);
     }
 
     while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
