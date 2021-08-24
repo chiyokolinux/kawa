@@ -26,7 +26,7 @@ int sync_repo(char reponame[], char repourl[]) {
     curl = curl_easy_init();
     if (curl) {
         /* curl did some caching of the repos, we don't want that */
-        char repourl_cachefix[strlen(repourl) + 20]; // 19 is max value length of unsigned long long, we add a ? so 20 chars max. added
+        char repourl_cachefix[strlen(repourl) + 22]; // 19 is max value length of unsigned long long, we add a ? so 20 chars max. added, plus one null byte and one safety byte
         strcpy(repourl_cachefix, "");
         sprintf(repourl_cachefix, "%s?%ld", repourl, (unsigned long)time(NULL));
         
@@ -40,6 +40,11 @@ int sync_repo(char reponame[], char repourl[]) {
         strcat(path, reponame);
         strcat(path, ".packages.db");
         FILE* indexfile = fopen(path, "w+");
+
+        if (!indexfile) {
+            perror("fopen");
+            return 3;
+        }
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, indexfile);
 
         res = curl_easy_perform(curl);
@@ -73,6 +78,11 @@ int sync_all() {
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
 
+    if (!fp) {
+        perror("fopen");
+        return 3;
+    }
+
     while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
         printf("Syncing Repo %s...\n", reponame);
         retval += sync_repo(reponame, repourl);
@@ -100,6 +110,11 @@ int sync_repo_cli(char reponame_target[]) {
     strcat(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/repos.conf");
     fp = fopen(path, "r");
+
+    if (!fp) {
+        perror("fopen");
+        return 3;
+    }
 
     while (fscanf(fp, "%126s %510s", reponame, repourl) != EOF) {
         int name_offset = strcmp(reponame, reponame_target);
