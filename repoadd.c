@@ -36,6 +36,11 @@ int repoadd(char reponame[], char repourl[]) {
         strcat(path, "/etc/kawa.d/repos.conf");
         fp = fopen(path, "a");
 
+        if (!fp) {
+            perror("fopen");
+            return 3;
+        }
+
         fprintf(fp, "%s %s\n", reponame, repourl);
         
         fclose(fp);
