@@ -21,5 +21,14 @@
 int makepackages() {
     printf("Running mkpackage.sh for every package in packages...  ");
     fflush(stdout);
-    return system("sp=\"/-\\|\"; sc=0; spin() { printf \"\\b${sp:sc++:1}\"; ((sc==${#sp})) && sc=0; }; endspin() { printf \"\\r%s\\n\" \"$@\"; }; echo \"Running mkpackage.sh for every package in packages...\" > Kawamake.log; for d in packages/*/; do spin; ${d}/mkpackage.sh >> Kawamake.log; done; endspin;");
+    return system("sp=\"/-\\|\"; sc=0; "
+                  "spin() { printf \"\\b${sp:sc++:1}\"; ((sc==${#sp})) && sc=0; }; "
+                  "endspin() { printf \"\\r%s\\n\" \"$@\"; }; "
+                  "echo \"Running mkpackage.sh for every package in packages...\" > Kawamake.log; "
+                  "for d in packages/*/; do "
+                  "spin; ${d}/mkpackage.sh >> Kawamake.log; "
+                  "git add ${d}; "
+                  "git commit -qm \"bump $(basename ${d}) to v$(sed -ne \"s/^VERSION=\\([a-zA-Z0-9._\\-]\\+\\)$/\\1/p\" ${d}/package.conf)\" > /dev/null 2>&1 && { ./mkdb.py > /dev/null 2>&1 && { git add packages.db && git commit -qm \"rebuild package database\" > /dev/null 2>&1; } || true; } || true; "
+                  "done; endspin; "
+                  "git add Kawamake.log && git commit -qm \"kawa makepackages\" > /dev/null 2>&1;");
 }
