@@ -27,5 +27,5 @@ KAWA TODOs
 - post-install hooks
 - always install patches before everything
 - download retries DONE
-- `pkg://` package archive reference scheme
+- `pkg://` package archive reference scheme DONE
 - backup config files
