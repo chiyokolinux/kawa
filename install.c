@@ -118,6 +118,8 @@ int install(int pkgc, char *pkgnames[]) {
                 nodelist->packages[nodelist->pkg_count] = currpkg;
                 nodelist->pkg_count++;
             }
+
+            free(i);
         }
     }
 
