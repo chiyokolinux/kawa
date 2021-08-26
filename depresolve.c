@@ -109,6 +109,8 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
             patchlist->pkg_count++;
         }
     }
+
+    free(i);
     return;
 }
 

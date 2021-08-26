@@ -297,14 +297,14 @@ int download_package(struct package *currpkg, struct pkglist *database, int is_u
     kawafile_dir_create(currpkg->name);
 
     // download package & scripts
-    if (download_archive(currpkg, is_update))
+    if (download_archive(currpkg, is_update, database))
         return 1;
     if (download_scripts(currpkg, database->repos->repos[*currpkg->repoindex]->baseurl))
         return 1;
     return 0;
 }
 
-int download_archive(struct package *dlpackage, int force) {
+int download_archive(struct package *dlpackage, int force, struct pkglist *database) {
     printf("Downloading %s...", dlpackage->name);
     fflush(stdout);
 
@@ -312,8 +312,7 @@ int download_archive(struct package *dlpackage, int force) {
 
     // initialize path
     char path[strlen(INSTALLPREFIX)+46+strlen(dlpackage->name)];
-    strcpy(path, "");
-    strcat(path, INSTALLPREFIX);
+    strcpy(path, INSTALLPREFIX);
     strcat(path, "/etc/kawa.d/kawafiles/");
     strcat(path, dlpackage->name);
     strcat(path, "/package.src.kawapkg");
@@ -322,6 +321,45 @@ int download_archive(struct package *dlpackage, int force) {
     if (stat(path, &st) != -1 && !force) {
         printf(" Done\n");
         return 0;
+    }
+
+    // package archive references
+    if (!strncmp(dlpackage->archiveurl, "pkg://", 6)) {
+        struct package *dlpackage_ref;
+        int *i;
+        if (!(i = malloc(sizeof(int)))) malloc_fail();
+        dlpackage_ref = bsearch_pkg(dlpackage->archiveurl + 6, database, i, 1);
+        free(i);
+
+        printf(" (reference to %s)\n", dlpackage_ref->name);
+
+        kawafile_dir_create(dlpackage_ref->name);
+        int retval = download_archive(dlpackage_ref, force, database);
+
+        char path_ref[26+strlen(dlpackage_ref->name)];
+        strcpy(path_ref, "../");
+        strcat(path_ref, dlpackage_ref->name);
+        strcat(path_ref, "/package.src.kawapkg");
+
+        struct stat st = {0};
+        if (stat(path, &st) != -1) {
+            if (!unlink(path)) {
+                perror("unlink");
+                return 1;
+            }
+        }
+
+        if (!symlink(path_ref, path)) {
+            // we haven't chdir'd to the "correct" directory
+            // so symlink wrongly interprets this as a danling link
+            // so we need to ignore ENOENT
+            if (errno != ENOENT) {
+                perror("symlink");
+                return 1;
+            }
+        }
+
+        return retval;
     }
 
     CURL *curl;
