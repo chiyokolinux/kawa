@@ -76,7 +76,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "}\n"
                 "cleanup() {\n"
                 "    cd %7$s\n"
-                "    rm -rf $(tar tf package.src.kawapkg | head -n1)\n"
+                "    rm -rf $(tar tf package.src.kawapkg | head -n1 | cut -d'/' -f1)\n"
                 "}\n"
                 "file_uninstall() {\n"
                 "    rm -f $(xargs -a %7$s/files.list)\n"
