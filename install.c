@@ -24,14 +24,19 @@ int install(int pkgc, char *pkgnames[]) {
     for (int i = 0; i < pkgc; i++) {
         if (!strcmp(pkgnames[i], "-D") || !strcmp(pkgnames[i], "--no-depends"))
             resolve_depends = 0;
-        if (!strcmp(pkgnames[i], "-S") || !strcmp(pkgnames[i], "--sync"))
+        else if (!strcmp(pkgnames[i], "-S") || !strcmp(pkgnames[i], "--sync"))
             sync_before_install = 1;
-        if (!strcmp(pkgnames[i], "-r") || !strcmp(pkgnames[i], "--reinstall") || !strcmp(pkgnames[i], "--force"))
+        else if (!strcmp(pkgnames[i], "-r") || !strcmp(pkgnames[i], "--reinstall") || !strcmp(pkgnames[i], "--force"))
             force_install = 1;
-        if (!strcmp(pkgnames[i], "-I") || !strcmp(pkgnames[i], "--ignore-updates"))
+        else if (!strcmp(pkgnames[i], "-I") || !strcmp(pkgnames[i], "--ignore-updates"))
             ignore_updates = 1;
-        if (!strcmp(pkgnames[i], "-N") || !strcmp(pkgnames[i], "--accept-nonfree"))
+        else if (!strcmp(pkgnames[i], "-N") || !strcmp(pkgnames[i], "--accept-nonfree"))
             accept_nonfree = 1;
+        else if (strlen(pkgnames[i]) >= 1)
+            if (pkgnames[i][0] == '-') {
+                fprintf(stderr, "Unrecognized option: %s\n", pkgnames[i]);
+                exit(7);
+            }
     }
     if (sync_before_install)
         sync_all();
