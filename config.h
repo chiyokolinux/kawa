@@ -49,4 +49,11 @@
 // if you care about the exact number.
 #define MAXDOWNLOADRETRY 2
 
+// packages where kawa will show a big huge warning before uninstalling
+// this will be handled by (direct and indirect) dependencies of the
+// package "chiyoko-base" (pkg name will then be configurable here) in
+// the future, but for now, we have a kind of package must-have-list
+// MUST end with NULL; otherwise kawa will segfault on remove!!
+#define ESSENTIALPACKAGES (const char*[11]){ "linux", "linux-headers", "ichirou", "kanrisha", "kawa", "glibc", "gcc", "cbsh", "bash", "curl", NULL }
+
 #endif // CONFIG_H

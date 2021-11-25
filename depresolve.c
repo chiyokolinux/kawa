@@ -80,7 +80,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
             unsigned int pkg_deptype = 0;
             int i4 = 0;
 
-            for (; current[i4] != '\0' && current[i4] != ':'; i4++) {
+            for (; current[i4] != '\0' && current[i4] != ':' && i4 < 4; i4++) {
                 pkg_deptype |= current[i4] << (i4 * 8);
             }
 
@@ -98,6 +98,7 @@ void resolve_recursive(struct pkglist *nodelist, struct pkg_update *updatepkgs[]
             // NOTE: we do force_install == 1 ? 1 : 0 because force = 2 should force the next package to be reinstalled but not its dependencies
         }
     }
+    // TODO: There is *still* no conflict checking done here. Fix that!
 
     if (!current_installed) {
         if (!current_is_patch) {

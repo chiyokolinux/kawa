@@ -36,7 +36,31 @@ int pkg_remove(int pkgc, char *pkgnames[]) {
             return 1;
         }
     }
-    
+
+    char has_essential = 0;
+    char *first_essential = NULL;
+    for (int i = 2; i < pkgc; i++) {
+        for (int i2 = 0; ESSENTIALPACKAGES[i2] != NULL; i2++) {
+            if (!strcmp(pkgnames[i], ESSENTIALPACKAGES[i2])) {
+                has_essential = 1;
+                first_essential = pkgnames[i];
+                break;
+            }
+        }
+        if (has_essential)
+            break;
+    }
+    if (has_essential) {
+        printf("\nAttempted to remove essential package %s.\nThis is a VERY dangerous action that will leave you with something anywhere from a major headache to a bricked system. To confirm that you are okay with this and know exactly what you are doing, please type \"Yes, please perform this dangerous action.\" and press Enter.\n>>> ", first_essential);
+        fflush(stdout);
+        char input[46];
+        fgets(input, 46, stdin);
+        if (strcmp(input, "Yes, please perform this dangerous action.\n")) {
+            printf("Non-confirmative input received. Aborting.\n");
+            exit(0);
+        }
+    }
+
     printf("\nThe following packages will be removed:\n ");
     for (int i = 2; i < pkgc; i++) {
         printf(" %s", pkgnames[i]);
