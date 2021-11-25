@@ -104,7 +104,9 @@ struct strarr_retval split_space(char to_split[]) {
     if (!(retval = malloc(sizeof(char *) * (spacecount + 1)))) malloc_fail();
     
     // end at newline
-    size_t ln = strlen(p) - 1;
+    ssize_t ln = strlen(p) - 1;
+    if (ln < 0) // underflow protection
+        ln = 0;
     if (p[ln] == '\n' || p[ln] == '\r')  // for CRLF
         p[ln] = '\0';
     
@@ -208,7 +210,7 @@ struct pkglist *get_all_packages() {
 
     int currepoidx = 0;
     struct repository **repos;
-    if (!(repos = malloc(sizeof(struct repository*)))) malloc_fail();
+    if (!(repos = malloc(sizeof(struct repository*) * 8))) malloc_fail();
 
     FILE *fp;
     char reponame[127];
@@ -232,11 +234,18 @@ struct pkglist *get_all_packages() {
         fflush(stdout);
         struct pkglist *currepo = get_packages_from_repo(reponame, currepoidx);
 
+        // realloc more space if needed
+        if (currepoidx % 8 == 0 && currepoidx > 0) {
+            if (!(repos = realloc(repos, sizeof(struct repository*) * (currepoidx + 8)))) malloc_fail();
+        }
+
         // set repolist variables
         if (!(repos[currepoidx] = malloc(sizeof(struct repository*) + sizeof(struct repository)))) malloc_fail();
+        char *baseurl = str_replace(repourl, "packages.db", "");
         strcpy(repos[currepoidx]->reponame, reponame);
         strcpy(repos[currepoidx]->repourl, repourl);
-        strcpy(repos[currepoidx]->baseurl, str_replace(repourl, "packages.db", "")); // TODO: free this after copying
+        strcpy(repos[currepoidx]->baseurl, baseurl);
+        free(baseurl);
 
         // append packages to pkglist
         printf(" Read %d packages\n", currepo->pkg_count);

@@ -377,6 +377,7 @@ int download_archive(struct package *dlpackage, int force, struct pkglist *datab
         // archiveurl variable parsing (very simple)
         char *archiveurl_version_replaced = str_replace(dlpackage->archiveurl, "${VERSION}", dlpackage->version);
         char *archiveurl_name_replaced = str_replace(archiveurl_version_replaced, "${NAME}", dlpackage->name);
+        free(archiveurl_version_replaced);
         curl_easy_setopt(curl, CURLOPT_URL, archiveurl_name_replaced);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
@@ -406,6 +407,7 @@ int download_archive(struct package *dlpackage, int force, struct pkglist *datab
 
         curl_easy_cleanup(curl);
         fclose(indexfile);
+        free(archiveurl_name_replaced);
     } else {
         fprintf(stderr, "\nDownloading package %s failed: Cannot create cURL object\n", dlpackage->name);
         return 3;
