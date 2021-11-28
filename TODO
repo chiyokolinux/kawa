@@ -29,3 +29,5 @@ KAWA TODOs
 - download retries DONE
 - `pkg://` package archive reference scheme DONE
 - backup config files
+- download progress
+- option to hide compilation output
