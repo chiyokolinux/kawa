@@ -109,6 +109,7 @@ int sourcepkg_gen_kawafile(struct package *package) {
                 "do_update() {\n"
                 "    prepare_files\n"
                 "    [[ -f %7$s/pre.update.sh ]] && { %7$s/pre.update.sh || die; }\n"
+                "    find %7$s -name \"*.patch.sh\" -exec {} %7$s \\;\n"
                 "    perform_install\n"
                 "    [[ -f %7$s/post.update.sh ]] && { %7$s/post.update.sh || die; }\n"
                 "    cleanup\n"
