@@ -34,4 +34,4 @@ KAWA TODOs
 - kawa bootstrap to init fs files
 - kawa merge (new & improved vfs merger)
 - git integration for kawa merge (set up using kawa bootstrap) to version config files?
-- there are some problems with duplication in Installed.packages.db (is this still reproducible? how?)
+- there are some problems with duplication in Installed.packages.db (is this still reproducible? how?) DONE
