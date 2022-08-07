@@ -257,7 +257,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkglist *patchlis
                 break;
             }
         }
-        retval += install_no_deps(patchlist->packages[i], database, maninst, 0, &pkg_deptypes);
+        retval += install_no_deps(patchlist->packages[i], database, installed, maninst, 0, &pkg_deptypes);
     }
 
     // then, update packages
@@ -269,7 +269,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkglist *patchlis
         free(ii);
 
         // because we're updating, nothing's being changed anyways, so we can just leave manual_installed be false.
-        retval += install_no_deps(currpkg, database, 0, 1, NULL);
+        retval += install_no_deps(currpkg, database, installed, 0, 1, NULL);
         
         // re-wire version variables
         for (int i2 = 0; i2 < installed->pkg_count; i2++) {
@@ -293,7 +293,7 @@ int download_install_packages(struct pkglist *nodelist, struct pkglist *patchlis
                 break;
             }
         }
-        retval += install_no_deps(nodelist->packages[i], database, maninst, 0, &pkg_deptypes);
+        retval += install_no_deps(nodelist->packages[i], database, installed, maninst, 0, &pkg_deptypes);
     }
 
     return retval;
@@ -508,7 +508,7 @@ int download_scripts(struct package *dlpackage, char *baseurl) {
     return 0;
 }
 
-int install_no_deps(struct package *currpkg, struct pkglist *database, int manual_installed, int is_update, struct strarr_retval *deptypes) {
+int install_no_deps(struct package *currpkg, struct pkglist *database, struct pkglist *installed, int manual_installed, int is_update, struct strarr_retval *deptypes) {
     int retval = 1;
 
     if (!is_update) {
@@ -533,7 +533,7 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
 
     if (!retval) {
         if (!is_update)
-            add_db_entry(currpkg, manual_installed, database, deptypes);
+            add_db_entry(currpkg, manual_installed, database, installed, deptypes);
     } else {
         fprintf(stderr, "\nThere were errors during the installation of %s. Aborting.\n", currpkg->name);
         exit(retval);
@@ -542,18 +542,19 @@ int install_no_deps(struct package *currpkg, struct pkglist *database, int manua
     return retval;
 }
 
-int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct strarr_retval *deptypes) {
+int add_db_entry(struct package *package, int manual_installed, struct pkglist *database, struct pkglist *installed, struct strarr_retval *deptypes) {
     // TODO: Write Dependency Types to package->depends field
 
     // check if already in installed db, i.e. Installed.packages.db
     // that was parsed at program run does NOT contain package.
     // if it does, just return
     // NOTE: we check this earlier now, so this check has been removed
-    /*int *i;
+    // NOTE: this breaks with force installation though
+    int *i;
     if (!(i = malloc(sizeof(int)))) malloc_fail();
     if (bsearch_pkg(package->name, installed, i, -1)) {
         return 0;
-    }*/
+    }
 
     // open file
     char indexpath[strlen(INSTALLPREFIX)+34];
