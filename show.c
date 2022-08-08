@@ -27,10 +27,14 @@ int show(char pkgname[]) {
     if (!(i = malloc(sizeof(int)))) malloc_fail();
     currpkg = bsearch_pkg(pkgname, database, i, 0);
 
-    char package_installed[4] = "no";
+    char package_installed[16] = "no";
     for (int i2 = 0; i2 < installed->pkg_count; i2++) {
         if (!strcmp(pkgname, installed->packages[i2]->name)) {
-            strcpy(package_installed, "yes");
+            if (!strcmp("auto", installed->packages[i2]->description)) {
+                strcpy(package_installed, "yes (automatic)");
+            } else {
+                strcpy(package_installed, "yes (manual)");
+            }
             break;
         }
     }
